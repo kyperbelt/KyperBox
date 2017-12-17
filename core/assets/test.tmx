@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" tiledversion="2017.07.25" orientation="orthogonal" renderorder="right-down" width="27" height="20" tilewidth="48" tileheight="48" nextobjectid="28">
+ <properties>
+  <property name="atlas" value="image/game.atlas"/>
+ </properties>
+ <tileset firstgid="1" name="back_up" tilewidth="84" tileheight="38" tilecount="1" columns="0">
+  <grid orientation="orthogonal" width="1" height="1"/>
+  <tile id="0">
+   <image width="84" height="38" source="../../input_assets/game/back_up.png"/>
+  </tile>
+ </tileset>
+ <tileset firstgid="2" name="bomb" tilewidth="58" tileheight="24" tilecount="1" columns="0">
+  <grid orientation="orthogonal" width="1" height="1"/>
+  <tile id="0">
+   <image width="58" height="24" source="../../input_assets/game/bomb.png"/>
+  </tile>
+ </tileset>
+ <tileset firstgid="3" name="buy_up" tilewidth="84" tileheight="38" tilecount="1" columns="0">
+  <grid orientation="orthogonal" width="1" height="1"/>
+  <tile id="0">
+   <image width="84" height="38" source="../../input_assets/game/buy_up.png"/>
+  </tile>
+ </tileset>
+ <tileset firstgid="4" name="exit_up" tilewidth="84" tileheight="38" tilecount="1" columns="0">
+  <grid orientation="orthogonal" width="1" height="1"/>
+  <tile id="0">
+   <image width="84" height="38" source="../../input_assets/game/exit_up.png"/>
+  </tile>
+ </tileset>
+ <tileset firstgid="5" name="play_up" tilewidth="84" tileheight="38" tilecount="1" columns="0">
+  <grid orientation="orthogonal" width="1" height="1"/>
+  <tile id="0">
+   <image width="84" height="38" source="../../input_assets/game/play_up.png"/>
+  </tile>
+ </tileset>
+ <tileset firstgid="6" name="shoes" tilewidth="65" tileheight="25" tilecount="1" columns="0">
+  <grid orientation="orthogonal" width="1" height="1"/>
+  <tile id="0">
+   <image width="65" height="25" source="../../input_assets/game/shoes.png"/>
+  </tile>
+ </tileset>
+ <tileset firstgid="7" name="upgrades" tilewidth="159" tileheight="34" tilecount="1" columns="0">
+  <grid orientation="orthogonal" width="1" height="1"/>
+  <tile id="0">
+   <image width="159" height="34" source="../../input_assets/game/upgrades.png"/>
+  </tile>
+ </tileset>
+ <objectgroup name="background"/>
+ <objectgroup name="playground"/>
+ <objectgroup name="foreground"/>
+ <objectgroup name="uiground">
+  <object id="4" name="playbutton" type="ImageButton" gid="5" x="670.903" y="704.619" width="192" height="86" rotation="24.2516">
+   <properties>
+    <property name="downImage" value="play_down"/>
+    <property name="pressedXOff" type="float" value="5"/>
+    <property name="pressedYOff" type="float" value="-5"/>
+    <property name="upImage" value="play_up"/>
+   </properties>
+  </object>
+  <object id="3" name="test_table" type="Table" x="48" y="336" width="432" height="480">
+   <properties>
+    <property name="background" value="windowbackground"/>
+    <property name="children" value="upgrades,bombimage,shoesimage,exitbutton,buy2,buy1"/>
+    <property name="ninepatch" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="6" name="bombimage" type="Image" gid="2" x="93.8481" y="537.694" width="122.667" height="72">
+   <properties>
+    <property name="image" value="bomb"/>
+   </properties>
+  </object>
+  <object id="7" name="shoesimage" type="Image" gid="6" x="93.8911" y="659.056" width="144" height="72">
+   <properties>
+    <property name="image" value="shoes"/>
+   </properties>
+  </object>
+  <object id="8" name="exitbutton" type="ImageButton" gid="4" x="200.961" y="795.366" width="144" height="86">
+   <properties>
+    <property name="downImage" value="exit_down"/>
+    <property name="pressedXOff" type="float" value="-3"/>
+    <property name="pressedYOff" type="float" value="-3"/>
+    <property name="upImage" value="exit_up"/>
+   </properties>
+  </object>
+  <object id="10" name="buy2" type="ImageButton" gid="3" x="321.553" y="521.938" width="96" height="48">
+   <properties>
+    <property name="downImage" value="buy_down"/>
+    <property name="upImage" value="buy_up"/>
+   </properties>
+  </object>
+  <object id="12" name="buy1" type="ImageButton" gid="3" x="325.278" y="630.717" width="96" height="48">
+   <properties>
+    <property name="downImage" value="buy_down"/>
+    <property name="upImage" value="buy_up"/>
+   </properties>
+  </object>
+  <object id="13" name="upgrades" type="Image" gid="7" x="147.571" y="435.135" width="240" height="82">
+   <properties>
+    <property name="image" value="upgrades"/>
+   </properties>
+  </object>
+  <object id="16" name="test_label" type="Label" x="672" y="432" width="240" height="144">
+   <properties>
+    <property name="color" type="color" value="#ffffffff"/>
+    <property name="font" value="gamefont"/>
+    <property name="text" value="This is a test label! [RED]testing wrap []lolololol cholololol"/>
+    <property name="wrap" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="20" name="test_button" type="TextButton" x="528" y="624" width="96" height="48">
+   <properties>
+    <property name="bg_down" value="button_down"/>
+    <property name="bg_hover" value="button_up"/>
+    <property name="bg_up" value="button_up"/>
+    <property name="font" value="gamefont"/>
+    <property name="font_scale_x" type="float" value="1"/>
+    <property name="font_scale_y" type="float" value="1"/>
+    <property name="ninepatch" type="bool" value="true"/>
+    <property name="pressedXOff" type="float" value="-5"/>
+    <property name="pressedYOff" type="float" value="-5"/>
+    <property name="text" value="PLAY"/>
+   </properties>
+  </object>
+  <object id="25" name="test_progressbar" type="ProgressBar" x="960" y="432" width="48" height="384">
+   <properties>
+    <property name="background" value="redtexture"/>
+    <property name="knob_after" value=""/>
+    <property name="knob_before" value="greentexture"/>
+    <property name="max" type="float" value="100"/>
+    <property name="min" type="float" value="0"/>
+    <property name="step_size" type="float" value="1"/>
+    <property name="vertical" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="26" name="test_progressbar2" type="ProgressBar" x="432" y="816" width="576" height="48">
+   <properties>
+    <property name="background" value="redtexture"/>
+    <property name="knob_after" value=""/>
+    <property name="knob_before" value="greentexture"/>
+    <property name="max" type="float" value="1"/>
+    <property name="min" type="float" value="0"/>
+    <property name="step_size" type="float" value="0.01"/>
+    <property name="vertical" type="bool" value="false"/>
+   </properties>
+  </object>
+  <object id="27" name="test_progressbar3" type="ProgressBar" x="432" y="864" width="576" height="48">
+   <properties>
+    <property name="background" value="redtexture"/>
+    <property name="flipped" type="bool" value="true"/>
+    <property name="knob_after" value=""/>
+    <property name="knob_before" value="greentexture"/>
+    <property name="max" type="float" value="100"/>
+    <property name="min" type="float" value="0"/>
+    <property name="step_size" type="float" value="1"/>
+    <property name="vertical" type="bool" value="false"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="preload" locked="1">
+  <object id="1" name="ScreenSize" type="Viewport" x="0" y="240" width="1280" height="720"/>
+  <object id="14" name="default48" type="Font" x="-96" y="192" width="48" height="48">
+   <properties>
+    <property name="font_file" value="Impact48.fnt"/>
+   </properties>
+  </object>
+  <object id="18" name="gamefont" type="Font" x="-96" y="288" width="48" height="48">
+   <properties>
+    <property name="font_file" value="freesiaUPC38.fnt"/>
+    <property name="markup" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="19" name="buttonfont" type="Font" x="-96" y="384" width="48" height="48">
+   <properties>
+    <property name="font_file" value="pricedownBI48.fnt"/>
+    <property name="markup" type="bool" value="true"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>

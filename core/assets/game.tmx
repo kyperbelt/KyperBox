@@ -1,0 +1,488 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" tiledversion="2017.07.25" orientation="orthogonal" renderorder="right-down" width="100" height="30" tilewidth="32" tileheight="32" nextobjectid="43">
+ <properties>
+  <property name="atlas" value="image/game.atlas"/>
+ </properties>
+ <tileset firstgid="1" name="back_up" tilewidth="84" tileheight="38" tilecount="1" columns="0">
+  <grid orientation="orthogonal" width="1" height="1"/>
+  <tile id="0">
+   <image width="84" height="38" source="../../input_assets/game/back_up.png"/>
+  </tile>
+ </tileset>
+ <tileset firstgid="2" name="bomb" tilewidth="58" tileheight="24" tilecount="1" columns="0">
+  <grid orientation="orthogonal" width="1" height="1"/>
+  <tile id="0">
+   <image width="58" height="24" source="../../input_assets/game/bomb.png"/>
+  </tile>
+ </tileset>
+ <tileset firstgid="3" name="buy_up" tilewidth="84" tileheight="38" tilecount="1" columns="0">
+  <grid orientation="orthogonal" width="1" height="1"/>
+  <tile id="0">
+   <image width="84" height="38" source="../../input_assets/game/buy_up.png"/>
+  </tile>
+ </tileset>
+ <tileset firstgid="4" name="exit_up" tilewidth="84" tileheight="38" tilecount="1" columns="0">
+  <grid orientation="orthogonal" width="1" height="1"/>
+  <tile id="0">
+   <image width="84" height="38" source="../../input_assets/game/exit_up.png"/>
+  </tile>
+ </tileset>
+ <tileset firstgid="5" name="play_up" tilewidth="84" tileheight="38" tilecount="1" columns="0">
+  <grid orientation="orthogonal" width="1" height="1"/>
+  <tile id="0">
+   <image width="84" height="38" source="../../input_assets/game/play_up.png"/>
+  </tile>
+ </tileset>
+ <tileset firstgid="6" name="shoes" tilewidth="65" tileheight="25" tilecount="1" columns="0">
+  <grid orientation="orthogonal" width="1" height="1"/>
+  <tile id="0">
+   <image width="65" height="25" source="../../input_assets/game/shoes.png"/>
+  </tile>
+ </tileset>
+ <tileset firstgid="7" name="upgrades" tilewidth="159" tileheight="34" tilecount="1" columns="0">
+  <grid orientation="orthogonal" width="1" height="1"/>
+  <tile id="0">
+   <image width="159" height="34" source="../../input_assets/game/upgrades.png"/>
+  </tile>
+ </tileset>
+ <tileset firstgid="8" name="SunsetTempleBackground" tilewidth="640" tileheight="360" tilecount="1" columns="0">
+  <grid orientation="orthogonal" width="1" height="1"/>
+  <tile id="0">
+   <image width="640" height="360" source="../../input_assets/game/SunsetTempleBackground.png"/>
+  </tile>
+ </tileset>
+ <tileset firstgid="9" name="player_walking_0" tilewidth="32" tileheight="32" tilecount="1" columns="0">
+  <grid orientation="orthogonal" width="1" height="1"/>
+  <tile id="0">
+   <image width="32" height="32" source="../../input_assets/game/player_walking_0.png"/>
+  </tile>
+ </tileset>
+ <tileset firstgid="10" name="TempleTIles" tilewidth="32" tileheight="32" tilecount="221" columns="17">
+  <image source="../../input_assets/game/TempleTIles.png" width="544" height="416"/>
+  <tile id="76">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="77">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="78">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="79">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="80">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="81">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="82">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="83">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="102">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+     <property name="type" type="int" value="1"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="103">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="104">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="105">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="106">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="107">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="110">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="111">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="112">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="113">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="114">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="115">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="120">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="121">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="122">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="123">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="124">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="127">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="128">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="129">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="130">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="131">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="132">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="136">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="137">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="138">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="139">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="140">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="141">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="153">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="154">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="155">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="156">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="157">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="158">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="170">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="171">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="172">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="173">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="174">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="175">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="187">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="188">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="189">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="190">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="191">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="192">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+ </tileset>
+ <objectgroup name="background">
+  <object id="39" name="cloud_background" type="ScrollingBackground" gid="8" x="-336" y="1104" width="1920" height="1056">
+   <properties>
+    <property name="image" value="SunsetTempleBackground"/>
+    <property name="repeat_horizontal" type="bool" value="true"/>
+    <property name="repeat_vertical" type="bool" value="false"/>
+    <property name="speed_horizontal" type="float" value="-50"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="playground">
+  <object id="40" name="player_1" type="PlatformerObject" gid="9" x="288" y="336" width="96" height="96"/>
+  <object id="41" name="object" type="BasicGameObject" x="384" y="480" width="96" height="96">
+   <properties>
+    <property name="sprite" value="windowbackground"/>
+   </properties>
+  </object>
+  <object id="42" name="platformer_tiles" type="TilemapLayerObject" x="0" y="928" width="32" height="32">
+   <properties>
+    <property name="tile_layer" value="platformer_tiles"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <layer name="platformer_tiles" width="100" height="30">
+  <data encoding="base64" compression="zlib">
+   eJzt1sEJgDAQRNG0rKYBW7AFW7BAvQiuB/HkfOQ/yEHIYYlkJq2JYk4PoGJJD6BiTQ+gYksPoMK8YjGvWMwrFt+7LPYHi/3BYn+w2B8s9geL/cFif7DYHyz2B4v9wWJ/sNgfLPYHi/eDxfvB4vuKxfcVi3nFYl6xnHk1fLDGY00v91339x9/38+mP/wrZewwtD0K
+  </data>
+ </layer>
+ <objectgroup name="foreground"/>
+ <objectgroup name="uiground">
+  <object id="28" name="bomb" type="Image" gid="2" x="528" y="384" width="288" height="120">
+   <properties>
+    <property name="image" value="bomb"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="preload" locked="1">
+  <object id="1" name="ScreenSize" type="Viewport" x="0" y="240" width="1280" height="720"/>
+ </objectgroup>
+</map>

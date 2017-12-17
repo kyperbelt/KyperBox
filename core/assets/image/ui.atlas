@@ -1,0 +1,97 @@
+
+ui.png
+size: 1024,64
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+back_down
+  rotate: false
+  xy: 160, 19
+  size: 84, 38
+  orig: 84, 38
+  offset: 0, 0
+  index: -1
+back_up
+  rotate: false
+  xy: 246, 19
+  size: 84, 38
+  orig: 84, 38
+  offset: 0, 0
+  index: -1
+bomb
+  rotate: false
+  xy: 848, 36
+  size: 52, 21
+  orig: 58, 24
+  offset: 3, 1
+  index: -1
+buy_down
+  rotate: false
+  xy: 332, 19
+  size: 84, 38
+  orig: 84, 38
+  offset: 0, 0
+  index: -1
+buy_up
+  rotate: false
+  xy: 418, 19
+  size: 84, 38
+  orig: 84, 38
+  offset: 0, 0
+  index: -1
+dash
+  rotate: false
+  xy: 64, 2
+  size: 49, 21
+  orig: 52, 23
+  offset: 1, 1
+  index: -1
+exit_down
+  rotate: false
+  xy: 504, 19
+  size: 84, 38
+  orig: 84, 38
+  offset: 0, 0
+  index: -1
+exit_up
+  rotate: false
+  xy: 590, 19
+  size: 84, 38
+  orig: 84, 38
+  offset: 0, 0
+  index: -1
+play_down
+  rotate: false
+  xy: 676, 19
+  size: 84, 38
+  orig: 84, 38
+  offset: 0, 0
+  index: -1
+play_up
+  rotate: false
+  xy: 762, 19
+  size: 84, 38
+  orig: 84, 38
+  offset: 0, 0
+  index: -1
+shoes
+  rotate: false
+  xy: 2, 2
+  size: 60, 21
+  orig: 65, 25
+  offset: 2, 3
+  index: -1
+upgrade
+  rotate: false
+  xy: 902, 21
+  size: 22, 36
+  orig: 22, 36
+  offset: 0, 0
+  index: -1
+upgrades
+  rotate: false
+  xy: 2, 25
+  size: 156, 32
+  orig: 159, 34
+  offset: 2, 1
+  index: -1

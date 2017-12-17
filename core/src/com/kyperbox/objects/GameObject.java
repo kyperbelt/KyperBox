@@ -1,0 +1,201 @@
+package com.kyperbox.objects;
+
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.maps.MapProperties;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
+import com.kyperbox.GameState;
+import com.kyperbox.KyperBoxGame;
+import com.kyperbox.controllers.GameObjectController;
+
+public abstract class GameObject extends Group{
+	
+	public static final String NO_SPRITE = "NO_SPRITE_RENDERED";
+	
+	private GameLayer layer;
+	private String sprite;
+	private Array<GameObjectController> controllers;
+	private MapProperties properties;
+	private Vector2 velocity;
+	private Rectangle bounds;
+	private Rectangle ret_bounds;
+	private Color debug_bounds;
+	private boolean flip_x;
+	private boolean flip_y;
+	
+	public GameObject() {
+		controllers = new Array<GameObjectController>();
+		sprite = NO_SPRITE;
+		velocity = new Vector2();
+		setOrigin(Align.center);
+		debug_bounds = Color.YELLOW;
+		flip_x = false;
+		flip_y = false;
+	}
+	
+	public boolean getFlipX() {
+		return flip_x;
+	}
+	
+	public boolean getFlipY() {
+		return flip_y;
+	}
+	
+	public void setFlip(boolean flip_x,boolean flip_y) {
+		this.flip_x = flip_x;
+		this.flip_y = flip_y;
+	}
+	
+	public void setBounds(float x,float y,float w,float h) {
+		bounds.set(x, y, w, h);
+	}
+	
+	public Rectangle getBounds() {
+		ret_bounds.set(getX()+bounds.x, getY()+bounds.y, bounds.width, bounds.height);;
+		return ret_bounds;
+	}
+	
+	public void setDebugBoundsColor(Color color) {
+		this.debug_bounds = color;
+	}
+	
+	@Override
+	public void drawDebug(ShapeRenderer shapes) {
+		shapes.setColor(debug_bounds);
+		Rectangle b = getBounds();
+		shapes.rect(b.x, b.y, b.width, b.height);
+		super.drawDebug(shapes);
+	}
+	
+	public void setVelocity(float x,float y) {
+		velocity.set(x,y);
+	}
+	
+	public Vector2 getVelocity() {
+		return velocity;
+	}
+	
+	public void addChild(GameObject child) {
+		addActor(child);
+	}
+	
+	@Override
+	public void addActor(Actor actor) {
+		if(!(actor instanceof GameObject)) {
+			getState().log("unable to add ["+actor.getName()+"] to ["+getName()+"]. Only GameObjects can be children of GameObjects");
+			return;
+		}
+		super.addActor(actor);
+	}
+	
+	public <t>t getController(Class<t> type) {
+		for(GameObjectController manager:controllers)
+			if(type.isInstance(manager))
+				return type.cast(manager);
+		return null;
+	}
+	
+	public MapProperties getProperties() {
+		return properties;
+	}
+	
+	public void init(MapProperties properties) {
+		this.properties = properties;
+		bounds = new Rectangle(0, 0, getWidth(), getHeight());
+		ret_bounds = new Rectangle(bounds);
+	}
+	
+	public Array<GameObjectController> getControllers(){return controllers;}
+	
+	public void update(float delta) {
+		//TODO: overrride
+		for(int i = 0;i < controllers.size;i++)
+			controllers.get(i).update(this, delta);
+		setPosition(getX()+velocity.x*delta, getY()+velocity.y*delta);
+	}
+	
+	@Override
+	public void act(float delta) {
+		// TODO Auto-generated method stub
+		update(delta);
+		super.act(delta);
+	}
+	
+	public void onRemove() {
+		//TODO:override
+		for(GameObjectController controller:controllers)
+			controller.remove(this);
+		controllers.clear();
+	}
+	
+	protected void setGameLayer(GameLayer layer) {
+		this.layer = layer;
+	}
+	
+	public void setSprite(String sprite) {
+		this.sprite = sprite;
+	}
+	
+	public void addGameObjectController(GameObjectController controller) {
+		if(getController(controller.getClass())!=null) {
+			layer.getState().error("Cannot add type ["+controller.getClass().getName()+"] more than once.");
+		}
+		controllers.add(controller);
+		controllers.sort(layer.getState().getGame().getPriorityComperator());
+		controller.init(this);
+	}
+	
+	@Override
+	public void draw(Batch batch, float parentAlpha) {
+		if(sprite!=null&&!sprite.isEmpty()&&!sprite.equals(NO_SPRITE)) {
+			Sprite render = layer.getGameSprite(sprite);
+			render.setPosition(getX(),getY());
+			render.setRotation(getRotation());
+			render.setAlpha(getColor().a*parentAlpha);
+			render.setOrigin(getOriginX(), getOriginY());
+			render.setColor(getColor());
+			render.setSize(getWidth(), getHeight());
+			render.setScale(getScaleX(), getScaleY());
+			render.setFlip(flip_x, flip_y);
+			render.draw(batch);
+		}
+		super.draw(batch, parentAlpha);
+	}
+	
+	/**
+	 * get the game layer this object belongs to
+	 * @return
+	 */
+	public GameLayer getGameLayer() {
+		return layer;
+	}
+	
+	public KyperBoxGame getGame() {
+		return getState().getGame();
+	}
+	
+	public GameState getState() {
+		return layer.getState();
+	}
+	
+	@Override
+	public boolean remove() {
+		layer = null;
+		onRemove();
+		return super.remove();
+	}
+
+	public static enum GameObjectChangeType{
+		MANAGER,
+		LOCATION,
+		NAME,
+		FOLLOW_BOUNDS_REACHED
+	}
+}

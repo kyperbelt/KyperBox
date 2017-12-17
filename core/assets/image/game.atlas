@@ -1,0 +1,293 @@
+
+game.png
+size: 2048,1024
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+Impact48
+  rotate: false
+  xy: 2, 499
+  size: 512, 512
+  orig: 512, 512
+  offset: 0, 0
+  index: -1
+SunsetTempleBackground
+  rotate: false
+  xy: 2, 137
+  size: 640, 360
+  orig: 640, 360
+  offset: 0, 0
+  index: -1
+back_down
+  rotate: false
+  xy: 644, 459
+  size: 84, 38
+  orig: 84, 38
+  offset: 0, 0
+  index: -1
+back_up
+  rotate: false
+  xy: 1544, 715
+  size: 84, 38
+  orig: 84, 38
+  offset: 0, 0
+  index: -1
+badlogic
+  rotate: false
+  xy: 1544, 755
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: -1
+bomb
+  rotate: false
+  xy: 1888, 987
+  size: 58, 24
+  orig: 58, 24
+  offset: 0, 0
+  index: -1
+button_down
+  rotate: false
+  xy: 230, 111
+  size: 24, 24
+  orig: 24, 24
+  offset: 0, 0
+  index: -1
+button_up
+  rotate: false
+  xy: 1948, 987
+  size: 24, 24
+  orig: 24, 24
+  offset: 0, 0
+  index: -1
+buy_down
+  rotate: false
+  xy: 1802, 973
+  size: 84, 38
+  orig: 84, 38
+  offset: 0, 0
+  index: -1
+buy_up
+  rotate: false
+  xy: 2, 61
+  size: 84, 38
+  orig: 84, 38
+  offset: 0, 0
+  index: -1
+dash
+  rotate: false
+  xy: 2, 36
+  size: 52, 23
+  orig: 52, 23
+  offset: 0, 0
+  index: -1
+exit_down
+  rotate: false
+  xy: 644, 419
+  size: 84, 38
+  orig: 84, 38
+  offset: 0, 0
+  index: -1
+exit_up
+  rotate: false
+  xy: 730, 459
+  size: 84, 38
+  orig: 84, 38
+  offset: 0, 0
+  index: -1
+freesiaUPC38
+  rotate: false
+  xy: 516, 499
+  size: 512, 512
+  orig: 512, 512
+  offset: 0, 0
+  index: -1
+greentexture
+  rotate: false
+  xy: 1750, 729
+  size: 24, 24
+  orig: 24, 24
+  offset: 0, 0
+  index: -1
+play_down
+  rotate: false
+  xy: 1544, 675
+  size: 84, 38
+  orig: 84, 38
+  offset: 0, 0
+  index: -1
+play_up
+  rotate: false
+  xy: 1630, 715
+  size: 84, 38
+  orig: 84, 38
+  offset: 0, 0
+  index: -1
+player_action_0
+  rotate: false
+  xy: 88, 67
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+player_action_1
+  rotate: false
+  xy: 644, 385
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+player_action_2
+  rotate: false
+  xy: 730, 425
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+player_action_3
+  rotate: false
+  xy: 816, 465
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+player_climbing_0
+  rotate: false
+  xy: 1544, 641
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+player_climbing_1
+  rotate: false
+  xy: 1630, 681
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+player_climbing_2
+  rotate: false
+  xy: 1716, 721
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+player_climbing_3
+  rotate: false
+  xy: 1802, 889
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+player_falling_0
+  rotate: false
+  xy: 1852, 939
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+player_falling_1
+  rotate: false
+  xy: 2, 2
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+player_jumping_0
+  rotate: false
+  xy: 122, 67
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+player_jumping_1
+  rotate: false
+  xy: 644, 351
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+player_jumping_2
+  rotate: false
+  xy: 678, 385
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+player_jumping_3
+  rotate: false
+  xy: 764, 425
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+player_walking_0
+  rotate: false
+  xy: 850, 465
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+player_walking_1
+  rotate: false
+  xy: 1544, 607
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+player_walking_2
+  rotate: false
+  xy: 1578, 641
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+player_walking_3
+  rotate: false
+  xy: 1664, 681
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+pricedownBI48
+  rotate: false
+  xy: 1030, 499
+  size: 512, 512
+  orig: 512, 512
+  offset: 0, 0
+  index: -1
+redtexture
+  rotate: false
+  xy: 644, 325
+  size: 24, 24
+  orig: 24, 24
+  offset: 0, 0
+  index: -1
+shoes
+  rotate: false
+  xy: 163, 110
+  size: 65, 25
+  orig: 65, 25
+  offset: 0, 0
+  index: -1
+upgrade
+  rotate: false
+  xy: 1802, 851
+  size: 22, 36
+  orig: 22, 36
+  offset: 0, 0
+  index: -1
+upgrades
+  rotate: false
+  xy: 2, 101
+  size: 159, 34
+  orig: 159, 34
+  offset: 0, 0
+  index: -1
+windowbackground
+  rotate: false
+  xy: 1802, 923
+  size: 48, 48
+  orig: 48, 48
+  offset: 0, 0
+  index: -1
