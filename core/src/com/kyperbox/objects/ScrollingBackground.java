@@ -40,7 +40,7 @@ public class ScrollingBackground extends GameObject{
 		repeat_horizontal = properties.get("repeat_horizontal",false,Boolean.class);
 		if(image == null || image.isEmpty())
 			getState().error("background ["+getName()+"] image not set.");
-		background =getGame().getAtlas(getState().getData().getString("map_atlas")).findRegion(image);
+		background =getGame().getAtlas(getState().getUserData().getString("map_atlas")).findRegion(image);
 		size = 1;
 		xoff = 0;
 		yoff = 0;

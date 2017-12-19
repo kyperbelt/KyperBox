@@ -457,21 +457,21 @@
   </object>
  </objectgroup>
  <objectgroup name="playground">
+  <object id="42" name="platformer_tiles" type="TilemapLayerObject" x="0" y="928" width="32" height="32">
+   <properties>
+    <property name="tile_layer" value="platformer_tiles"/>
+   </properties>
+  </object>
   <object id="40" name="player_1" type="PlatformerObject" gid="9" x="288" y="336" width="96" height="96"/>
   <object id="41" name="object" type="BasicGameObject" x="384" y="480" width="96" height="96">
    <properties>
     <property name="sprite" value="windowbackground"/>
    </properties>
   </object>
-  <object id="42" name="platformer_tiles" type="TilemapLayerObject" x="0" y="928" width="32" height="32">
-   <properties>
-    <property name="tile_layer" value="platformer_tiles"/>
-   </properties>
-  </object>
  </objectgroup>
  <layer name="platformer_tiles" width="100" height="30">
   <data encoding="base64" compression="zlib">
-   eJzt1sEJgDAQRNG0rKYBW7AFW7BAvQiuB/HkfOQ/yEHIYYlkJq2JYk4PoGJJD6BiTQ+gYksPoMK8YjGvWMwrFt+7LPYHi/3BYn+w2B8s9geL/cFif7DYHyz2B4v9wWJ/sNgfLPYHi/eDxfvB4vuKxfcVi3nFYl6xnHk1fLDGY00v91339x9/38+mP/wrZewwtD0K
+   eJzt0ckJgEAURMGJ0jWBUW/mf7ANQuYLVfDuDd0aAAAAAAAAAMC/TWlOS1rTlvahi+jpSGe6Bm/BH9X4oxZ/1OKPWvxRiz++c6tMrweULTm0
   </data>
  </layer>
  <objectgroup name="foreground"/>

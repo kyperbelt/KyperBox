@@ -46,6 +46,7 @@ public class GameState {
 	private GameLayer foreground;
 	private GameLayer uiground;
 	private UserData user_data;
+	private TiledMap map_data;
 	
 	private ObjectMap<String,BitmapFont> fonts;
 	
@@ -85,7 +86,7 @@ public class GameState {
 		//load game state
 		game.loadTiledMap(tmx);
 		game.getAssetManager().finishLoading();
-		TiledMap data = game.getTiledMap(tmx);
+		map_data = game.getTiledMap(tmx);
 		user_data = new UserData(tmx+"(data)");
 		
 		
@@ -99,7 +100,7 @@ public class GameState {
 		uiground = new GameLayer(this);
 		uiground.setName("uiground_");
 		
-		String atlas_name = data.getProperties().get("atlas", String.class);
+		String atlas_name = map_data.getProperties().get("atlas", String.class);
 		atlas_name = atlas_name.substring(atlas_name.lastIndexOf("/"), atlas_name.length());
 		atlas_name = atlas_name.replace("/", "");
 		
@@ -113,17 +114,17 @@ public class GameState {
 		}
 
 		//do preload
-		loadFonts(data, data.getProperties().get("atlas",String.class));
+		loadFonts(map_data, map_data.getProperties().get("atlas",String.class));
 		//load UI
 		
-		loadUi(data.getLayers().get("uiground"), game.getAtlas(atlas_name));
+		loadUi(map_data.getLayers().get("uiground"), game.getAtlas(atlas_name));
 		
 		//load foreground
-		loadLayer(foreground,data.getLayers().get("foreground"));		
+		loadLayer(foreground,map_data.getLayers().get("foreground"));		
 		//load Playground
-		loadLayer(playground,data.getLayers().get("playground"));
+		loadLayer(playground,map_data.getLayers().get("playground"));
 		//load background
-		loadLayer(background,data.getLayers().get("background"));
+		loadLayer(background,map_data.getLayers().get("background"));
 
 	
 		
@@ -139,7 +140,11 @@ public class GameState {
 		log("initiated");
 	}
 	
-	public UserData getData() {
+	public TiledMap getMapData() {
+		return map_data;
+	}
+	
+	public UserData getUserData() {
 		return user_data;
 	}
 	

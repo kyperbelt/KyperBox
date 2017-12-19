@@ -15,7 +15,7 @@ public abstract class StateManager {
 		return state;
 	}
 	
-	public UserData getStateData() {return state.getData();}
+	public UserData getStateData() {return state.getUserData();}
 	
 	/**
 	 * called before all layer data is instantiated

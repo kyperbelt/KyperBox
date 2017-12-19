@@ -77,6 +77,10 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 		initiate();
 	}
 	
+	public Stage getGameState() {
+		return game_stage;
+	}
+	
 	public Viewport getView() {
 		return view;
 	}

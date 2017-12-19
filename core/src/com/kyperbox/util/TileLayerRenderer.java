@@ -1,13 +1,5 @@
 package com.kyperbox.util;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.maps.tiled.TiledMapTile;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
-import com.badlogic.gdx.math.Rectangle;
-
 import static com.badlogic.gdx.graphics.g2d.Batch.C1;
 import static com.badlogic.gdx.graphics.g2d.Batch.C2;
 import static com.badlogic.gdx.graphics.g2d.Batch.C3;
@@ -29,15 +21,29 @@ import static com.badlogic.gdx.graphics.g2d.Batch.Y2;
 import static com.badlogic.gdx.graphics.g2d.Batch.Y3;
 import static com.badlogic.gdx.graphics.g2d.Batch.Y4;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.maps.tiled.TiledMapTile;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
+import com.kyperbox.objects.GameLayer.LayerCamera;
+import com.kyperbox.objects.GameObject;
+
 public class TileLayerRenderer {
 	static protected final int NUM_VERTICES = 20;
 	private float unit_scale;
 	private Rectangle view_bounds;
+	private Vector2 pos;
 	private float vertices[] = new float[NUM_VERTICES];
-	
-	public TileLayerRenderer() {
+	private GameObject object;
+	public TileLayerRenderer(GameObject object) {
+		this.object = object;
 		view_bounds = new Rectangle();
 		unit_scale = 1.0f;
+		pos = new Vector2(0,0);
 	}
 	
 	public Rectangle getViewBounds() {
@@ -57,41 +63,49 @@ public class TileLayerRenderer {
 	}
 	
 	public void renderTileLayer (TiledMapTileLayer layer,Batch batch) {
+		LayerCamera cam = object.getGameLayer().getCamera();
+		pos.set(0, 0);
+		pos = cam.unproject(pos);
+		view_bounds.set(pos.x, pos.y, object.getGame().getView().getWorldWidth(), object.getGame().getView().getWorldHeight());
+		unit_scale = (object.getScaleX()+object.getScaleY())/2f;
 		final Color batchColor = batch.getColor();
 		final float color = Color.toFloatBits(batchColor.r, batchColor.g, batchColor.b, batchColor.a * layer.getOpacity());
 
-		final int layerWidth = layer.getWidth();
-		final int layerHeight = layer.getHeight();
+		final int layer_width = layer.getWidth();
+		final int layer_height = layer.getHeight();
 
-		final float layerTileWidth = layer.getTileWidth() * unit_scale;
-		final float layerTileHeight = layer.getTileHeight() * unit_scale;
+		final float layer_tilewidth = layer.getTileWidth() * unit_scale;
+		final float layer_tileheight = layer.getTileHeight() * unit_scale;
 
-		final float layerOffsetX = layer.getRenderOffsetX() * unit_scale;
-		// offset in tiled is y down, so we flip it
-		final float layerOffsetY = -layer.getRenderOffsetY() * unit_scale;
+		
+		final float offset_x = object.getX() * unit_scale;
+		final float offset_y = object.getY() * unit_scale;
 
-		final int col1 = Math.max(0, (int)((view_bounds.x - layerOffsetX) / layerTileWidth));
-		final int col2 = Math.min(layerWidth,
-			(int)((view_bounds.x + view_bounds.width + layerTileWidth - layerOffsetX) / layerTileWidth));
+		final int col1 = Math.max(0, (int)((view_bounds.x - offset_x) / layer_tilewidth));
+		final int col2 = Math.min(layer_width,
+			(int)((view_bounds.x + view_bounds.width + layer_tilewidth - offset_x) / layer_tilewidth));
 
-		final int row1 = Math.max(0, (int)((view_bounds.y - layerOffsetY) / layerTileHeight));
-		final int row2 = Math.min(layerHeight,
-			(int)((view_bounds.y + view_bounds.height + layerTileHeight - layerOffsetY) / layerTileHeight));
+		final int row1 = Math.max(0, (int)((view_bounds.y - offset_y) / layer_tileheight));
+		final int row2 = Math.min(layer_height,
+			(int)((view_bounds.y + view_bounds.height + layer_tileheight - offset_y) / layer_tileheight));
 
-		float y = row2 * layerTileHeight + layerOffsetY;
-		float xStart = col1 * layerTileWidth + layerOffsetX;
+		float y = row2 * layer_tileheight + offset_y;
+		float xStart = col1 * layer_tilewidth + offset_x;
 		final float[] vertices = this.vertices;
 
+
+	
 		for (int row = row2; row >= row1; row--) {
+			
 			float x = xStart;
 			for (int col = col1; col < col2; col++) {
+				
 				final TiledMapTileLayer.Cell cell = layer.getCell(col, row);
 				if (cell == null) {
-					x += layerTileWidth;
+					x += layer_tilewidth;
 					continue;
 				}
 				final TiledMapTile tile = cell.getTile();
-
 				if (tile != null) {
 					final boolean flipX = cell.getFlipHorizontally();
 					final boolean flipY = cell.getFlipVertically();
@@ -197,10 +211,11 @@ public class TileLayerRenderer {
 						}
 					}
 					batch.draw(region.getTexture(), vertices, 0, NUM_VERTICES);
+					
 				}
-				x += layerTileWidth;
+				x += layer_tilewidth;
 			}
-			y -= layerTileHeight;
+			y -= layer_tileheight;
 		}
 	}
 

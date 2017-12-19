@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.AtlasTmxMapLoader;
 import com.badlogic.gdx.maps.tiled.BaseTmxMapLoader;
@@ -262,11 +263,12 @@ public class KyperMapLoader extends BaseTmxMapLoader<AtlasTmxMapLoader.AtlasTile
 			int tileheight = element.getIntAttribute("tileheight", 0);
 			int spacing = element.getIntAttribute("spacing", 0);
 			int margin = element.getIntAttribute("margin", 0);
-			int tilecount = element.getIntAttribute("tilecount", 1);
 			String source = element.getAttribute("source", null);
 			int offsetX = 0;
 			int offsetY = 0;
-
+			
+			
+			
 			String imageSource = "";
 			int imageWidth = 0, imageHeight = 0;
 
@@ -281,8 +283,6 @@ public class KyperMapLoader extends BaseTmxMapLoader<AtlasTmxMapLoader.AtlasTile
 					tileheight = element.getIntAttribute("tileheight", 0);
 					spacing = element.getIntAttribute("spacing", 0);
 					margin = element.getIntAttribute("margin", 0);
-					tilecount = element.getIntAttribute("tilecount", 1);
-					KyperBoxGame.log("kypermaploader:", "tilecount = "+tilecount);
 					Element offset = element.getChildByName("tileoffset");
 					if (offset != null) {
 						offsetX = offset.getIntAttribute("x", 0);
@@ -308,6 +308,7 @@ public class KyperMapLoader extends BaseTmxMapLoader<AtlasTmxMapLoader.AtlasTile
 				Element imageElement = element.getChildByName("image");
 				if (imageElement != null) {
 					imageSource = imageElement.getAttribute("source");
+					imageSource.replace("../../input_assets", "");
 					imageWidth = imageElement.getIntAttribute("width", 0);
 					imageHeight = imageElement.getIntAttribute("height", 0);
 					image = getRelativeFileHandle(tmxFile, imageSource);
@@ -338,19 +339,32 @@ public class KyperMapLoader extends BaseTmxMapLoader<AtlasTmxMapLoader.AtlasTile
 			tileset.setName(name);
 			props.put("firstgid", firstgid);
 			props.put("imagesource", imageSource);
+			
 			props.put("imagewidth", imageWidth);
 			props.put("imageheight", imageHeight);
 			props.put("tilewidth", tilewidth);
 			props.put("tileheight", tileheight);
 			props.put("margin", margin);
 			props.put("spacing", spacing);
-
+			
+			
+				
 			if (imageSource != null && imageSource.length() > 0) {
 				int lastgid = firstgid + ((imageWidth / tilewidth) * (imageHeight / tileheight)) - 1;
-				for (AtlasRegion region : atlas.findRegions(regionsName)) {
-					// handle unused tile ids
+				
+				TextureRegion[][] regions = atlas.findRegion(regionsName).split(tilewidth,tileheight);
+				int h = regions.length;
+				int w = regions[0].length;
+				
+				for(int i = 0;i < w*h;i++) {
+					int row = i % w;
+					int col = i / w;
+					
+					TextureRegion region = regions[col][row];
 					if (region != null) {
-						int tileid = region.index + firstgid;
+						
+						int tileid = firstgid+i;
+						KyperBoxGame.log("tilemap -------------", "tileid:"+tileid);
 						if (tileid >= firstgid && tileid <= lastgid) {
 							StaticTiledMapTile tile = new StaticTiledMapTile(region);
 							tile.setId(tileid);
@@ -360,12 +374,27 @@ public class KyperMapLoader extends BaseTmxMapLoader<AtlasTmxMapLoader.AtlasTile
 						}
 					}
 				}
+//				for (AtlasRegion region : atlas.findRegions(regionsName)) {
+//					// handle unused tile ids
+//					if (region != null) {
+//						int tileid = region.index + firstgid;
+//						if (tileid >= firstgid && tileid <= lastgid) {
+//							StaticTiledMapTile tile = new StaticTiledMapTile(region);
+//							tile.setId(tileid);
+//							tile.setOffsetX(offsetX);
+//							tile.setOffsetY(flipY ? -offsetY : offsetY);
+//							tileset.putTile(tileid, tile);
+//						}
+//					}
+//				}
 			}
 
 			for (Element tileElement : element.getChildrenByName("tile")) {
 				int tileid = firstgid + tileElement.getIntAttribute("id", 0);
+				
 				TiledMapTile tile = tileset.getTile(tileid);
 				if (tile == null) {
+					
 					Element imageElement = tileElement.getChildByName("image");
 					if (imageElement != null) {
 						// Is a tilemap with individual images.

@@ -18,9 +18,16 @@ SunsetTempleBackground
   orig: 640, 360
   offset: 0, 0
   index: -1
+TempleTIles
+  rotate: false
+  xy: 644, 81
+  size: 544, 416
+  orig: 544, 416
+  offset: 0, 0
+  index: -1
 back_down
   rotate: false
-  xy: 644, 459
+  xy: 1190, 459
   size: 84, 38
   orig: 84, 38
   offset: 0, 0
@@ -83,14 +90,14 @@ dash
   index: -1
 exit_down
   rotate: false
-  xy: 644, 419
+  xy: 1190, 419
   size: 84, 38
   orig: 84, 38
   offset: 0, 0
   index: -1
 exit_up
   rotate: false
-  xy: 730, 459
+  xy: 1276, 459
   size: 84, 38
   orig: 84, 38
   offset: 0, 0
@@ -132,21 +139,21 @@ player_action_0
   index: -1
 player_action_1
   rotate: false
-  xy: 644, 385
+  xy: 1190, 385
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 player_action_2
   rotate: false
-  xy: 730, 425
+  xy: 1276, 425
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 player_action_3
   rotate: false
-  xy: 816, 465
+  xy: 1362, 465
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
@@ -202,28 +209,28 @@ player_jumping_0
   index: -1
 player_jumping_1
   rotate: false
-  xy: 644, 351
+  xy: 1190, 351
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 player_jumping_2
   rotate: false
-  xy: 678, 385
+  xy: 1224, 385
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 player_jumping_3
   rotate: false
-  xy: 764, 425
+  xy: 1310, 425
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 player_walking_0
   rotate: false
-  xy: 850, 465
+  xy: 1396, 465
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
@@ -258,7 +265,7 @@ pricedownBI48
   index: -1
 redtexture
   rotate: false
-  xy: 644, 325
+  xy: 1190, 325
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
