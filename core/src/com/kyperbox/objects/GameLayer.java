@@ -22,12 +22,17 @@ public class GameLayer extends Group{
 	private Array<LayerManager> managers;
 	private GameState state;
 	private LayerCamera cam;
+	private MapProperties layer_properties;
 	
 	public GameLayer(GameState state) {
 		managers = new Array<LayerManager>();
 		this.state = state;
 		cam = new LayerCamera(this);
 		cam.setPosition(0, 0);
+	}
+	
+	public void setLayerProperties(MapProperties properties) {
+		this.layer_properties = properties;
 	}
 	
 	/**
@@ -87,7 +92,7 @@ public class GameLayer extends Group{
 	public void act(float delta) {
 		for(LayerManager manager:managers) {
 			if(manager.isActive())
-				manager.updateLayer(delta);
+				manager.update(delta);
 		}
 		cam.update(delta);
 		super.act(delta);
@@ -175,6 +180,11 @@ public class GameLayer extends Group{
 		manager.setLayer(this);
 		managers.add(manager);
 		managers.sort(getState().getGame().getPriorityComperator());
+		manager.init(getLayerProperties());
+	}
+	
+	public MapProperties getLayerProperties() {
+		return layer_properties;
 	}
 	
 	
@@ -262,7 +272,9 @@ public class GameLayer extends Group{
 		}
 		
 		public Vector2 unproject(Vector2 coords) {
-			coords.set(-position.x +coords.x, position.y - coords.y).scl(1f/getZoom());
+			Viewport view = layer.getState().getGame().getView();
+			view.unproject(coords);
+			coords.set(-position.x +coords.x, position.y + coords.y).scl(1f/getZoom());
 			return coords;
 		}
 		
@@ -408,6 +420,12 @@ public class GameLayer extends Group{
 		}
 	}
 	
-	
+	@Override
+	protected void drawDebugBounds(ShapeRenderer shapes) {
+		super.drawDebugBounds(shapes);
+		for(LayerManager manager:managers) {
+			manager.drawDebug(shapes);
+		}
+	}
 	
 }

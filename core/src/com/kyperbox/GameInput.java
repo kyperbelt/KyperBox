@@ -93,6 +93,14 @@ public class GameInput{
 		return inputs_last_pressed.get(input)&&!inputPressed(input);
 	}
 	
+	public float getMouseX() {
+		return Gdx.input.getX();
+	}
+	
+	public float getMouseY() {
+		return Gdx.input.getY();
+	}
+	
 	public void update() {
 		for(String input:input_check) {
 			float value = NOT_USED;
@@ -142,6 +150,26 @@ public class GameInput{
 			
 			}
 			return false;
+		}
+		
+	}
+	
+	public static class MouseButtonMapping implements InputMapping{
+		private int button;
+		public MouseButtonMapping(int button) {
+			this.button = button;
+		}
+		
+		@Override
+		public float inputValue() {
+			if(Gdx.input.isButtonPressed(button))
+				return 1f;
+			return NOT_USED;
+		}
+
+		@Override
+		public boolean sameAs(InputMapping m) {
+			return m instanceof MouseButtonMapping && ((MouseButtonMapping)m).button == button;
 		}
 		
 	}

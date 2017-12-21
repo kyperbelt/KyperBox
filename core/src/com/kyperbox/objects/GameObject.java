@@ -21,11 +21,17 @@ public abstract class GameObject extends Group{
 	
 	private GameLayer layer;
 	private String sprite;
+	
+	//collision vars -- will only be used if layer supports collision
+	//it is layer manager responsibility to use these vars.
+	private boolean ignore_collision;
+	private Rectangle bounds;
+	private Rectangle ret_bounds;
+	
 	private Array<GameObjectController> controllers;
 	private MapProperties properties;
 	private Vector2 velocity;
-	private Rectangle bounds;
-	private Rectangle ret_bounds;
+	
 	private Color debug_bounds;
 	private boolean flip_x;
 	private boolean flip_y;
@@ -38,6 +44,15 @@ public abstract class GameObject extends Group{
 		debug_bounds = Color.YELLOW;
 		flip_x = false;
 		flip_y = false;
+		ignore_collision = false;
+	}
+	
+	public boolean ignoresCollision() {
+		return ignore_collision;
+	}
+	
+	public void setIgnoreCollision(boolean ignore_collision) {
+		this.ignore_collision = ignore_collision;
 	}
 	
 	public boolean getFlipX() {
@@ -53,12 +68,12 @@ public abstract class GameObject extends Group{
 		this.flip_y = flip_y;
 	}
 	
-	public void setBounds(float x,float y,float w,float h) {
+	public void setCollisionBounds(float x,float y,float w,float h) {
 		bounds.set(x, y, w, h);
 	}
 	
-	public Rectangle getBounds() {
-		ret_bounds.set(getX()+bounds.x, getY()+bounds.y, bounds.width, bounds.height);;
+	public Rectangle getCollisionBounds() {
+		ret_bounds.set(getX()+bounds.x, getY()+bounds.y, bounds.width, bounds.height);
 		return ret_bounds;
 	}
 	
@@ -69,7 +84,7 @@ public abstract class GameObject extends Group{
 	@Override
 	public void drawDebug(ShapeRenderer shapes) {
 		shapes.setColor(debug_bounds);
-		Rectangle b = getBounds();
+		Rectangle b = getCollisionBounds();
 		shapes.rect(b.x, b.y, b.width, b.height);
 		super.drawDebug(shapes);
 	}
@@ -167,6 +182,13 @@ public abstract class GameObject extends Group{
 			render.draw(batch);
 		}
 		super.draw(batch, parentAlpha);
+	}
+	
+	@Override
+	public void setPosition(float x, float y) {
+		if(layer!=null&&(x!=getX() || y!= getY()))
+			layer.gameObjectChanged(this, GameObjectChangeType.LOCATION, 1);
+		super.setPosition(x, y);
 	}
 	
 	/**

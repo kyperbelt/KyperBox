@@ -1,5 +1,6 @@
 package com.kyperbox.managers;
 
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.kyperbox.objects.GameLayer;
@@ -11,6 +12,11 @@ public abstract class LayerManager implements Priority {
 	private boolean active;
 	private GameLayer layer;
 	private int priority;
+	
+	public LayerManager() {
+		active = true;
+		priority = LOW;
+	}
 	
 	/**
 	 * called when the gamelayer and tmx is fully loaded
@@ -36,7 +42,7 @@ public abstract class LayerManager implements Priority {
 	 * on layer update
 	 * @param delta
 	 */
-	public abstract void updateLayer(float delta);
+	public abstract void update(float delta);
 	/**
 	 * when the layer is removed
 	 */
@@ -75,6 +81,10 @@ public abstract class LayerManager implements Priority {
 	@Override
 	public int getPriority() {
 		return priority;
+	}
+	
+	public void drawDebug(ShapeRenderer shapes) {
+		
 	}
 	
 	public void refresh() {

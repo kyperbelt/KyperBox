@@ -19,6 +19,9 @@ public class PlatformerController extends GameObjectController{
 	private boolean walking;
 	private boolean jumping;
 	
+	/**
+	 * simple platformer movement and controls. 
+	 */
 	public PlatformerController() {
 	}
 	
@@ -77,6 +80,8 @@ public class PlatformerController extends GameObjectController{
 				stopY();
 				
 			}
+			break;
+		default:
 			break;
 		}
 		jumping = false;

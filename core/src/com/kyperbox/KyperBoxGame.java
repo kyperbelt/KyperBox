@@ -55,7 +55,7 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 		prio_compare = new PriorityComparator();
 		game_stage = new Stage(view);
 		game_states = new ObjectMap<String,GameState>();
-		game_stage.setDebugAll(true);
+		game_stage.setDebugAll(false);
 		
 		current_gamestates = new Array<GameState>();
 		
@@ -75,6 +75,10 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 		Gdx.input.setInputProcessor(game_stage);
 		
 		initiate();
+	}
+	
+	public void debugRender(boolean enable) {
+		game_stage.setDebugAll(enable);
 	}
 	
 	public Stage getGameState() {

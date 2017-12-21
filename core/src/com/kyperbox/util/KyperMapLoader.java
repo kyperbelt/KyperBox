@@ -364,7 +364,6 @@ public class KyperMapLoader extends BaseTmxMapLoader<AtlasTmxMapLoader.AtlasTile
 					if (region != null) {
 						
 						int tileid = firstgid+i;
-						KyperBoxGame.log("tilemap -------------", "tileid:"+tileid);
 						if (tileid >= firstgid && tileid <= lastgid) {
 							StaticTiledMapTile tile = new StaticTiledMapTile(region);
 							tile.setId(tileid);
@@ -374,6 +373,9 @@ public class KyperMapLoader extends BaseTmxMapLoader<AtlasTmxMapLoader.AtlasTile
 						}
 					}
 				}
+				//WOULD NOT LOAD TILES FROM TILESET REGION
+				//ONLY INDIVIDUAL TILES IN THE ATLAS
+				//#FAIL
 //				for (AtlasRegion region : atlas.findRegions(regionsName)) {
 //					// handle unused tile ids
 //					if (region != null) {

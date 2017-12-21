@@ -2,7 +2,6 @@ package com.kyperbox.controllers;
 
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
-import com.badlogic.gdx.math.MathUtils;
 import com.kyperbox.objects.GameObject;
 
 public class AnimationController extends GameObjectController{
@@ -10,7 +9,8 @@ public class AnimationController extends GameObjectController{
 	private Animation<String> current_animation;
 	private float animation_elapsed;
 	private float play_speed;
-	private GameObject daddy;
+	private GameObject daddy; //The gameobject this controller belongs to
+							  //or as i like to call it, its daddy haha
 	
 	@Override
 	public void init(GameObject object) {
@@ -20,6 +20,11 @@ public class AnimationController extends GameObjectController{
 		daddy.getState().log("init animation controller");
 	}
 	
+	/**
+	 * Play speed gets applied to the update delta value
+	 * to increase or decrease the animation playback speed
+	 * @param play_speed
+	 */
 	public void setPlaySpeed(float play_speed) {
 		this.play_speed = Math.max(play_speed, 0f);
 	}
@@ -28,12 +33,22 @@ public class AnimationController extends GameObjectController{
 		setAnimation(animation,PlayMode.LOOP);
 	}
 	
+	/**
+	 * set the animation currently played by this animation controller. 
+	 * Animations are retrieved from the animation store in KyperBoxGame.java
+	 * @param animation
+	 * @param playmode - the animation playmode
+	 */
 	public void setAnimation(String animation,PlayMode playmode) {
 		animation_elapsed = 0f;
 		current_animation = daddy.getGame().getAnimation(animation);
 		current_animation.setPlayMode(playmode);
 	}
 	
+	/**
+	 * get how much time this animation has been running for
+	 * @return - time elapsed in seconds.
+	 */
 	public float getAnimationElapsed() {
 		return animation_elapsed;
 	}
@@ -42,6 +57,11 @@ public class AnimationController extends GameObjectController{
 		return current_animation;
 	}
 	
+	/**
+	 * check to see if The animation is finished by checking the animation 
+	 * total duration against elapsed time
+	 * @return - true if elapsed time is greater than duration.
+	 */
 	public boolean isAnimationFinished() {
 		if(current_animation == null) {
 			daddy.getState().error("No animation found, finished not possible.");

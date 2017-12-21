@@ -107,6 +107,12 @@ public class GameState {
 		user_data.setString("map_atlas", atlas_name);
 		
 		fonts = new ObjectMap<String, BitmapFont>();
+
+		//set layer properties
+		uiground.setLayerProperties(map_data.getLayers().get("uiground").getProperties());
+		foreground.setLayerProperties(map_data.getLayers().get("foreground").getProperties());
+		playground.setLayerProperties(map_data.getLayers().get("playground").getProperties());
+		background.setLayerProperties(map_data.getLayers().get("background").getProperties());
 		
 		//init manager
 		if(manager!=null) {
@@ -116,34 +122,39 @@ public class GameState {
 		//do preload
 		loadFonts(map_data, map_data.getProperties().get("atlas",String.class));
 		//load UI
-		
 		loadUi(map_data.getLayers().get("uiground"), game.getAtlas(atlas_name));
-		
 		//load foreground
-		loadLayer(foreground,map_data.getLayers().get("foreground"));		
+		loadLayer(foreground,map_data.getLayers().get("foreground"));	
 		//load Playground
 		loadLayer(playground,map_data.getLayers().get("playground"));
 		//load background
 		loadLayer(background,map_data.getLayers().get("background"));
 
-	
-		
+		//add layers to scene
 		game.addGameLayer(background);
 		game.addGameLayer(playground);
 		game.addGameLayer(foreground);
 		game.addGameLayer(uiground);
 		
-		//init manager
+		//init state manager
 		if(manager!=null) {
 			manager.init(this);
 		}
 		log("initiated");
 	}
 	
+	/**
+	 * get the tmx map data used to create this game state
+	 * @return
+	 */
 	public TiledMap getMapData() {
 		return map_data;
 	}
 	
+	/**
+	 * get the user defined data for this state
+	 * @return
+	 */
 	public UserData getUserData() {
 		return user_data;
 	}
@@ -152,6 +163,11 @@ public class GameState {
 		this.game = game;
 	}
 	
+	/**
+	 * get the KyperBoxGame instance which contains all the 
+	 * goodies like sound/input/assets ect.
+	 * @return
+	 */
 	public KyperBoxGame getGame() {
 		return game;
 	}
@@ -183,6 +199,10 @@ public class GameState {
 		}
 	}
 	
+	/**
+	 * get the manager that is running this state
+	 * @return
+	 */
 	public StateManager getManager() {
 		return manager;
 	}
@@ -225,6 +245,12 @@ public class GameState {
 		KyperBoxGame.error(tmx, message);
 	}
 	
+	/**
+	 * disable all the layers from this state. 
+	 * They no longer receive touch inputs
+	 * TODO: disable delta//implement pause
+	 * @param disable
+	 */
 	public void disableLayers(boolean disable) {
 		if(disable) {
 			uiground.setTouchable(Touchable.disabled);
@@ -526,7 +552,6 @@ public class GameState {
 	 */
 	
 	private void loadLayer(GameLayer game_layer,MapLayer map_layer) {
-	//	MapProperties layer_properties = layer.getProperties();
 		MapObjects objects = map_layer.getObjects();
 		for(MapObject object: objects) {
 			MapProperties object_properties = object.getProperties();
