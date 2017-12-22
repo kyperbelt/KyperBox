@@ -1,5 +1,6 @@
-package com.kyperbox.managers;
+package com.kyperbox.systems;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.math.Rectangle;
@@ -10,8 +11,8 @@ import com.badlogic.gdx.utils.Pool.Poolable;
 import com.kyperbox.objects.GameObject;
 import com.kyperbox.objects.GameObject.GameObjectChangeType;
 
-public class QuadTree extends LayerManager{
-	
+public class QuadTree extends LayerSystem{
+	private static final int PAD = 10;
 	//TODO: add bounds follow
 	//TODO: test with object controller
 	//TODO: add a recursive update check to clean up unused Quads
@@ -35,7 +36,7 @@ public class QuadTree extends LayerManager{
 	 * @param height
 	 */
 	public QuadTree(float x,float y,float width,float height) {
-		bounds = new Rectangle(x, y, width, height);
+		bounds = new Rectangle(x-PAD, y-PAD, width+PAD*2, height+PAD*2);
 		objects = new ObjectMap<GameObject,Quad>();
 		follow_view = false;
 		final QuadTree m = this;
@@ -48,12 +49,20 @@ public class QuadTree extends LayerManager{
 		max_depth = 4; 
 		max_objects = 10;
 		root = quad_pool.obtain();
-		root.init(null, 0, x, y, width, height);
+		root.init(null, 0, bounds.x, bounds.y, bounds.width, bounds.height);
 		ret_list = new Array<GameObject>();
+	}
+	
+	public ObjectMap<GameObject, Quad> getQuadObjectPairs(){
+		return objects;
 	}
 	
 	public void setMaxDepth(int max_depth) {
 		this.max_depth = max_depth;
+	}
+	
+	public Quad getRoot() {
+		return root;
 	}
 	
 	public void setMaxObjects(int max_objects) {
@@ -81,28 +90,30 @@ public class QuadTree extends LayerManager{
 	public void gameObjectChanged(GameObject object, GameObjectChangeType type, int value) {
 		if(type != GameObjectChangeType.LOCATION)
 			return;
-		getLayer().getState().log("QuadTree: location_changed object="+object.getName());
 		Quad check = objects.get(object);
 		if(check != null) {
-			if(!check.getBounds().contains(object.getCollisionBounds())) {
-				check.remove(object);
-				root.place(object);
-			}
+			check.remove(object);
+			root.place(object);
+		}else {
+			root.place(object);
 		}
 	}
 
 	@Override
 	public void gameObjectRemoved(GameObject object, GameObject parent) {
 		objects.get(object).remove(object);
+		objects.remove(object);
 		getLayer().getState().log("QuadTree: removed object ="+object.getName());
 	}
 
 	@Override
 	public void update(float delta) {
+		root.update();
 	}
 	
 	@Override
 	public void drawDebug(ShapeRenderer shapes) {
+		shapes.setColor(Color.SKY);
 		root.debugRender(shapes);
 	}
 
@@ -264,8 +275,20 @@ public class QuadTree extends LayerManager{
 			return quad_index;
 		}
 		
+		public void update() {
+			if(getSize() == 0) {
+				clear();
+			}else
+			if(quads[0] != null) {
+				for (int i = 0; i < quads.length; i++) {
+					quads[i].update();
+				}
+			}
+		}
+		
 		public void clear() {
-			objects.clear();
+			while(objects.size>0)
+				manager.getRoot().place(objects.pop());
 			for (int i = 0; i < quads.length; i++) {
 				if(quads[i]!=null) {
 					quads[i].clear();

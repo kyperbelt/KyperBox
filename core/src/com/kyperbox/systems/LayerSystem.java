@@ -1,19 +1,20 @@
-package com.kyperbox.managers;
+package com.kyperbox.systems;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.kyperbox.managers.Priority;
 import com.kyperbox.objects.GameLayer;
 import com.kyperbox.objects.GameObject;
 import com.kyperbox.objects.GameObject.GameObjectChangeType;
 
-public abstract class LayerManager implements Priority {
+public abstract class LayerSystem implements Priority {
 	
 	private boolean active;
 	private GameLayer layer;
 	private int priority;
 	
-	public LayerManager() {
+	public LayerSystem() {
 		active = true;
 		priority = LOW;
 	}

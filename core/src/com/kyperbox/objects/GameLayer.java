@@ -14,18 +14,18 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.kyperbox.GameState;
-import com.kyperbox.managers.LayerManager;
 import com.kyperbox.objects.GameObject.GameObjectChangeType;
+import com.kyperbox.systems.LayerSystem;
 
 public class GameLayer extends Group{
 	
-	private Array<LayerManager> managers;
+	private Array<LayerSystem> systems;
 	private GameState state;
 	private LayerCamera cam;
 	private MapProperties layer_properties;
 	
 	public GameLayer(GameState state) {
-		managers = new Array<LayerManager>();
+		systems = new Array<LayerSystem>();
 		this.state = state;
 		cam = new LayerCamera(this);
 		cam.setPosition(0, 0);
@@ -90,9 +90,9 @@ public class GameLayer extends Group{
 	
 	@Override
 	public void act(float delta) {
-		for(LayerManager manager:managers) {
-			if(manager.isActive())
-				manager.update(delta);
+		for(LayerSystem system:systems) {
+			if(system.isActive())
+				system.update(delta);
 		}
 		cam.update(delta);
 		super.act(delta);
@@ -105,8 +105,8 @@ public class GameLayer extends Group{
 	 * @param value -the value of the change
 	 */
 	public void gameObjectChanged(GameObject object,GameObjectChangeType type,int value) {
-		for(LayerManager manager : managers) {
-			manager.gameObjectChanged(object, type, value);
+		for(LayerSystem system : systems) {
+			system.gameObjectChanged(object, type, value);
 		}
 	}
 	
@@ -129,9 +129,9 @@ public class GameLayer extends Group{
 	 * @param parent
 	 */
 	public void gameObjectAdded(GameObject object,GameObject parent) {
-		for(LayerManager manager:managers) {
-			if(manager.isActive())
-				manager.gameObjectAdded(object,parent);
+		for(LayerSystem system:systems) {
+			if(system.isActive())
+				system.gameObjectAdded(object,parent);
 		}
 	}
 	
@@ -144,22 +144,26 @@ public class GameLayer extends Group{
 	@Override
 	public boolean removeActor(Actor actor) {
 		boolean r =  super.removeActor(actor);
-		gameObjectAdded((GameObject) actor, null);
+		GameObjectRemoved((GameObject) actor, null);
 		return r;
 	}
 	
 	public void GameObjectRemoved(GameObject object,GameObject parent) {
-		for(LayerManager manager:managers) {
-			if(manager.isActive())
-				manager.gameObjectRemoved(object,parent);
+		for(LayerSystem system:systems) {
+			if(system.isActive())
+				system.gameObjectRemoved(object,parent);
 		}
 	}
 	
 	@Override
 	public void drawDebug(ShapeRenderer shapes) {
-		shapes.setColor(Color.RED);
-		Rectangle cfb = cam.getCamFollowBounds();
-		shapes.rect(cfb.x, cfb.y, cfb.width, cfb.height);
+		
+		if(getDebug()) {
+			shapes.setColor(Color.RED);
+			Rectangle cfb = cam.getCamFollowBounds();
+			shapes.rect(cfb.x, cfb.y, cfb.width, cfb.height);
+		}
+		
 		super.drawDebug(shapes);
 	}
 	
@@ -167,20 +171,20 @@ public class GameLayer extends Group{
 	 * get all the layer managers
 	 * @return
 	 */
-	public Array<LayerManager> getManagers(){return managers;}
+	public Array<LayerSystem> getSystems(){return systems;}
 	
 	/**
 	 * add a layer manager
 	 */
-	public void addLayerManager(LayerManager manager) {
-		for(LayerManager m: managers)
-			if(m.getClass().isInstance(manager)) {
+	public void addLayerSystem(LayerSystem system) {
+		for(LayerSystem m: systems)
+			if(m.getClass().isInstance(system)) {
 				getState().error("manager ["+m.getClass().getName()+"] already exists in layer "+getName()+".");
 			}
-		manager.setLayer(this);
-		managers.add(manager);
-		managers.sort(getState().getGame().getPriorityComperator());
-		manager.init(getLayerProperties());
+		system.setLayer(this);
+		systems.add(system);
+		systems.sort(getState().getGame().getPriorityComperator());
+		system.init(getLayerProperties());
 	}
 	
 	public MapProperties getLayerProperties() {
@@ -190,8 +194,8 @@ public class GameLayer extends Group{
 	
 	@Override
 	public boolean remove() {
-		while (managers.size > 0) {
-			managers.pop().onRemove();
+		while (systems.size > 0) {
+			systems.pop().onRemove();
 		}
 		return super.remove();
 	}
@@ -423,9 +427,10 @@ public class GameLayer extends Group{
 	@Override
 	protected void drawDebugBounds(ShapeRenderer shapes) {
 		super.drawDebugBounds(shapes);
-		for(LayerManager manager:managers) {
-			manager.drawDebug(shapes);
-		}
+		if(getDebug())
+			for(LayerSystem system:systems) {
+				system.drawDebug(shapes);
+			}
 	}
 	
 }

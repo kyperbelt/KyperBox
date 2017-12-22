@@ -77,6 +77,10 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 		initiate();
 	}
 	
+	public boolean getDebugRender() {
+		return game_stage.isDebugAll();
+	}
+	
 	public void debugRender(boolean enable) {
 		game_stage.setDebugAll(enable);
 	}

@@ -83,9 +83,11 @@ public abstract class GameObject extends Group{
 	
 	@Override
 	public void drawDebug(ShapeRenderer shapes) {
-		shapes.setColor(debug_bounds);
-		Rectangle b = getCollisionBounds();
-		shapes.rect(b.x, b.y, b.width, b.height);
+		if(getDebug()) {
+			shapes.setColor(debug_bounds);
+			Rectangle b = getCollisionBounds();
+			shapes.rect(b.x, b.y, b.width, b.height);
+		}
 		super.drawDebug(shapes);
 	}
 	
@@ -209,6 +211,7 @@ public abstract class GameObject extends Group{
 	
 	@Override
 	public boolean remove() {
+		layer.GameObjectRemoved(this, null);
 		layer = null;
 		onRemove();
 		return super.remove();
