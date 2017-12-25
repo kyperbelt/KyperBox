@@ -15,6 +15,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.StringBuilder;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.kyperbox.managers.StateManager;
 import com.kyperbox.managers.Priority.PriorityComparator;
@@ -27,6 +28,9 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	private static final String IMAGE_FOLDER = "image";
 	private static final String MUSIC_FOLDER = "music";
 	private static final String SFX_FOLDER = "sound";
+	private static final String GAME_ATLAS = "game.atlas";
+	private static final String TAG = "KyperBox->";
+	private static final String FILE_SEPARATOR = "/";
 	
 	protected Stage game_stage;
 	private AssetManager assets;
@@ -201,16 +205,17 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	//ASSET METHODS
 	//========================================
 	
+	
 	public Sound getSound(String name) {
-		return assets.get(SFX_FOLDER+"/"+name,Sound.class);
+		return assets.get(SFX_FOLDER+FILE_SEPARATOR+name,Sound.class);
 	}
 	
 	public Music getMusic(String name) {
-		return assets.get(MUSIC_FOLDER+"/"+name,Music.class);
+		return assets.get(MUSIC_FOLDER+FILE_SEPARATOR+name,Music.class);
 	}
 	
 	public TextureAtlas getAtlas(String name) {
-		return assets.get(IMAGE_FOLDER+"/"+name,TextureAtlas.class);
+		return assets.get(IMAGE_FOLDER+FILE_SEPARATOR+name,TextureAtlas.class);
 	}
 	
 	public TiledMap getTiledMap(String name) {
@@ -248,11 +253,11 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	}
 	
 	public static void error(String tag,String message) {
-		Gdx.app.error("KyperBox->"+tag, message);
+		Gdx.app.error(TAG+tag, message);
 	}
 	
 	public static void log(String tag,String message) {
-		Gdx.app.log("KyperBox->"+tag, message);
+		Gdx.app.log(TAG+tag, message);
 	}
 	
 	@Override
@@ -267,7 +272,7 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	 * @return
 	 */
 	public Sprite getGameSprite(String name) {
-		return getGameSprite(name, "game.atlas");
+		return getGameSprite(name, GAME_ATLAS);
 	}
 	
 	public Sprite getGameSprite(String name,String atlas) {

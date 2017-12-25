@@ -1,7 +1,11 @@
 package com.kyperbox.controllers;
 
-import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
-import com.badlogic.gdx.math.MathUtils;
+import java.security.GeneralSecurityException;
+
+import org.w3c.dom.CDATASection;
+
+import com.badlogic.gdx.utils.Array;
+import com.kyperbox.controllers.CollisionController.CollisionData;
 import com.kyperbox.managers.Priority;
 import com.kyperbox.objects.GameObject;
 
@@ -18,6 +22,7 @@ public class PlatformerController extends GameObjectController{
 	private boolean direction_left;
 	private boolean walking;
 	private boolean jumping;
+	private CollisionController collision_control;
 	
 	/**
 	 * simple platformer movement and controls. 
@@ -35,6 +40,7 @@ public class PlatformerController extends GameObjectController{
 		setJumpSpeed(object.getProperties().get("min_jump_speed", 200f,Float.class),object.getProperties().get("max_jump_speed", 600f,Float.class));
 		setGravity(object.getProperties().get("gravity", -12f,Float.class));
 		setWalkSpeed(object.getProperties().get("walk_speed",300f,Float.class));
+		collision_control = object.getController(CollisionController.class);
 		
 	}
 	
@@ -54,11 +60,13 @@ public class PlatformerController extends GameObjectController{
 
 	@Override
 	public void update(GameObject object, float delta) {
-		
+		on_ground = false;
 		switch(state) {
 		case STAND:
-			if(object.getY() > 0) {
+			if(object.getY() > 0 && (collision_control==null || (collision_control.collisionWithOffset(object,0,-1) == null))) {
 				state = PlatformState.FALL;
+			}else {
+				on_ground = true;
 			}
 			break;
 		case JUMP: 
@@ -78,8 +86,28 @@ public class PlatformerController extends GameObjectController{
 				object.setPosition(object.getX(), 0);
 				state = PlatformState.STAND;
 				stopY();
-				
 			}
+			if(collision_control!=null) {
+				
+				Array<CollisionData> col_data = collision_control.getCollisions();
+				for (int i = 0; i < col_data.size; i++) {
+					CollisionData cd = col_data.get(i);
+					PlatformerController tpc = cd.getTarget().getController(PlatformerController.class);
+					if(tpc == null)
+						continue;
+					float cd_y = cd.getOverlapBox().y;
+					float cd_h = cd.getOverlapBox().height;
+					if(tpc.on_ground && cd_y+cd_h > object.getCollisionBounds().y) {
+						object.setPosition(object.getX(), cd_y+cd_h);
+						stopY();
+						on_ground = true;
+						state = PlatformState.STAND;
+					}
+				}
+			}else {
+				collision_control = object.getController(CollisionController.class);
+			}
+				
 			break;
 		default:
 			break;

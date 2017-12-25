@@ -132,7 +132,6 @@ public abstract class GameObject extends Group{
 	public Array<GameObjectController> getControllers(){return controllers;}
 	
 	public void update(float delta) {
-		//TODO: overrride
 		for(int i = 0;i < controllers.size;i++)
 			controllers.get(i).update(this, delta);
 		setPosition(getX()+velocity.x*delta, getY()+velocity.y*delta);
@@ -140,16 +139,13 @@ public abstract class GameObject extends Group{
 	
 	@Override
 	public void act(float delta) {
-		// TODO Auto-generated method stub
 		update(delta);
 		super.act(delta);
 	}
 	
 	public void onRemove() {
-		//TODO:override
 		for(GameObjectController controller:controllers)
 			controller.remove(this);
-		controllers.clear();
 	}
 	
 	protected void setGameLayer(GameLayer layer) {

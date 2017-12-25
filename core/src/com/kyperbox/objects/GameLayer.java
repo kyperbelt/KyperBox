@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.kyperbox.GameState;
+import com.kyperbox.controllers.GameObjectController;
 import com.kyperbox.objects.GameObject.GameObjectChangeType;
 import com.kyperbox.systems.LayerSystem;
 
@@ -203,6 +204,13 @@ public class GameLayer extends Group{
 
 	public LayerCamera getCamera() {
 		return cam;
+	}
+	
+	public <t>t getSystem(Class<t> type) {
+		for(LayerSystem system:systems)
+			if(type.isInstance(system))
+				return type.cast(system);
+		return null;
 	}
 	
 	public static class LayerCamera{

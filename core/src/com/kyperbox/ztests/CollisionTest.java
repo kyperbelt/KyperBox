@@ -6,7 +6,6 @@ import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
@@ -16,6 +15,7 @@ import com.kyperbox.GameInput.KeyboardMapping;
 import com.kyperbox.GameInput.MouseButtonMapping;
 import com.kyperbox.GameState;
 import com.kyperbox.KyperBoxGame;
+import com.kyperbox.controllers.CollisionController;
 import com.kyperbox.controllers.PlatformerController;
 import com.kyperbox.managers.StateManager;
 import com.kyperbox.objects.BasicGameObject;
@@ -30,7 +30,7 @@ public class CollisionTest extends KyperBoxGame{
 
 	@Override
 	public void initiate() {
-		Gdx.app.setLogLevel(Application.LOG_NONE);
+		//Gdx.app.setLogLevel(Application.LOG_NONE);
 		
 		registerGameState("collisiontest.tmx", new StateManager() {
 			QuadTree quadtree;
@@ -39,7 +39,7 @@ public class CollisionTest extends KyperBoxGame{
 			private Label stats;
 			private GameLayer playground;
 			private int counter;
-			private float interval = .01f;
+			private float interval = .2f;
 			private float elapsed;
 			private StringBuilder string = new StringBuilder(100);
 			private String object_head = "objects=";
@@ -69,7 +69,10 @@ public class CollisionTest extends KyperBoxGame{
 					test.setPosition(mouse_pos.x, mouse_pos.y);
 					log("positioncheck", mouse_pos.toString());
 					playground.addGameObject(test, pooperties);
-					test.addGameObjectController(new PlatformerController());
+					if(test.getController(PlatformerController.class)==null)
+						test.addGameObjectController(new PlatformerController());
+					if(test.getController(CollisionController.class)==null)
+						test.addGameObjectController(new CollisionController(-1));
 					objects.add(test);
 					
 				}
@@ -83,11 +86,14 @@ public class CollisionTest extends KyperBoxGame{
 				}
 				
 				if(getInput().inputJustPressed("move_down")) {
+
+					counter = 0;
 					for (int i = 0; i < objects.size; i++) {
 						objects.get(i).remove();
 					}
-					objects.clear();
 					test_objects.freeAll(objects);
+
+					objects.clear();
 				}
 				
 				string.setLength(0);
@@ -122,7 +128,7 @@ public class CollisionTest extends KyperBoxGame{
 				
 			}
 		});
-		
+		debugRender(true);
 		setGameState("collisiontest.tmx");
 		
 	}
