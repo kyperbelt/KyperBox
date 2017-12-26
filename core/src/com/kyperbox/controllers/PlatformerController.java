@@ -1,10 +1,7 @@
 package com.kyperbox.controllers;
 
-import java.security.GeneralSecurityException;
-
-import org.w3c.dom.CDATASection;
-
 import com.badlogic.gdx.utils.Array;
+import com.kyperbox.KyperBoxGame;
 import com.kyperbox.controllers.CollisionController.CollisionData;
 import com.kyperbox.managers.Priority;
 import com.kyperbox.objects.GameObject;
@@ -35,12 +32,15 @@ public class PlatformerController extends GameObjectController{
 		this.daddy = object;
 		jumping = false;
 		walking = false;
+		on_ground = false;
 		state = PlatformState.STAND;
 		setPriority(Priority.HIGH);
 		setJumpSpeed(object.getProperties().get("min_jump_speed", 200f,Float.class),object.getProperties().get("max_jump_speed", 600f,Float.class));
 		setGravity(object.getProperties().get("gravity", -12f,Float.class));
 		setWalkSpeed(object.getProperties().get("walk_speed",300f,Float.class));
 		collision_control = object.getController(CollisionController.class);
+		if(collision_control!=null)
+			collision_control.getCollisions().clear();
 		
 	}
 	
@@ -61,10 +61,22 @@ public class PlatformerController extends GameObjectController{
 	@Override
 	public void update(GameObject object, float delta) {
 		on_ground = false;
+		if(collision_control==null) {
+			collision_control = object.getController(CollisionController.class);
+		}
+		
 		switch(state) {
 		case STAND:
-			if(object.getY() > 0 && (collision_control==null || (collision_control.collisionWithOffset(object,0,-1) == null))) {
-				state = PlatformState.FALL;
+			GameObject collision = collision_control.collisionWithOffset(object,0,-1);
+			
+			if((collision == null)&& object.getCollisionBounds().y > 0) {
+					state = PlatformState.FALL;
+			}else if(collision!=null){
+				PlatformerController cp = collision.getController(PlatformerController.class);
+				if(cp!=null && cp.on_ground)
+					on_ground = true;
+				else
+					state = PlatformState.FALL;
 			}else {
 				on_ground = true;
 			}
@@ -104,8 +116,6 @@ public class PlatformerController extends GameObjectController{
 						state = PlatformState.STAND;
 					}
 				}
-			}else {
-				collision_control = object.getController(CollisionController.class);
 			}
 				
 			break;

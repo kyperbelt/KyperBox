@@ -40,7 +40,7 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	private Array<GameState> current_gamestates;
 	private Array<String> packages;
 	
-	private PriorityComparator prio_compare;
+	private static PriorityComparator prio_compare;
 
 	private ObjectMap<String,Sprite> sprites;
 	private ObjectMap<String,Animation<String>>animations;
@@ -54,9 +54,15 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	 //WARNING    ===========
 	}//DO NOT USE ===========
 	
+	
+	public static PriorityComparator getPriorityComperator() {
+		if(prio_compare == null)
+			prio_compare = new PriorityComparator();
+		return prio_compare;
+	}
+	
 	@Override
 	public void create () {
-		prio_compare = new PriorityComparator();
 		game_stage = new Stage(view);
 		game_states = new ObjectMap<String,GameState>();
 		game_stage.setDebugAll(false);
@@ -103,10 +109,6 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	
 	public GameInput getInput() {
 		return input;
-	}
-	
-	public PriorityComparator getPriorityComperator() {
-		return prio_compare;
 	}
 	
 	public void registerObjectPackage(String object_package) {

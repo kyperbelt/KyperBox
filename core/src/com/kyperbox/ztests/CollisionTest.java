@@ -34,6 +34,11 @@ public class CollisionTest extends KyperBoxGame{
 		
 		registerGameState("collisiontest.tmx", new StateManager() {
 			QuadTree quadtree;
+			private String sprite_name = "windowbackground";
+			private String action_button = "action_button";
+			private String move_up = "move_up";
+			private String move_down = "move_down";
+			private String object_name_start = "object@";
 			private Vector2 mouse_pos;
 			private MapProperties pooperties;
 			private Label stats;
@@ -57,27 +62,38 @@ public class CollisionTest extends KyperBoxGame{
 			public void update(float delta) {
 				elapsed+=delta;
 				
-				if(getInput().inputPressed("action_button")&&elapsed >= interval) {
+				if(getInput().inputPressed(action_button)&&elapsed >= interval) {
 					
 					elapsed = 0;
 					mouse_pos = playground.getCamera().unproject(mouse_pos.set(getInput().getMouseX(), getInput().getMouseY()));
 					BasicGameObject test = test_objects.obtain();
 					test.setSize(32, 32);
-					test.setName("random_object@"+counter);
-					test.setSprite("windowbackground");
+					test.setName(object_name_start+counter);
+					test.setSprite(sprite_name);
 					counter++;
 					test.setPosition(mouse_pos.x, mouse_pos.y);
-					log("positioncheck", mouse_pos.toString());
+					
 					playground.addGameObject(test, pooperties);
+					
+					
 					if(test.getController(PlatformerController.class)==null)
 						test.addGameObjectController(new PlatformerController());
+					else {
+						test.getController(PlatformerController.class).reset();
+					}
 					if(test.getController(CollisionController.class)==null)
 						test.addGameObjectController(new CollisionController(-1));
+					else {
+						test.getController(CollisionController.class).reset();
+					}
+					
+					
+					
 					objects.add(test);
 					
 				}
 				
-				if(getInput().inputJustPressed("move_up")) {
+				if(getInput().inputJustPressed(move_up)) {
 					debugRender(!getDebugRender());
 					if(Gdx.app.getLogLevel()!=Application.LOG_NONE)
 						Gdx.app.setLogLevel(Application.LOG_NONE);
@@ -85,7 +101,7 @@ public class CollisionTest extends KyperBoxGame{
 						Gdx.app.setLogLevel(Application.LOG_INFO);
 				}
 				
-				if(getInput().inputJustPressed("move_down")) {
+				if(getInput().inputJustPressed(move_down)) {
 
 					counter = 0;
 					for (int i = 0; i < objects.size; i++) {

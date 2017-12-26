@@ -145,7 +145,6 @@ public class GameLayer extends Group{
 	@Override
 	public boolean removeActor(Actor actor) {
 		boolean r =  super.removeActor(actor);
-		GameObjectRemoved((GameObject) actor, null);
 		return r;
 	}
 	

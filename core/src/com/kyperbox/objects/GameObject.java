@@ -127,6 +127,9 @@ public abstract class GameObject extends Group{
 		this.properties = properties;
 		bounds = new Rectangle(0, 0, getWidth(), getHeight());
 		ret_bounds = new Rectangle(bounds);
+		for (int i = 0; i < controllers.size; i++) {
+			controllers.get(i).init(this);
+		}
 	}
 	
 	public Array<GameObjectController> getControllers(){return controllers;}
@@ -144,8 +147,9 @@ public abstract class GameObject extends Group{
 	}
 	
 	public void onRemove() {
-		for(GameObjectController controller:controllers)
-			controller.remove(this);
+		for (int i = 0; i < controllers.size; i++) {
+			controllers.get(i).remove(this);
+		}
 	}
 	
 	protected void setGameLayer(GameLayer layer) {
@@ -161,7 +165,7 @@ public abstract class GameObject extends Group{
 			layer.getState().error("Cannot add type ["+controller.getClass().getName()+"] more than once.");
 		}
 		controllers.add(controller);
-		controllers.sort(layer.getState().getGame().getPriorityComperator());
+		controllers.sort(KyperBoxGame.getPriorityComperator());
 		controller.init(this);
 	}
 	
@@ -208,9 +212,10 @@ public abstract class GameObject extends Group{
 	@Override
 	public boolean remove() {
 		layer.GameObjectRemoved(this, null);
+		boolean l = layer.removeActor(this);
 		layer = null;
 		onRemove();
-		return super.remove();
+		return l;
 	}
 
 	public static enum GameObjectChangeType{

@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Pool.Poolable;
 import com.kyperbox.objects.BasicGameObject;
@@ -91,7 +90,6 @@ public class QuadTree extends LayerSystem {
 	@Override
 	public void gameObjectAdded(GameObject object, GameObject parent) {
 		objects.add(object);
-		getLayer().getState().log("QuadTree: object_added=" + object.getName());
 	}
 
 	@Override
@@ -101,8 +99,8 @@ public class QuadTree extends LayerSystem {
 
 	@Override
 	public void gameObjectRemoved(GameObject object, GameObject parent) {
+		object.getState().log("removed:"+object.getName()+" from quadtree");
 		objects.removeValue(object,true);
-		getLayer().getState().log("QuadTree: removed object =" + object.getName());
 	}
 
 	@Override
@@ -227,9 +225,11 @@ public class QuadTree extends LayerSystem {
 		}
 
 		public void assessPossibleCollisions(Array<GameObject> possible_collisions, GameObject object) {
-			int index = getQuadIndex(object);
-			if (index != -1 && quads[0] != null) {
-				quads[index].assessPossibleCollisions(possible_collisions, object);
+			
+			if (quads[0] != null) {
+				for(int i = 0;i < quads.length;i++)
+					if(quads[i].getBounds().overlaps(object.getCollisionBounds()))
+						quads[i].assessPossibleCollisions(possible_collisions, object);
 			}
 			for (int i = 0; i < quad_objects.size; i++) {
 				if (quad_objects.get(i) != object)
@@ -259,10 +259,6 @@ public class QuadTree extends LayerSystem {
 				size += quads[i].getSize();
 			}
 			return size;
-		}
-
-		public void remove(GameObject object) {
-			quad_objects.removeValue(object, true);
 		}
 
 		/**

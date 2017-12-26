@@ -70,6 +70,8 @@ public class CollisionController extends GameObjectController {
 	public void init(GameObject object) {
 		tree = object.getGameLayer().getSystem(QuadTree.class);
 		setPriority(Priority.HIGH);
+		object.getState().log("COLCon init:"+object.getName());
+		collisions.clear();
 
 	}
 
@@ -92,13 +94,13 @@ public class CollisionController extends GameObjectController {
 					CollisionData data = CollisionData.getPool().obtain();
 					Rectangle self_bounds = object.getCollisionBounds();
 					Rectangle target_bounds = target.getCollisionBounds();
-
-					float x = self_bounds.x > target_bounds.x ? self_bounds.x : target_bounds.x;
-					float y = self_bounds.y > target_bounds.y ? self_bounds.y : target_bounds.y;
-
-					float w = self_bounds.x > target_bounds.x ? target_bounds.x + target_bounds.width - self_bounds.x
-							: self_bounds.x + self_bounds.width - target_bounds.x;
-					float h = self_bounds.y > target_bounds.y ? target_bounds.y + target_bounds.height - self_bounds.y
+					
+					//create a quad for the collision
+					float x = self_bounds.x > target_bounds.x ? self_bounds.x : target_bounds.x; 						//X
+					float y = self_bounds.y > target_bounds.y ? self_bounds.y : target_bounds.y; 						//Y
+					float w = self_bounds.x > target_bounds.x ? target_bounds.x + target_bounds.width - self_bounds.x	//WIDTH
+							: self_bounds.x + self_bounds.width - target_bounds.x;									
+					float h = self_bounds.y > target_bounds.y ? target_bounds.y + target_bounds.height - self_bounds.y	//HEIGHT
 							: self_bounds.y + self_bounds.height - target_bounds.y;
 
 					data.init(object, target, this, x, y, w, h);
@@ -124,7 +126,7 @@ public class CollisionController extends GameObjectController {
 			Array<GameObject> possible_collisions = tree.checkPossibleCollisionsForRect(check.x, check.y, check.width, check.height);
 			for (int i = 0; i < possible_collisions.size; i++) {
 				GameObject target = possible_collisions.get(i);
-				if(target.getCollisionBounds().overlaps(check)) {
+				if(target!=object&&target.getCollisionBounds().overlaps(check)) {
 					return target;
 				}
 			}
