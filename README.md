@@ -1,3 +1,3 @@
 # KyperBox
 
-[https://trello.com/b/KQrcUFgS/kyperbox-project TRELLO]
+TRELLO: https://trello.com/b/KQrcUFgS/kyperbox-project
