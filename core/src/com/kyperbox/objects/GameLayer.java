@@ -14,7 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.kyperbox.GameState;
-import com.kyperbox.controllers.GameObjectController;
+import com.kyperbox.KyperBoxGame;
 import com.kyperbox.objects.GameObject.GameObjectChangeType;
 import com.kyperbox.systems.LayerSystem;
 
@@ -183,7 +183,7 @@ public class GameLayer extends Group{
 			}
 		system.setLayer(this);
 		systems.add(system);
-		systems.sort(getState().getGame().getPriorityComperator());
+		systems.sort(KyperBoxGame.getPriorityComperator());
 		system.init(getLayerProperties());
 	}
 	
@@ -285,7 +285,7 @@ public class GameLayer extends Group{
 		public Vector2 unproject(Vector2 coords) {
 			Viewport view = layer.getState().getGame().getView();
 			view.unproject(coords);
-			coords.set(-position.x +coords.x, position.y + coords.y).scl(1f/getZoom());
+			coords.set(-position.x +coords.x, coords.y - position.y).scl(1f/getZoom());
 			return coords;
 		}
 		

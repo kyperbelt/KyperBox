@@ -30,6 +30,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.Scaling;
+import com.kyperbox.input.GameInput;
 import com.kyperbox.managers.StateManager;
 import com.kyperbox.objects.GameLayer;
 import com.kyperbox.objects.GameObject;
@@ -59,17 +60,17 @@ public class GameState {
 			}
 			
 			@Override
-			public void init(GameState game) {
+			public void preInit(GameState state) {
 				
 			}
 			
 			@Override
-			public void dispose(GameState game) {
+			public void init(GameState state) {
 				
 			}
-
+			
 			@Override
-			public void preInit(GameState game) {
+			public void dispose(GameState state) {
 				
 			}
 		});

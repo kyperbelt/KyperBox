@@ -19,21 +19,20 @@ public abstract class StateManager {
 	
 	/**
 	 * called before all layer data is instantiated
-	 * perfect type to add layer_managers
-	 * @param game
+	 * perfect time to add layer_managers
 	 */
 	public abstract void preInit(GameState state);
 	
 	/**
 	 * called when this state is set
-	 * @param game
 	 */
 	public abstract void init(GameState state);
+	
 	/**
 	 * called every update
-	 * @param delta
 	 */
 	public abstract void update(float delta);
+	
 	/**
 	 * called when the 
 	 * @param game

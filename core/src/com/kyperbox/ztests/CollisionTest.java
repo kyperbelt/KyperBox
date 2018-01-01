@@ -11,18 +11,23 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.StringBuilder;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.kyperbox.GameInput.KeyboardMapping;
-import com.kyperbox.GameInput.MouseButtonMapping;
 import com.kyperbox.GameState;
 import com.kyperbox.KyperBoxGame;
 import com.kyperbox.controllers.CollisionController;
 import com.kyperbox.controllers.PlatformerController;
+import com.kyperbox.input.KeyboardMapping;
+import com.kyperbox.input.MouseButtonMapping;
 import com.kyperbox.managers.StateManager;
 import com.kyperbox.objects.BasicGameObject;
 import com.kyperbox.objects.GameLayer;
 import com.kyperbox.systems.QuadTree;
 
 public class CollisionTest extends KyperBoxGame{
+	
+	public static final String CAM_LEFT = "cam_left";
+	public static final String CAM_RIGHT = "cam_right";
+	public static final String CAM_DOWN = "cam_down";
+	public static final String CAM_UP = "cam_up";
 
 	public CollisionTest() {
 		super(new FitViewport(1280, 720));
@@ -31,6 +36,16 @@ public class CollisionTest extends KyperBoxGame{
 	@Override
 	public void initiate() {
 		//Gdx.app.setLogLevel(Application.LOG_NONE);
+		
+		getInput().registerInput(CAM_UP);
+		getInput().registerInput(CAM_DOWN);
+		getInput().registerInput(CAM_LEFT);
+		getInput().registerInput(CAM_RIGHT);
+		
+		getInput().addInputMapping(CAM_UP, new KeyboardMapping(Keys.UP));
+		getInput().addInputMapping(CAM_DOWN, new KeyboardMapping(Keys.DOWN));
+		getInput().addInputMapping(CAM_LEFT, new KeyboardMapping(Keys.LEFT));
+		getInput().addInputMapping(CAM_RIGHT, new KeyboardMapping(Keys.RIGHT));
 		
 		registerGameState("collisiontest.tmx", new StateManager() {
 			QuadTree quadtree;
@@ -44,8 +59,9 @@ public class CollisionTest extends KyperBoxGame{
 			private Label stats;
 			private GameLayer playground;
 			private int counter;
-			private float interval = .2f;
+			private float interval = .5f;
 			private float elapsed;
+			private float cam_speed = 100f;
 			private StringBuilder string = new StringBuilder(100);
 			private String object_head = "objects=";
 			private Pool<BasicGameObject> test_objects = new Pool<BasicGameObject>() {
@@ -93,6 +109,25 @@ public class CollisionTest extends KyperBoxGame{
 					
 				}
 				
+				Vector2 cam_pos = playground.getCamera().getPosition();
+				
+				if(getInput().inputPressed(CAM_LEFT)) {
+					playground.getCamera().setPosition(cam_pos.x-cam_speed*delta,cam_pos.y);
+					cam_pos = playground.getCamera().getPosition();
+				}
+				if(getInput().inputPressed(CAM_RIGHT)) {
+					playground.getCamera().setPosition(cam_pos.x+cam_speed*delta, cam_pos.y);
+					cam_pos = playground.getCamera().getPosition();
+				}
+				if(getInput().inputPressed(CAM_UP)) {
+					playground.getCamera().setPosition(cam_pos.x, cam_pos.y+cam_speed*delta);
+					cam_pos = playground.getCamera().getPosition();
+				}
+				if(getInput().inputPressed(CAM_DOWN)) {
+					playground.getCamera().setPosition(cam_pos.x, cam_pos.y-cam_speed*delta);
+				}
+				
+				
 				if(getInput().inputJustPressed(move_up)) {
 					debugRender(!getDebugRender());
 					if(Gdx.app.getLogLevel()!=Application.LOG_NONE)
@@ -126,6 +161,7 @@ public class CollisionTest extends KyperBoxGame{
 				pooperties = new MapProperties();
 				pooperties.put("sprite", "windowbackground");
 				quadtree = new QuadTree(0, 0, getView().getWorldWidth(), getView().getWorldHeight());
+				quadtree.setFollowView(true);
 				state.getPlaygroundLayer().addLayerSystem(quadtree);
 			}
 			

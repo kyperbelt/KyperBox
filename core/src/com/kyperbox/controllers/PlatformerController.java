@@ -1,20 +1,18 @@
 package com.kyperbox.controllers;
 
 import com.badlogic.gdx.utils.Array;
-import com.kyperbox.KyperBoxGame;
 import com.kyperbox.controllers.CollisionController.CollisionData;
 import com.kyperbox.managers.Priority;
 import com.kyperbox.objects.GameObject;
 
 public class PlatformerController extends GameObjectController{
 	
-	private GameObject daddy;
+	private GameObject daddy; //object that fathers this controller
 	private PlatformState state;
 	private float walk_speed;
 	private float jump_speed;
 	private float min_jump_speed;
 	private boolean on_ground;
-	private boolean was_on_ground;
 	private float gravity;
 	private boolean direction_left;
 	private boolean walking;
@@ -29,6 +27,8 @@ public class PlatformerController extends GameObjectController{
 	
 	@Override
 	public void init(GameObject object) {
+		if(object.getParent()==null)
+			return;
 		this.daddy = object;
 		jumping = false;
 		walking = false;
@@ -67,7 +67,9 @@ public class PlatformerController extends GameObjectController{
 		
 		switch(state) {
 		case STAND:
-			GameObject collision = collision_control.collisionWithOffset(object,0,-1);
+			GameObject collision = null;
+			if(collision_control!=null)
+			  collision = collision_control.collisionWithOffset(object,0,-1);
 			
 			if((collision == null)&& object.getCollisionBounds().y > 0) {
 					state = PlatformState.FALL;

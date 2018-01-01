@@ -1,22 +1,18 @@
 package com.kyperbox.ztests;
 
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.kyperbox.GameInput.KeyboardMapping;
-import com.kyperbox.controllers.PlatformerController;
-import com.kyperbox.controllers.PlatformerController.PlatformState;
 import com.kyperbox.GameState;
 import com.kyperbox.KyperBoxGame;
+import com.kyperbox.controllers.PlatformerController;
+import com.kyperbox.input.KeyboardMapping;
 import com.kyperbox.managers.StateManager;
 import com.kyperbox.objects.GameLayer;
-import com.kyperbox.objects.GameObject;
 import com.kyperbox.objects.PlatformerObject;
-import com.kyperbox.objects.ScrollingBackground;
 
 public class MyGame extends KyperBoxGame{
 
@@ -32,9 +28,9 @@ public class MyGame extends KyperBoxGame{
 		StateManager test_manager = new StateManager() {
 			
 			GameLayer playground;
-			Vector2 mouse_coords;
-			GameObject cloud1;
-			ScrollingBackground background;
+			//Vector2 mouse_coords;
+			//GameObject cloud1;
+			//ScrollingBackground background;
 			PlatformerObject player;
 			
 			
@@ -48,7 +44,7 @@ public class MyGame extends KyperBoxGame{
 				
 				playground = game.getPlaygroundLayer();
 				
-				mouse_coords = new Vector2();
+				//mouse_coords = new Vector2();
 				
 				
 				
@@ -112,7 +108,7 @@ public class MyGame extends KyperBoxGame{
 					});
 				}
 				
-				background = (ScrollingBackground) game.getBackgroundLayer().getGameObject("cloud_background");
+				//background = (ScrollingBackground) game.getBackgroundLayer().getGameObject("cloud_background");
 				player = (PlatformerObject)game.getPlaygroundLayer().getGameObject("player_1");
 				playground.getCamera().setCentered();
 				playground.getCamera().setCamFollowBounds(-100, -316, 200, 300);

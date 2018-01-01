@@ -67,10 +67,10 @@ public class UserData {
 	@SuppressWarnings("unchecked")
 	public boolean loadFromJson(String json) {
 		if(MYFRIEND == null)
-			MYFRIEND = new Json(); 
-		//TODO: load from json
-		variables = MYFRIEND.fromJson(ObjectMap.class, json);
-		return false;
+			MYFRIEND = new Json();
+		ObjectMap<String,String> vv = MYFRIEND.fromJson(ObjectMap.class, json);
+		variables = vv !=null? vv:variables;
+		return vv != null;
 	
 	}
 	

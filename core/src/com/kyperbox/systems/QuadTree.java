@@ -3,8 +3,11 @@ package com.kyperbox.systems;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapProperties;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Pool.Poolable;
 import com.kyperbox.objects.BasicGameObject;
@@ -12,6 +15,8 @@ import com.kyperbox.objects.GameObject;
 import com.kyperbox.objects.GameObject.GameObjectChangeType;
 
 public class QuadTree extends LayerSystem {
+	
+	//this padding is added for absolutely no reason TODO: remove? it doesnt bother me right now so im going to leave it.
 	private static final int PAD = 10;
 	// TODO: add bounds follow
 	// TODO: test with object controller
@@ -26,7 +31,11 @@ public class QuadTree extends LayerSystem {
 	private Quad root; // the head honcho of this quad tree
 	private Array<GameObject> ret_list; // an array used to return results to gameobjects for collision checks
 	private GameObject check_object;
-
+	private IntArray remove_objects;
+	private boolean culling;
+	private float follow_x;
+	private float follow_y;
+	
 	/**
 	 * create a quadtree collision manager with a default max_depth of 4 and a
 	 * max_object count of 10.
@@ -39,6 +48,10 @@ public class QuadTree extends LayerSystem {
 	public QuadTree(float x, float y, float width, float height) {
 		check_object = new BasicGameObject();
 		check_object.init(null);
+		remove_objects = new IntArray();
+		culling = true;
+		follow_x  =0;
+		follow_y  =0;
 		bounds = new Rectangle(x - PAD, y - PAD, width + PAD * 2, height + PAD * 2);
 		objects =  new Array<GameObject>();
 		follow_view = false;
@@ -90,11 +103,19 @@ public class QuadTree extends LayerSystem {
 	@Override
 	public void gameObjectAdded(GameObject object, GameObject parent) {
 		objects.add(object);
+		
 	}
 
 	@Override
 	public void gameObjectChanged(GameObject object, GameObjectChangeType type, int value) {
+		if(type != GameObjectChangeType.LOCATION)
+			return;
 		
+		if(culling&&!objects.contains(object, true))  {
+			if(root.bounds.overlaps(object.getCollisionBounds())) {
+				objects.add(object);
+			}
+		}
 	}
 
 	@Override
@@ -106,8 +127,30 @@ public class QuadTree extends LayerSystem {
 	@Override
 	public void update(float delta) {
 		root.clear();
+		remove_objects.clear();
+		if(follow_view) {
+			Vector2 view_pos = getLayer().getCamera().getPosition();
+			if(follow_x!=view_pos.x) {
+				root.translate(view_pos.x - follow_x , 0);
+				follow_x = view_pos.x;
+			}
+				
+			if(follow_y!=view_pos.y) {
+				root.translate(0, view_pos.y - follow_y);
+				follow_y = view_pos.y;
+			}
+				
+		}
 		for (int i = 0; i < objects.size; i++) {
-			root.place(objects.get(i));
+			if(culling&&!root.bounds.overlaps(objects.get(i).getCollisionBounds())) {
+				remove_objects.add(i);
+			}else
+				root.place(objects.get(i));
+				
+		}
+		
+		for (int i = 0; i < remove_objects.size; i++) {
+			objects.removeIndex(remove_objects.get(i));
 		}
 	}
 
@@ -120,6 +163,10 @@ public class QuadTree extends LayerSystem {
 	@Override
 	public void onRemove() {
 		getLayer().getState().log("QuadTree: removed");
+		root.clear();
+		ret_list.clear();
+		objects.clear();
+		remove_objects.clear();
 	}
 
 	public Pool<Quad> getPool() {
@@ -133,6 +180,30 @@ public class QuadTree extends LayerSystem {
 		check_object.setCollisionBounds(0, 0, w, h);
 		root.assessPossibleCollisions(ret_list, check_object);
 		return ret_list;
+	}
+	
+	/**
+	 * if true then this quadtree bounds follow the camera view of the layer it belongs to. 
+	 * @param follow_view
+	 */
+	public void setFollowView(boolean follow_view) {
+		this.follow_view = follow_view;
+	}
+	
+	public boolean isFollowingView() {
+		return follow_view;
+	}
+	
+	/**
+	 * if true, objects are culled when they are outside the bounds of the root {@link Quad} and added when they re-enter.
+	 * @param culling
+	 */
+	public void setCulling(boolean culling) {
+		this.culling = culling;
+	}
+	
+	public boolean isCulling() {
+		return culling;
 	}
 
 	public static class Quad implements Poolable {
@@ -238,7 +309,7 @@ public class QuadTree extends LayerSystem {
 		}
 
 		public void debugRender(ShapeRenderer shapes) {
-			shapes.rect(bounds.x, bounds.y, bounds.width, bounds.height);
+			shapes.rect(bounds.x-manager.getLayer().getCamera().getPosition().x, bounds.y-manager.getLayer().getCamera().getPosition().y, bounds.width, bounds.height);
 			if (quads[0] != null) {
 				for (int i = 0; i < quads.length; i++) {
 					quads[i].debugRender(shapes);
@@ -259,6 +330,14 @@ public class QuadTree extends LayerSystem {
 				size += quads[i].getSize();
 			}
 			return size;
+		}
+		
+		public void translate(float x,float y) {
+			bounds.setPosition(bounds.x+x, bounds.y+y);
+			if(quads[0] != null)
+				for (int i = 0; i < quads.length; i++) {
+					quads[i].translate(x, y);
+				}
 		}
 
 		/**

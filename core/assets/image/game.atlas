@@ -6,294 +6,308 @@ filter: Nearest,Nearest
 repeat: none
 Impact48
   rotate: false
-  xy: 2, 499
+  xy: 2, 490
   size: 512, 512
   orig: 512, 512
   offset: 0, 0
   index: -1
 SunsetTempleBackground
   rotate: false
-  xy: 2, 137
+  xy: 2, 128
   size: 640, 360
   orig: 640, 360
   offset: 0, 0
   index: -1
 TempleTIles
   rotate: false
-  xy: 644, 81
+  xy: 644, 72
   size: 544, 416
   orig: 544, 416
   offset: 0, 0
   index: -1
 back_down
   rotate: false
-  xy: 1190, 459
+  xy: 1190, 450
   size: 84, 38
   orig: 84, 38
   offset: 0, 0
   index: -1
 back_up
   rotate: false
-  xy: 1544, 715
+  xy: 1544, 706
   size: 84, 38
   orig: 84, 38
   offset: 0, 0
   index: -1
 badlogic
   rotate: false
-  xy: 1544, 755
+  xy: 1544, 746
   size: 256, 256
   orig: 256, 256
   offset: 0, 0
   index: -1
 bomb
   rotate: false
-  xy: 1888, 987
+  xy: 1888, 978
   size: 58, 24
   orig: 58, 24
   offset: 0, 0
   index: -1
 button_down
   rotate: false
-  xy: 230, 111
+  xy: 230, 102
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 button_up
   rotate: false
-  xy: 1948, 987
+  xy: 1948, 978
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 buy_down
   rotate: false
-  xy: 1802, 973
+  xy: 1802, 964
   size: 84, 38
   orig: 84, 38
   offset: 0, 0
   index: -1
 buy_up
   rotate: false
-  xy: 2, 61
+  xy: 2, 52
   size: 84, 38
   orig: 84, 38
   offset: 0, 0
   index: -1
 dash
   rotate: false
-  xy: 2, 36
+  xy: 88, 67
   size: 52, 23
   orig: 52, 23
   offset: 0, 0
   index: -1
 exit_down
   rotate: false
-  xy: 1190, 419
+  xy: 1190, 410
   size: 84, 38
   orig: 84, 38
   offset: 0, 0
   index: -1
 exit_up
   rotate: false
-  xy: 1276, 459
+  xy: 1276, 450
   size: 84, 38
   orig: 84, 38
   offset: 0, 0
   index: -1
 freesiaUPC38
   rotate: false
-  xy: 516, 499
+  xy: 516, 490
   size: 512, 512
   orig: 512, 512
   offset: 0, 0
   index: -1
 greentexture
   rotate: false
-  xy: 1750, 729
+  xy: 1430, 464
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 play_down
   rotate: false
-  xy: 1544, 675
+  xy: 1544, 666
   size: 84, 38
   orig: 84, 38
   offset: 0, 0
   index: -1
 play_up
   rotate: false
-  xy: 1630, 715
+  xy: 1630, 706
   size: 84, 38
   orig: 84, 38
   offset: 0, 0
   index: -1
 player_action_0
   rotate: false
-  xy: 88, 67
+  xy: 1276, 416
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 player_action_1
   rotate: false
-  xy: 1190, 385
+  xy: 1362, 456
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 player_action_2
   rotate: false
-  xy: 1276, 425
+  xy: 1544, 632
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 player_action_3
   rotate: false
-  xy: 1362, 465
+  xy: 1630, 672
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 player_climbing_0
   rotate: false
-  xy: 1544, 641
+  xy: 1716, 712
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 player_climbing_1
   rotate: false
-  xy: 1630, 681
+  xy: 1802, 879
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 player_climbing_2
   rotate: false
-  xy: 1716, 721
+  xy: 1853, 930
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 player_climbing_3
   rotate: false
-  xy: 1802, 889
+  xy: 52, 18
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 player_falling_0
   rotate: false
-  xy: 1852, 939
+  xy: 1190, 340
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 player_falling_1
   rotate: false
-  xy: 2, 2
+  xy: 1230, 376
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 player_jumping_0
   rotate: false
-  xy: 122, 67
+  xy: 1310, 416
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 player_jumping_1
   rotate: false
-  xy: 1190, 351
+  xy: 1396, 456
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 player_jumping_2
   rotate: false
-  xy: 1224, 385
+  xy: 1544, 598
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 player_jumping_3
   rotate: false
-  xy: 1310, 425
+  xy: 1578, 632
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 player_walking_0
   rotate: false
-  xy: 1396, 465
+  xy: 1664, 672
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 player_walking_1
   rotate: false
-  xy: 1544, 607
+  xy: 1750, 712
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 player_walking_2
   rotate: false
-  xy: 1578, 641
+  xy: 1802, 845
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 player_walking_3
   rotate: false
-  xy: 1664, 681
+  xy: 1190, 306
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 pricedownBI48
   rotate: false
-  xy: 1030, 499
+  xy: 1030, 490
   size: 512, 512
   orig: 512, 512
   offset: 0, 0
   index: -1
 redtexture
   rotate: false
-  xy: 1190, 325
+  xy: 1578, 606
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
+rpg_chest_down
+  rotate: false
+  xy: 1190, 374
+  size: 38, 34
+  orig: 38, 34
+  offset: 0, 0
+  index: -1
+rpg_man_down
+  rotate: false
+  xy: 1802, 913
+  size: 49, 49
+  orig: 49, 49
+  offset: 0, 0
+  index: -1
 shoes
   rotate: false
-  xy: 163, 110
+  xy: 163, 101
   size: 65, 25
   orig: 65, 25
   offset: 0, 0
   index: -1
 upgrade
   rotate: false
-  xy: 1802, 851
+  xy: 1544, 560
   size: 22, 36
   orig: 22, 36
   offset: 0, 0
   index: -1
 upgrades
   rotate: false
-  xy: 2, 101
+  xy: 2, 92
   size: 159, 34
   orig: 159, 34
   offset: 0, 0
   index: -1
 windowbackground
   rotate: false
-  xy: 1802, 923
+  xy: 2, 2
   size: 48, 48
   orig: 48, 48
   offset: 0, 0

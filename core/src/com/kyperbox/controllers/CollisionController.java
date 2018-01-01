@@ -68,6 +68,8 @@ public class CollisionController extends GameObjectController {
 
 	@Override
 	public void init(GameObject object) {
+		if(object.getParent() == null)
+			return;
 		tree = object.getGameLayer().getSystem(QuadTree.class);
 		setPriority(Priority.HIGH);
 		object.getState().log("COLCon init:"+object.getName());

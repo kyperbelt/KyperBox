@@ -1,9 +1,10 @@
-package com.kyperbox;
+package com.kyperbox.input;
 
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.kyperbox.KyperBoxGame;
 
 public class GameInput{
 	
@@ -50,7 +51,7 @@ public class GameInput{
 		}
 		inputs_pressed.put(input, NOT_USED);
 		inputs_last_pressed.put(input, false);
-		mappings.put(input, new Array<GameInput.InputMapping>());
+		mappings.put(input, new Array<InputMapping>());
 		input_check.add(input);
 	}
 	
@@ -122,56 +123,4 @@ public class GameInput{
 		}
 	}
 	
-	public static interface InputMapping{
-		
-		public float inputValue();
-		boolean sameAs(InputMapping m);
-	}
-	
-	public static class KeyboardMapping implements InputMapping{
-
-		private int key;
-		
-		public KeyboardMapping(int key) {
-			this.key = key;
-		}
-		@Override
-		public float inputValue() {
-			if(Gdx.input.isKeyPressed(key))
-				return 1f;
-			return NOT_USED;
-		}
-		@Override
-		public boolean sameAs(InputMapping m) {
-			if(m instanceof KeyboardMapping) {
-				KeyboardMapping km = (KeyboardMapping) m;
-				if(km.key == key)
-					return true;
-			
-			}
-			return false;
-		}
-		
-	}
-	
-	public static class MouseButtonMapping implements InputMapping{
-		private int button;
-		public MouseButtonMapping(int button) {
-			this.button = button;
-		}
-		
-		@Override
-		public float inputValue() {
-			if(Gdx.input.isButtonPressed(button))
-				return 1f;
-			return NOT_USED;
-		}
-
-		@Override
-		public boolean sameAs(InputMapping m) {
-			return m instanceof MouseButtonMapping && ((MouseButtonMapping)m).button == button;
-		}
-		
-	}
-
 }
