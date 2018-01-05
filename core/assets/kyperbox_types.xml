@@ -1,25 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <objecttypes>
+ <objecttype name="Assets" color="#00ff00">
+  <property name="Atlases" type="string"/>
+  <property name="Musics" type="string"/>
+  <property name="Sounds" type="string"/>
+ </objecttype>
+ <objecttype name="BasicGameObject" color="#ff0000">
+  <property name="sprite" type="string" default="NO_SPRITE_RENDERED"/>
+ </objecttype>
+ <objecttype name="Font" color="#55ff00">
+  <property name="font_file" type="string" default=""/>
+  <property name="markup" type="bool" default="false"/>
+ </objecttype>
  <objecttype name="GameObject" color="#a0a0a4"/>
+ <objecttype name="Image" color="#ff00ff">
+  <property name="image" type="string"/>
+ </objecttype>
  <objecttype name="ImageButton" color="#ff00ff">
   <property name="downImage" type="string"/>
   <property name="hoverImage" type="string"/>
   <property name="pressedXOff" type="float" default="0"/>
   <property name="pressedYOff" type="float" default="0"/>
   <property name="upImage" type="string"/>
- </objecttype>
- <objecttype name="Assets" color="#00ff00">
-  <property name="Atlases" type="string"/>
-  <property name="Musics" type="string"/>
-  <property name="Sounds" type="string"/>
- </objecttype>
- <objecttype name="Table" color="#ff00ff">
-  <property name="background" type="string"/>
-  <property name="children" type="string"/>
-  <property name="ninepatch" type="bool" default="false"/>
- </objecttype>
- <objecttype name="Image" color="#ff00ff">
-  <property name="image" type="string"/>
  </objecttype>
  <objecttype name="Label" color="#ff00ff">
   <property name="Blue" type="int" default="255"/>
@@ -29,6 +31,36 @@
   <property name="font" type="string"/>
   <property name="text" type="string"/>
   <property name="wrap" type="bool" default="false"/>
+ </objecttype>
+ <objecttype name="PlatformerObject" color="#ff0000">
+  <property name="gravity" type="float" default="-12"/>
+  <property name="max_jump_speed" type="float" default="600"/>
+  <property name="min_jump_speed" type="float" default="200"/>
+  <property name="walk_speed" type="float" default="300"/>
+ </objecttype>
+ <objecttype name="ProgressBar" color="#ff00ff">
+  <property name="background" type="string"/>
+  <property name="flipped" type="bool" default="false"/>
+  <property name="knob" type="string"/>
+  <property name="knob_after" type="string"/>
+  <property name="knob_before" type="string"/>
+  <property name="max" type="float" default="1"/>
+  <property name="min" type="float" default="0"/>
+  <property name="step_size" type="float" default="0.01"/>
+  <property name="vertical" type="bool" default="false"/>
+ </objecttype>
+ <objecttype name="ScrollingBackground" color="#ff0000">
+  <property name="absolute" type="bool" default="false"/>
+  <property name="image" type="string"/>
+  <property name="repeat_horizontal" type="bool" default="false"/>
+  <property name="repeat_vertical" type="bool" default="false"/>
+  <property name="speed_horizontal" type="float" default="0"/>
+  <property name="speed_vertical" type="float" default="0"/>
+ </objecttype>
+ <objecttype name="Table" color="#ff00ff">
+  <property name="background" type="string"/>
+  <property name="children" type="string"/>
+  <property name="ninepatch" type="bool" default="false"/>
  </objecttype>
  <objecttype name="TextButton" color="#ff00ff">
   <property name="Blue" type="int" default="255"/>
@@ -48,39 +80,8 @@
   <property name="pressedYOff" type="float" default="0"/>
   <property name="text" type="string"/>
  </objecttype>
- <objecttype name="Viewport" color="#0000ff"/>
- <objecttype name="Font" color="#55ff00">
-  <property name="font_file" type="string" default=""/>
-  <property name="markup" type="bool" default="false"/>
- </objecttype>
- <objecttype name="ProgressBar" color="#ff00ff">
-  <property name="background" type="string"/>
-  <property name="flipped" type="bool" default="false"/>
-  <property name="knob" type="string"/>
-  <property name="knob_after" type="string"/>
-  <property name="knob_before" type="string"/>
-  <property name="max" type="float" default="1"/>
-  <property name="min" type="float" default="0"/>
-  <property name="step_size" type="float" default="0.01"/>
-  <property name="vertical" type="bool" default="false"/>
- </objecttype>
- <objecttype name="BasicGameObject" color="#ff0000">
-  <property name="sprite" type="string" default="NO_SPRITE_RENDERED"/>
- </objecttype>
- <objecttype name="ScrollingBackground" color="#ff0000">
-  <property name="image" type="string"/>
-  <property name="repeat_horizontal" type="bool" default="false"/>
-  <property name="repeat_vertical" type="bool" default="false"/>
-  <property name="speed_horizontal" type="float" default="0"/>
-  <property name="speed_vertical" type="float" default="0"/>
- </objecttype>
- <objecttype name="PlatformerObject" color="#ff0000">
-  <property name="gravity" type="float" default="-12"/>
-  <property name="max_jump_speed" type="float" default="600"/>
-  <property name="min_jump_speed" type="float" default="200"/>
-  <property name="walk_speed" type="float" default="300"/>
- </objecttype>
  <objecttype name="TilemapLayerObject" color="#ff0000">
   <property name="tile_layer" type="string"/>
  </objecttype>
+ <objecttype name="Viewport" color="#0000ff"/>
 </objecttypes>

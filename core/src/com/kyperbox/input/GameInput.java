@@ -21,10 +21,10 @@ public class GameInput{
 		mappings = new ObjectMap<String, Array<InputMapping>>();
 		input_check = new Array<String>();
 		
-		registerInput("move_up");
-		registerInput("move_down");
-		registerInput("move_left");
-		registerInput("move_right");
+		registerInput(InputDefaults.MOVE_UP);
+		registerInput(InputDefaults.MOVE_DOWN);
+		registerInput(InputDefaults.MOVE_LEFT);
+		registerInput(InputDefaults.MOVE_RIGHT);
 		registerInput("action_button");
 		registerInput("jump_button");
 		

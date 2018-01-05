@@ -60,7 +60,7 @@ public class GameState {
 			}
 			
 			@Override
-			public void preInit(GameState state) {
+			public void addLayerSystems(GameState state) {
 				
 			}
 			
@@ -117,7 +117,7 @@ public class GameState {
 		
 		//init manager
 		if(manager!=null) {
-			manager.preInit(this);
+			manager.addLayerSystems(this);
 		}
 
 		//do preload

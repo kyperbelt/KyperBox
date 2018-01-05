@@ -5,7 +5,7 @@ import com.kyperbox.GameState;
 public class StateManagerAdapter extends StateManager{
 
 	@Override
-	public void preInit(GameState state) {
+	public void addLayerSystems(GameState state) {
 		//TODO: OVERRIDE
 	}
 

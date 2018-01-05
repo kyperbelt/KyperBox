@@ -3,7 +3,6 @@ package com.kyperbox.systems;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapProperties;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
@@ -150,7 +149,8 @@ public class QuadTree extends LayerSystem {
 		}
 		
 		for (int i = 0; i < remove_objects.size; i++) {
-			objects.removeIndex(remove_objects.get(i));
+			if(remove_objects.get(i)<objects.size)
+				objects.removeIndex(remove_objects.get(i));
 		}
 	}
 
@@ -158,6 +158,7 @@ public class QuadTree extends LayerSystem {
 	public void drawDebug(ShapeRenderer shapes) {
 		shapes.setColor(Color.SKY);
 		root.debugRender(shapes);
+		
 	}
 
 	@Override

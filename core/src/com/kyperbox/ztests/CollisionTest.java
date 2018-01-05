@@ -154,7 +154,7 @@ public class CollisionTest extends KyperBoxGame{
 			}
 			
 			@Override
-			public void preInit(GameState state) {
+			public void addLayerSystems(GameState state) {
 				objects = new Array<BasicGameObject>(2000);
 				counter = 0;
 				mouse_pos = new Vector2();

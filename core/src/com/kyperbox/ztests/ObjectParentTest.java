@@ -56,7 +56,7 @@ public class ObjectParentTest extends KyperBoxGame{
 			}
 			
 			@Override
-			public void preInit(GameState state) {
+			public void addLayerSystems(GameState state) {
 				state.getPlaygroundLayer().addLayerSystem(new QuadTree(getView().getWorldWidth(), getView().getWorldHeight()));
 				getInput().addInputMapping(move_left, new KeyboardMapping(Keys.LEFT));
 				getInput().addInputMapping(move_right, new KeyboardMapping(Keys.RIGHT));

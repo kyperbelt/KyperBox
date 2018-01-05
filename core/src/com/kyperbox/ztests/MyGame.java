@@ -35,7 +35,7 @@ public class MyGame extends KyperBoxGame{
 			
 			
 			@Override
-			public void preInit(GameState game) {
+			public void addLayerSystems(GameState game) {
 				getInput().addInputMapping("move_up", new KeyboardMapping(Keys.W));
 				getInput().addInputMapping("move_right", new KeyboardMapping(Keys.D));
 				getInput().addInputMapping("move_down", new KeyboardMapping(Keys.S));

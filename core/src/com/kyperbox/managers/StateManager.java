@@ -21,7 +21,7 @@ public abstract class StateManager {
 	 * called before all layer data is instantiated
 	 * perfect time to add layer_managers
 	 */
-	public abstract void preInit(GameState state);
+	public abstract void addLayerSystems(GameState state);
 	
 	/**
 	 * called when this state is set
