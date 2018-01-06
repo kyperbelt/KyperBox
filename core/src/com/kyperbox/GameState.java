@@ -278,7 +278,7 @@ public class GameState {
 			String type = properties.get("type",String.class);
 			String fontfile = properties.get("font_file",String.class);
 			if(fontfile!=null&&type!=null&&type.equals("Font")) {
-				boolean markup = properties.get("markup",new Boolean(false),Boolean.class);
+				boolean markup = properties.get("markup",false,boolean.class);
 				game.loadFont(fontfile, atlasname);
 				game.getAssetManager().finishLoading();
 				font = game.getFont(fontfile);

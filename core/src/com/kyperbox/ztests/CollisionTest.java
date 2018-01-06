@@ -98,7 +98,7 @@ public class CollisionTest extends KyperBoxGame{
 						test.getController(PlatformerController.class).reset();
 					}
 					if(test.getController(CollisionController.class)==null)
-						test.addGameObjectController(new CollisionController(-1));
+						test.addGameObjectController(new CollisionController());
 					else {
 						test.getController(CollisionController.class).reset();
 					}

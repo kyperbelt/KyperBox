@@ -3,7 +3,6 @@ package com.kyperbox.controllers;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Pool.Poolable;
 import com.kyperbox.managers.Priority;
@@ -19,47 +18,13 @@ import com.kyperbox.systems.QuadTree;
  */
 public class CollisionController extends GameObjectController {
 
-	private IntArray filter;
-	private int group;
-	private boolean sensor;
 	private QuadTree tree;
 	private Array<CollisionData> collisions;
 	private Rectangle check;
 
-	public CollisionController(int group, IntArray filter) {
-		this.group = group;
-		this.filter = filter;
-		this.sensor = false;
+	public CollisionController() {
 		check = new Rectangle();
 		this.collisions = new Array<CollisionController.CollisionData>();
-	}
-
-	public CollisionController(int group, int... filter) {
-		this(group, new IntArray(filter));
-	}
-
-	public CollisionController(int group) {
-		this(group, new IntArray());
-	}
-
-	public boolean isSensor() {
-		return sensor;
-	}
-
-	public void setSensor(boolean sensor) {
-		this.sensor = sensor;
-	}
-
-	public void setGroup(int group) {
-		this.group = group;
-	}
-
-	public int getGroup() {
-		return group;
-	}
-
-	public IntArray getFilter() {
-		return filter;
 	}
 
 	public Array<CollisionData> getCollisions() {
@@ -86,7 +51,7 @@ public class CollisionController extends GameObjectController {
 		if (tree != null) {
 			CollisionData.getPool().freeAll(collisions);
 			collisions.clear();
-			Array<GameObject> possible_collisions = tree.checkPossibleCollisionsForRect(object.getCollisionBounds().x, object.getCollisionBounds().y, object.getCollisionBounds().width, object.getCollisionBounds().height);
+			Array<GameObject> possible_collisions = tree.getPossibleCollisions(object);
 			for (int i = 0; i < possible_collisions.size; i++) {
 				GameObject target = possible_collisions.get(i);
 				CollisionController target_controller = target.getController(CollisionController.class);
@@ -125,7 +90,7 @@ public class CollisionController extends GameObjectController {
 	public GameObject collisionWithOffset(GameObject object,float xoff, float yoff) {
 		if (tree != null) {
 			check.set(object.getCollisionBounds().x+xoff, object.getCollisionBounds().y+yoff, object.getCollisionBounds().width, object.getCollisionBounds().height);
-			Array<GameObject> possible_collisions = tree.checkPossibleCollisionsForRect(check.x, check.y, check.width, check.height);
+			Array<GameObject> possible_collisions = tree.getPossibleCollisions(object);
 			for (int i = 0; i < possible_collisions.size; i++) {
 				GameObject target = possible_collisions.get(i);
 				if(target!=object&&target.getCollisionBounds().overlaps(check)) {
@@ -147,8 +112,6 @@ public class CollisionController extends GameObjectController {
 
 	@Override
 	public void reset() {
-		filter.clear();
-		group = -1;
 		collisions.clear();
 		super.reset();
 	}

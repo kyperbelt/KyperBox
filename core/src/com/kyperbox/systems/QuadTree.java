@@ -13,7 +13,7 @@ import com.kyperbox.objects.BasicGameObject;
 import com.kyperbox.objects.GameObject;
 import com.kyperbox.objects.GameObject.GameObjectChangeType;
 
-public class QuadTree extends LayerSystem {
+public class QuadTree extends CollisionSystem {
 	
 	//this padding is added for absolutely no reason TODO: remove? it doesnt bother me right now so im going to leave it.
 	private static final int PAD = 10;
@@ -68,12 +68,6 @@ public class QuadTree extends LayerSystem {
 		ret_list = new Array<GameObject>();
 	}
 
-	public Array<GameObject> getAllPossibleCollisions(GameObject object) {
-		ret_list.clear();
-		root.assessPossibleCollisions(ret_list, object);
-		return ret_list;
-	}
-
 	public void setMaxDepth(int max_depth) {
 		this.max_depth = max_depth;
 	}
@@ -101,6 +95,7 @@ public class QuadTree extends LayerSystem {
 
 	@Override
 	public void gameObjectAdded(GameObject object, GameObject parent) {
+		
 		objects.add(object);
 		
 	}
@@ -174,15 +169,6 @@ public class QuadTree extends LayerSystem {
 		return quad_pool;
 	}
 	
-	public Array<GameObject> checkPossibleCollisionsForRect(float x,float y,float w,float h){
-		ret_list.clear();
-		check_object.setSize(w, h);
-		check_object.setPosition(x, y);
-		check_object.setCollisionBounds(0, 0, w, h);
-		root.assessPossibleCollisions(ret_list, check_object);
-		return ret_list;
-	}
-	
 	/**
 	 * if true then this quadtree bounds follow the camera view of the layer it belongs to. 
 	 * @param follow_view
@@ -206,6 +192,15 @@ public class QuadTree extends LayerSystem {
 	public boolean isCulling() {
 		return culling;
 	}
+	
+
+	@Override
+	public Array<GameObject> getPossibleCollisions(GameObject object) {
+		ret_list.clear();
+		root.assessPossibleCollisions(ret_list, object);
+		return ret_list;
+	}
+
 
 	public static class Quad implements Poolable {
 
@@ -304,7 +299,7 @@ public class QuadTree extends LayerSystem {
 						quads[i].assessPossibleCollisions(possible_collisions, object);
 			}
 			for (int i = 0; i < quad_objects.size; i++) {
-				if (quad_objects.get(i) != object)
+				if (manager.shouldCollide(object, quad_objects.get(i)))
 					possible_collisions.add(quad_objects.get(i));
 			}
 		}

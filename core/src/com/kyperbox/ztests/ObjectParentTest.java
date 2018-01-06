@@ -67,11 +67,11 @@ public class ObjectParentTest extends KyperBoxGame{
 			@Override
 			public void init(GameState state) {
 				rpgman = state.getPlaygroundLayer().getGameObject("rpg_man");
-				rpgman.addGameObjectController(new CollisionController(-1));
+				rpgman.addGameObjectController(new CollisionController());
 				rpg_man_controller = new PlatformerController();
 				rpg_chest = new BasicGameObject();
 				rpg_chest.setName("rpg_chest");
-				rpg_chest.addGameObjectController(new CollisionController(-1));
+				rpg_chest.addGameObjectController(new CollisionController());
 				rpg_chest.setSize(32, 32);
 				rpg_chest.setPosition(20, 20);
 				rpg_chest.setSprite("rpg_chest_down");
@@ -83,7 +83,7 @@ public class ObjectParentTest extends KyperBoxGame{
 				
 				obstacle = state.getPlaygroundLayer().getGameObject("obstacle");
 				obstacle.addChild(rpg_chest);
-				obstacle.addGameObjectController(new CollisionController(-1));
+				obstacle.addGameObjectController(new CollisionController());
 			}
 			
 			@Override

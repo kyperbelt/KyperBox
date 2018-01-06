@@ -25,6 +25,8 @@ public abstract class GameObject extends Group {
 	// collision vars -- will only be used if layer supports collision
 	// it is layer manager responsibility to use these vars.
 	private boolean ignore_collision;
+	private int group;
+	private int filter;
 	private Rectangle bounds;
 	private Rectangle ret_bounds;
 
@@ -45,6 +47,24 @@ public abstract class GameObject extends Group {
 		flip_x = false;
 		flip_y = false;
 		ignore_collision = false;
+		group = 1;
+		filter = -1;
+	}
+	
+	public void setGroup(int group) {
+		this.group = group;
+	}
+	
+	public void setFilter(int filter) {
+		this.filter = filter;
+	}
+	
+	public int getGroup() {
+		return group;
+	}
+	
+	public int getFilter() {
+		return filter;
 	}
 
 	public boolean ignoresCollision() {
