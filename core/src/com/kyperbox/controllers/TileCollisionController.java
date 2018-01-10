@@ -61,6 +61,18 @@ public class TileCollisionController extends GameObjectController{
 		collision_map_tiles.add(mt);
 	}
 	
+	public MapTile getCollisionTile(int index){
+		return collision_map_tiles.get(index);
+	}
+	
+	public IntArray getCurrentCollisionTypes() {
+		return current_collisions;
+	}
+	
+	public Array<MapTile> getCurrentCollisionTiles(){
+		return collision_map_tiles;
+	}
+	
 	/**
 	 * get the solid filter for this controller
 	 * @return
