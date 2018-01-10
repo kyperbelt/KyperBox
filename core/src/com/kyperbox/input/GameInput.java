@@ -25,8 +25,12 @@ public class GameInput{
 		registerInput(InputDefaults.MOVE_DOWN);
 		registerInput(InputDefaults.MOVE_LEFT);
 		registerInput(InputDefaults.MOVE_RIGHT);
-		registerInput("action_button");
-		registerInput("jump_button");
+		registerInput(InputDefaults.ACTION_BUTTON);
+		registerInput(InputDefaults.JUMP_BUTTON);
+		registerInput(InputDefaults.EXIT);
+		registerInput(InputDefaults.ENTER);
+		registerInput(InputDefaults.STOP);
+		registerInput(InputDefaults.START);
 		
 	}
 	
@@ -60,9 +64,9 @@ public class GameInput{
 	}
 	
 	/**
-	 * clears all inputs and all their mappings
+	 * removes all inputs and all their mappings
 	 */
-	public void clearInputs() {
+	public void removeAllInputs() {
 		for(String input:input_check) {
 			inputs_pressed.remove(input);
 			inputs_last_pressed.remove(input);
@@ -72,10 +76,10 @@ public class GameInput{
 	}
 	
 	/**
-	 * clears an input and all its mappings
+	 * removes an input and all its mappings
 	 * @param input
 	 */
-	public void clearInput(String input) {
+	public void removeInput(String input) {
 		inputs_pressed.remove(input);
 		inputs_last_pressed.remove(input);
 		input_check.removeValue(input, false);

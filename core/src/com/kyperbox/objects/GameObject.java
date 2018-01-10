@@ -5,12 +5,14 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapProperties;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.kyperbox.GameState;
 import com.kyperbox.KyperBoxGame;
 import com.kyperbox.controllers.GameObjectController;
@@ -132,7 +134,7 @@ public abstract class GameObject extends Group {
 		} else if (getParent() == null) {
 			addActor(child);
 		} else {
-			KyperBoxGame.error("GAMEOBJECT ->" + getName(), "Could not add child to child object.");
+			KyperBoxGame.error("GAMEOBJECT [" + getName()+"] ->", "Could not add child to child object.");
 		}
 
 	}
@@ -207,17 +209,31 @@ public abstract class GameObject extends Group {
 	public void addGameObjectController(GameObjectController controller) {
 		if (getController(controller.getClass()) != null) {
 			layer.getState().error("Cannot add type [" + controller.getClass().getName() + "] more than once.");
+			return;
 		}
+		
 		controllers.add(controller);
 		controllers.sort(KyperBoxGame.getPriorityComperator());
 		controller.init(this);
+		if(layer!=null) {
+			layer.gameObjectChanged(this, GameObjectChangeType.MANAGER, 1);
+		}
+	}
+	
+	public void removeController(GameObjectController controller) {
+		if(controllers.removeValue(controller, true)) {
+			controller.remove(this);
+			if(layer!=null) {
+				layer.gameObjectChanged(this, GameObjectChangeType.MANAGER, -1);
+			}
+		}
 	}
 
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
 		if (sprite != null && !sprite.isEmpty() && !sprite.equals(NO_SPRITE)) {
 			Sprite render = layer.getGameSprite(sprite);
-			render.setPosition(getX(), getY());
+			render.setPosition(MathUtils.floor(getX()), MathUtils.floor(getY()));
 			render.setRotation(getRotation());
 			render.setAlpha(getColor().a * parentAlpha);
 			render.setOrigin(getOriginX(), getOriginY());
@@ -270,8 +286,66 @@ public abstract class GameObject extends Group {
 		}
 		return l;
 	}
+	
+	//map properties utility --------------------------
+	
+	public int[] getIntArray(String name) {
+		String[] strings = getStringArray(name);
+		if(strings == null)
+			return null;
+		int[] ints = new int[strings.length];
+		for (int i = 0; i < strings.length; i++) {
+			if(!isNumeric(strings[i]))
+				throw new GdxRuntimeException(String.format("GameObject [%s] could not create Int Array. %s is not a valid number.",getName(),strings[i]));
+			ints[i] = Integer.parseInt(strings[i]);
+		}
+		return ints;
+	}
+	
+	@Override
+	public void setBounds(float x, float y, float width, float height) {
+		setCollisionBounds(x, y, width, height);
+	}
+	
+	/**
+	 * comma delimited set of strings
+	 * @param name
+	 * @return
+	 */
+	public String[] getStringArray(String name) {
+		if(!getProperties().containsKey(name))
+			return null;
+		String[] strings = getProperties().get(name,String.class).trim().split(",");
+		return strings;
+	}
+	
+	/**
+	 * comma delimited set of floats
+	 * ignores
+	 * @param name
+	 * @return
+	 */
+	public float[] getFloatArray(String name) {
+		String[] strings = getStringArray(name);
+		if(strings == null)
+			return null;
+		float[] floats = new float[strings.length];
+		for (int i = 0; i < strings.length; i++) {
+			if(!isNumeric(strings[i]))
+				throw new GdxRuntimeException(String.format("GameObject [%s] could not create FloatArray. %s is not a valid float.",getName(),strings[i]));
+			floats[i] = Float.parseFloat(strings[i]);
+		}
+		return floats;
+	}
+	
+	private boolean isNumeric(String s) {  
+	    return s != null && s.matches("[-+]?\\d*\\.?\\d+");  
+	}  
 
-	public static enum GameObjectChangeType {
-		MANAGER, LOCATION, NAME, FOLLOW_BOUNDS_REACHED
+	public static class GameObjectChangeType {
+		public static final int MANAGER = 0; //value -1 means removed  1 = added
+		public static final int LOCATION = 1;
+		public static final int NAME = 2;
+		public static final int FOLLOW_BOUNDS_REACHED = 3;
 	}
 }

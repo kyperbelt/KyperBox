@@ -6,7 +6,6 @@ import com.badlogic.gdx.utils.Array;
 import com.kyperbox.objects.GameLayer;
 import com.kyperbox.objects.GameLayer.LayerCamera;
 import com.kyperbox.objects.GameObject;
-import com.kyperbox.objects.GameObject.GameObjectChangeType;
 import com.kyperbox.objects.ScrollingBackground;
 
 public class ParallaxMapper extends LayerSystem {
@@ -86,7 +85,7 @@ public class ParallaxMapper extends LayerSystem {
 	}
 
 	@Override
-	public void gameObjectChanged(GameObject object, GameObjectChangeType type, int value) {
+	public void gameObjectChanged(GameObject object, int type, float value) {
 	}
 
 	@Override

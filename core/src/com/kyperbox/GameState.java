@@ -190,14 +190,17 @@ public class GameState {
 	}
 	
 	public void update(float delta) {
+		
+		if(manager!=null) {
+			manager.update(delta);
+		}
+		
 		uiground.act(delta);
 		foreground.act(delta);
 		playground.act(delta);
 		background.act(delta);
 		
-		if(manager!=null) {
-			manager.update(delta);
-		}
+		
 	}
 	
 	/**

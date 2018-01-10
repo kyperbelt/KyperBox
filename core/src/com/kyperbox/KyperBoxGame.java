@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.tiles.AnimatedTiledMapTile;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -25,12 +26,13 @@ import com.kyperbox.util.UserData;
 
 public abstract class KyperBoxGame extends ApplicationAdapter {
 	
-	private static final String IMAGE_FOLDER = "image";
-	private static final String MUSIC_FOLDER = "music";
-	private static final String SFX_FOLDER = "sound";
-	private static final String GAME_ATLAS = "game.atlas";
-	private static final String TAG = "KyperBox->";
-	private static final String FILE_SEPARATOR = "/";
+	public static final String IMAGE_FOLDER = "image";
+	public static final String MUSIC_FOLDER = "music";
+	public static final String SFX_FOLDER = "sound";
+	public static final String TMX_FOLDER = "maps";
+	public static final String GAME_ATLAS = "game.atlas";
+	public static final String TAG = "KyperBox->";
+	public static final String FILE_SEPARATOR = "/";
 	
 	protected Stage game_stage;
 	private AssetManager assets;
@@ -179,6 +181,7 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	public void render () {
 		clear();
 		input.update();
+		AnimatedTiledMapTile.updateAnimationBaseTime();
 		float delta = Gdx.graphics.getDeltaTime();
 		if(current_gamestates.size > 0)
 			current_gamestates.peek().update(delta);
@@ -221,7 +224,7 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	}
 	
 	public TiledMap getTiledMap(String name) {
-		return assets.get(name,TiledMap.class);
+		return assets.get(TMX_FOLDER+FILE_SEPARATOR+name,TiledMap.class);
 	}
 	
 	public BitmapFont getFont(String name) {
@@ -239,19 +242,19 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	}
 	
 	public void loadSound(String name) {
-		assets.load(SFX_FOLDER+"/"+name,Sound.class);
+		assets.load(SFX_FOLDER+FILE_SEPARATOR+name,Sound.class);
 	}
 	
 	public void loadMusic(String name) {
-		assets.load(MUSIC_FOLDER+"/"+name,Music.class);;
+		assets.load(MUSIC_FOLDER+FILE_SEPARATOR+name,Music.class);;
 	}
 	
 	public void loadAtlas(String name) {
-		assets.load(IMAGE_FOLDER+"/"+name,TextureAtlas.class);
+		assets.load(IMAGE_FOLDER+FILE_SEPARATOR+name,TextureAtlas.class);
 	}
 	
 	public void loadTiledMap(String name) {
-		assets.load(name,TiledMap.class);
+		assets.load(TMX_FOLDER+FILE_SEPARATOR+name,TiledMap.class);
 	}
 	
 	public static void error(String tag,String message) {

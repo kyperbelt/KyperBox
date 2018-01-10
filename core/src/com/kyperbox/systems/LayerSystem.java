@@ -6,7 +6,6 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.kyperbox.managers.Priority;
 import com.kyperbox.objects.GameLayer;
 import com.kyperbox.objects.GameObject;
-import com.kyperbox.objects.GameObject.GameObjectChangeType;
 
 public abstract class LayerSystem implements Priority {
 	
@@ -34,7 +33,7 @@ public abstract class LayerSystem implements Priority {
 	 * right now that means that its managers have been changed
 	 * @param object
 	 */
-	public abstract void gameObjectChanged(GameObject object,GameObjectChangeType type,int value);
+	public abstract void gameObjectChanged(GameObject object,int type,float value);
 	/**
 	 * a game object has been removed from this 
 	 */

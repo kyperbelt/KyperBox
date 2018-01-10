@@ -101,7 +101,7 @@ public class QuadTree extends CollisionSystem {
 	}
 
 	@Override
-	public void gameObjectChanged(GameObject object, GameObjectChangeType type, int value) {
+	public void gameObjectChanged(GameObject object, int type, float value) {
 		if(type != GameObjectChangeType.LOCATION)
 			return;
 		

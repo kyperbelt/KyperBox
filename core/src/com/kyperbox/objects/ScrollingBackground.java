@@ -3,6 +3,7 @@ package com.kyperbox.objects;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapProperties;
+import com.badlogic.gdx.math.MathUtils;
 
 public class ScrollingBackground extends GameObject {
 
@@ -144,10 +145,10 @@ public class ScrollingBackground extends GameObject {
 					x = (i / (size / 3)) + xoff;
 					x_check = pos_x + (getWidth() * x);
 					y_check = pos_y + (getHeight() * y);
-					batch.draw(background, getX() + x_check, getY() + y_check, getWidth(), getHeight());
+					batch.draw(background, MathUtils.floor(getX() + x_check),MathUtils.floor( getY() + y_check), getWidth(), getHeight());
 				}
 			} else {
-				batch.draw(background, getX() + pos_x, getY() + pos_y, getWidth(), getHeight());
+				batch.draw(background, MathUtils.floor(getX() + pos_x), MathUtils.floor(getY() + pos_y), getWidth(), getHeight());
 			}
 
 		}

@@ -65,8 +65,8 @@ public class TileLayerRenderer {
 	public void renderTileLayer (TiledMapTileLayer layer,Batch batch) {
 		LayerCamera cam = object.getGameLayer().getCamera();
 		pos.set(0, 0);
-		pos = cam.unproject(pos);
-		view_bounds.set(pos.x, pos.y, object.getGame().getView().getWorldWidth(), object.getGame().getView().getWorldHeight());
+		pos = cam.getPosition();
+		view_bounds.set(pos.x+cam.getXOffset()-layer.getTileWidth(), pos.y+cam.getYOffset()-layer.getTileHeight(), object.getGame().getView().getWorldWidth()+(layer.getTileWidth()*2), object.getGame().getView().getWorldHeight()+(layer.getTileHeight()*2));
 		unit_scale = (object.getScaleX()+object.getScaleY())/2f;
 		final Color batchColor = batch.getColor();
 		final float color = Color.toFloatBits(batchColor.r, batchColor.g, batchColor.b, batchColor.a * layer.getOpacity());
@@ -77,6 +77,7 @@ public class TileLayerRenderer {
 		final float layer_tilewidth = layer.getTileWidth() * unit_scale;
 		final float layer_tileheight = layer.getTileHeight() * unit_scale;
 
+		
 		
 		final float offset_x = object.getX() * unit_scale;
 		final float offset_y = object.getY() * unit_scale;
@@ -210,6 +211,7 @@ public class TileLayerRenderer {
 						}
 						}
 					}
+					
 					batch.draw(region.getTexture(), vertices, 0, NUM_VERTICES);
 					
 				}

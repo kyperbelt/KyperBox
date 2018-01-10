@@ -91,7 +91,8 @@ public class GameLayer extends Group{
 	
 	@Override
 	public void act(float delta) {
-		for(LayerSystem system:systems) {
+		for(int i = 0;i < systems.size;i++) {
+			LayerSystem system = systems.get(i);
 			if(system.isActive())
 				system.update(delta);
 		}
@@ -105,7 +106,7 @@ public class GameLayer extends Group{
 	 * @param type -the type of change
 	 * @param value -the value of the change
 	 */
-	public void gameObjectChanged(GameObject object,GameObjectChangeType type,int value) {
+	public void gameObjectChanged(GameObject object,int type,float value) {
 		for(LayerSystem system : systems) {
 			system.gameObjectChanged(object, type, value);
 		}
@@ -394,7 +395,7 @@ public class GameLayer extends Group{
 				}
 			}else if(follow!=null) {
 				
-				goto_pos.set(follow.getX()+follow.getWidth()*.5f,follow.getY()+follow.getHeight()*.5f);
+				goto_pos.set(MathUtils.floor(follow.getX()+follow.getWidth()*.5f),MathUtils.floor(follow.getY()+follow.getHeight()*.5f));
 				goto_pos = project(goto_pos);
 				float hw = follow.getWidth()*.5f;
 				float hh = follow.getHeight()*.5f;
