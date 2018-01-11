@@ -30,6 +30,8 @@ public class TileCollisionTest extends KyperBoxGame {
 		getInput().addInputMapping(InputDefaults.MOVE_RIGHT, new KeyboardMapping(Keys.RIGHT));
 		getInput().addInputMapping(InputDefaults.MOVE_UP, new KeyboardMapping(Keys.UP));
 		getInput().addInputMapping(InputDefaults.MOVE_DOWN, new KeyboardMapping(Keys.DOWN));
+		getInput().addInputMapping(InputDefaults.START, new KeyboardMapping(Keys.W));
+		getInput().addInputMapping(InputDefaults.STOP, new KeyboardMapping(Keys.S));
 		
 		
 		//register test game state
@@ -62,6 +64,13 @@ public class TileCollisionTest extends KyperBoxGame {
 					player.setVelocity(player.getVelocity().x, speed);
 				}
 				
+				if(getInput().inputJustPressed(InputDefaults.START)) {
+					playground.getCamera().setZoom(playground.getCamera().getZoom()*1.1f);
+				}
+				
+				if(getInput().inputJustPressed(InputDefaults.STOP)) {
+					playground.getCamera().setZoom(playground.getCamera().getZoom()*.9f);
+				}
 				
 
 			}
@@ -76,7 +85,7 @@ public class TileCollisionTest extends KyperBoxGame {
 				state.getBackgroundLayer().addLayerSystem(parallax);
 				state.getPlaygroundLayer().addLayerSystem(new TileCollisionSystem("platformer_tiles"));
 				
-				//debugRender(true);
+				debugRender(true);
 			}
 
 			@Override
@@ -87,6 +96,7 @@ public class TileCollisionTest extends KyperBoxGame {
 				state.saveStateData();
 				// layers
 				playground = state.getPlaygroundLayer();
+				playground.getCamera().setZoom(2f);
 				player = (BasicGameObject) playground.getGameObject("player");
 				//tile collision controller
 				TileCollisionController tcc = new TileCollisionController();

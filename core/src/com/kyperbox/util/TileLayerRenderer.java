@@ -66,8 +66,9 @@ public class TileLayerRenderer {
 		LayerCamera cam = object.getGameLayer().getCamera();
 		pos.set(0, 0);
 		pos = cam.getPosition();
-		view_bounds.set(pos.x+cam.getXOffset()-layer.getTileWidth(), pos.y+cam.getYOffset()-layer.getTileHeight(), object.getGame().getView().getWorldWidth()+(layer.getTileWidth()*2), object.getGame().getView().getWorldHeight()+(layer.getTileHeight()*2));
-		unit_scale = (object.getScaleX()+object.getScaleY())/2f;
+		view_bounds.set((pos.x+cam.getXOffset()-layer.getTileWidth())*(1/cam.getZoom()), (pos.y+cam.getYOffset()-layer.getTileHeight())*(1/cam.getZoom()), (object.getGame().getView().getWorldWidth()+(layer.getTileWidth()*2))*(1/cam.getZoom()), (object.getGame().getView().getWorldHeight()+(layer.getTileHeight()*2))*(1/cam.getZoom()));
+	
+		unit_scale = (object.getScaleX()+object.getScaleY())*.5f;
 		final Color batchColor = batch.getColor();
 		final float color = Color.toFloatBits(batchColor.r, batchColor.g, batchColor.b, batchColor.a * layer.getOpacity());
 
