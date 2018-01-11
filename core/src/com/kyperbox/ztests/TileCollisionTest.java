@@ -81,6 +81,10 @@ public class TileCollisionTest extends KyperBoxGame {
 
 			@Override
 			public void init(GameState state) {
+				state.loadStateData();
+				log(state.getData().getName(), state.getData().getInt("test")+"");
+				state.getData().setInt("test", state.getData().getInt("test")+110);
+				state.saveStateData();
 				// layers
 				playground = state.getPlaygroundLayer();
 				player = (BasicGameObject) playground.getGameObject("player");

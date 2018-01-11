@@ -35,6 +35,7 @@ import com.kyperbox.managers.StateManager;
 import com.kyperbox.objects.GameLayer;
 import com.kyperbox.objects.GameObject;
 import com.kyperbox.util.KyperProgressBar;
+import com.kyperbox.util.SaveUtils;
 import com.kyperbox.util.UserData;
 
 public class GameState {
@@ -46,7 +47,7 @@ public class GameState {
 	private GameLayer playground;
 	private GameLayer foreground;
 	private GameLayer uiground;
-	private UserData user_data;
+	private UserData state_data;
 	private TiledMap map_data;
 	
 	private ObjectMap<String,BitmapFont> fonts;
@@ -88,7 +89,7 @@ public class GameState {
 		game.loadTiledMap(tmx);
 		game.getAssetManager().finishLoading();
 		map_data = game.getTiledMap(tmx);
-		user_data = new UserData(tmx+"(data)");
+		state_data = new UserData(tmx+"(data)");
 		
 		
 		
@@ -105,7 +106,7 @@ public class GameState {
 		atlas_name = atlas_name.substring(atlas_name.lastIndexOf("/"), atlas_name.length());
 		atlas_name = atlas_name.replace("/", "");
 		
-		user_data.setString("map_atlas", atlas_name);
+		state_data.setString("map_atlas", atlas_name);
 		
 		fonts = new ObjectMap<String, BitmapFont>();
 
@@ -156,8 +157,16 @@ public class GameState {
 	 * get the user defined data for this state
 	 * @return
 	 */
-	public UserData getUserData() {
-		return user_data;
+	public UserData getData() {
+		return state_data;
+	}
+	
+	public void saveStateData() {
+		SaveUtils.saveToPrefs(getGame().getGamePreferences(), state_data);
+	}
+	
+	public void loadStateData() {
+		SaveUtils.loadFromPrefs(getGame().getGamePreferences(), state_data);
 	}
 	
 	protected void setGame(KyperBoxGame game) {

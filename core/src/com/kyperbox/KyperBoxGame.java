@@ -2,6 +2,7 @@ package com.kyperbox;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.BitmapFontLoader.BitmapFontParameter;
 import com.badlogic.gdx.audio.Music;
@@ -16,12 +17,14 @@ import com.badlogic.gdx.maps.tiled.tiles.AnimatedTiledMapTile;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.kyperbox.managers.Priority.PriorityComparator;
 import com.kyperbox.input.GameInput;
+import com.kyperbox.managers.Priority.PriorityComparator;
 import com.kyperbox.managers.StateManager;
 import com.kyperbox.objects.GameLayer;
 import com.kyperbox.util.KyperMapLoader;
+import com.kyperbox.util.SaveUtils;
 import com.kyperbox.util.UserData;
 
 public abstract class KyperBoxGame extends ApplicationAdapter {
@@ -34,6 +37,8 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	public static final String TAG = "KyperBox->";
 	public static final String FILE_SEPARATOR = "/";
 	
+	private static final String GAME_DATA_NAME = "GAME_GLOBALS";
+	
 	protected Stage game_stage;
 	private AssetManager assets;
 	private Viewport view;
@@ -41,21 +46,47 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	private ObjectMap<String,GameState> game_states;
 	private Array<GameState> current_gamestates;
 	private Array<String> packages;
+	private Preferences game_prefs;
 	
 	private static PriorityComparator prio_compare;
 
 	private ObjectMap<String,Sprite> sprites;
 	private ObjectMap<String,Animation<String>>animations;
 	
-	private UserData data;
+	private UserData global_data;
 	
 	private GameInput input;
 	
-	public KyperBoxGame(Viewport view) {
-		this.view = view; 
+	private String game_name;
+	private String prefs_name;
+	
+	public KyperBoxGame(String prefs,String game_name,Viewport view) {
+		this.view = view;
+		this.prefs_name = prefs;
+		if(game_name == null)
+			this.game_name = this.getClass().getSimpleName();
+		else
+			this.game_name = game_name;
+		if(prefs_name == null) 
+			prefs_name = this.game_name+"_data";
 	 //WARNING    ===========
 	}//DO NOT USE ===========
 	
+	public KyperBoxGame(String game_name,Viewport view) {
+		this(null,game_name,view);
+	}
+	
+	public KyperBoxGame(Viewport view) {
+		this(null,view);
+	}
+	
+	public KyperBoxGame() {
+		this(new FillViewport(Resolutions._720.WIDTH(), Resolutions._720.HEIGHT()));
+	}
+	
+	public String getGameName() {
+		return game_name;
+	}
 	
 	public static PriorityComparator getPriorityComperator() {
 		if(prio_compare == null)
@@ -65,6 +96,8 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	
 	@Override
 	public void create () {
+		game_prefs = Gdx.app.getPreferences(prefs_name);
+		
 		game_stage = new Stage(view);
 		game_states = new ObjectMap<String,GameState>();
 		game_stage.setDebugAll(false);
@@ -81,12 +114,16 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 		packages = new Array<String>();
 		packages.add("com.kyperbox.objects");
 		
-		data = new UserData("GAME_DATA");
+		global_data = new UserData(GAME_DATA_NAME);
 		input = new GameInput();
 		
 		Gdx.input.setInputProcessor(game_stage);
 		
 		initiate();
+	}
+	
+	public Preferences getGamePreferences() {
+		return game_prefs;
 	}
 	
 	public boolean getDebugRender() {
@@ -105,8 +142,16 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 		return view;
 	}
 	
-	public UserData getData() {
-		return data;
+	public UserData getGlobals() {
+		return global_data;
+	}
+	
+	public void saveGlobals() {
+		SaveUtils.saveToPrefs(game_prefs, global_data);
+	}
+	
+	public void loadGlobals() {
+		SaveUtils.loadFromPrefs(game_prefs, global_data);
 	}
 	
 	public GameInput getInput() {
@@ -329,7 +374,6 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 			return null;
 		}
 	}
-	
 	
 	public abstract void initiate();
 }

@@ -1,8 +1,5 @@
 package com.kyperbox.objects;
 
-import java.util.Iterator;
-
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
@@ -66,7 +63,7 @@ public class TilemapLayerObject extends GameObject {
 	}
 
 	/**
-	 * get all cell collisions for a side
+	 * get all cell collisions for a side -ignores diagonals 
 	 * 
 	 * @param xx1
 	 * @param yy1

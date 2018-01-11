@@ -516,14 +516,15 @@ public class KyperMapLoader extends BaseTmxMapLoader<AtlasTmxMapLoader.AtlasTile
 		}
 	}
 
-	private Element findElementWithAttribute(Array<Element> elements, String attribute, String value) {
-		for (int i = 0; i < elements.size; i++) {
-			Element e = elements.get(i);
-			if (e.hasAttribute(attribute) && e.getAttribute(attribute).equals(value))
-				return e;
-		}
-		return null;
-	}
+	//TODO: not used -- remove or repurpose
+//	private Element findElementWithAttribute(Array<Element> elements, String attribute, String value) {
+//		for (int i = 0; i < elements.size; i++) {
+//			Element e = elements.get(i);
+//			if (e.hasAttribute(attribute) && e.getAttribute(attribute).equals(value))
+//				return e;
+//		}
+//		return null;
+//	}
 
 	protected void loadObject(TiledMap map, MapObjects objects, Element element, float heightInPixels) {
 

@@ -3,8 +3,6 @@ package com.kyperbox.desktop;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.kyperbox.KyperBoxGame;
-import com.kyperbox.ztests.CollisionTest;
-import com.kyperbox.ztests.ParallaxMappingTest;
 import com.kyperbox.ztests.TileCollisionTest;
 
 public class DesktopLauncher {
@@ -22,6 +20,7 @@ public class DesktopLauncher {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.width = (int) game.getView().getWorldWidth();
 		config.height = (int) game.getView().getWorldHeight();
+		config.title = game.getGameName();
 		new LwjglApplication(game, config);
 	}
 }
