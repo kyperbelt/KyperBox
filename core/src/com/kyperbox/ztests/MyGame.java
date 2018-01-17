@@ -112,7 +112,6 @@ public class MyGame extends KyperBoxGame{
 				player = (PlatformerObject)game.getPlaygroundLayer().getGameObject("player_1");
 				playground.getCamera().setCentered();
 				playground.getCamera().setCamFollowBounds(-100, -316, 200, 300);
-				playground.getCamera().follow(player);
 				
 				
 			}

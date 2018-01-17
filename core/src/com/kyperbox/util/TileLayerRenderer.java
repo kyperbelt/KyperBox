@@ -29,6 +29,7 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.kyperbox.objects.GameLayer.LayerCamera;
 import com.kyperbox.objects.GameObject;
 
@@ -39,38 +40,44 @@ public class TileLayerRenderer {
 	private Vector2 pos;
 	private float vertices[] = new float[NUM_VERTICES];
 	private GameObject object;
+
 	public TileLayerRenderer(GameObject object) {
 		this.object = object;
 		view_bounds = new Rectangle();
 		unit_scale = 1.0f;
-		pos = new Vector2(0,0);
+		pos = new Vector2(0, 0);
 	}
-	
+
 	public Rectangle getViewBounds() {
 		return view_bounds;
 	}
-	
-	public void setViewBounds(float x,float y,float w, float h) {
+
+	public void setViewBounds(float x, float y, float w, float h) {
 		view_bounds.set(x, y, w, h);
 	}
-	
+
 	public float getUnitScale() {
 		return unit_scale;
 	}
-	
+
 	public void setUnitScale(float unit_scale) {
 		this.unit_scale = unit_scale;
 	}
-	
-	public void renderTileLayer (TiledMapTileLayer layer,Batch batch) {
+
+	public void renderTileLayer(TiledMapTileLayer layer, Batch batch) {
 		LayerCamera cam = object.getGameLayer().getCamera();
+		Viewport view = object.getGame().getView();
 		pos.set(0, 0);
 		pos = cam.getPosition();
-		view_bounds.set((pos.x+cam.getXOffset()-layer.getTileWidth())*(1/cam.getZoom()), (pos.y+cam.getYOffset()-layer.getTileHeight())*(1/cam.getZoom()), (object.getGame().getView().getWorldWidth()+(layer.getTileWidth()*2))*(1/cam.getZoom()), (object.getGame().getView().getWorldHeight()+(layer.getTileHeight()*2))*(1/cam.getZoom()));
-	
-		unit_scale = (object.getScaleX()+object.getScaleY())*.5f;
+		view_bounds.set((pos.x+ cam.getXOffset()/cam.getZoom() - layer.getTileWidth()),
+				(pos.y+ cam.getYOffset()/cam.getZoom() - layer.getTileHeight()),
+				(view.getWorldWidth() + (layer.getTileWidth() * 2))/cam.getZoom(),
+				(view.getWorldHeight() + (layer.getTileHeight() * 2))/cam.getZoom());
+
+		unit_scale = (object.getScaleX() + object.getScaleY()) * .5f;
 		final Color batchColor = batch.getColor();
-		final float color = Color.toFloatBits(batchColor.r, batchColor.g, batchColor.b, batchColor.a * layer.getOpacity());
+		final float color = Color.toFloatBits(batchColor.r, batchColor.g, batchColor.b,
+				batchColor.a * layer.getOpacity());
 
 		final int layer_width = layer.getWidth();
 		final int layer_height = layer.getHeight();
@@ -78,30 +85,26 @@ public class TileLayerRenderer {
 		final float layer_tilewidth = layer.getTileWidth() * unit_scale;
 		final float layer_tileheight = layer.getTileHeight() * unit_scale;
 
-		
-		
 		final float offset_x = object.getX() * unit_scale;
 		final float offset_y = object.getY() * unit_scale;
 
-		final int col1 = Math.max(0, (int)((view_bounds.x - offset_x) / layer_tilewidth));
+		final int col1 = Math.max(0, (int) ((view_bounds.x - offset_x) / layer_tilewidth));
 		final int col2 = Math.min(layer_width,
-			(int)((view_bounds.x + view_bounds.width + layer_tilewidth - offset_x) / layer_tilewidth));
+				(int) ((view_bounds.x + view_bounds.width + layer_tilewidth - offset_x) / layer_tilewidth));
 
-		final int row1 = Math.max(0, (int)((view_bounds.y - offset_y) / layer_tileheight));
+		final int row1 = Math.max(0, (int) ((view_bounds.y - offset_y) / layer_tileheight));
 		final int row2 = Math.min(layer_height,
-			(int)((view_bounds.y + view_bounds.height + layer_tileheight - offset_y) / layer_tileheight));
+				(int) ((view_bounds.y + view_bounds.height + layer_tileheight - offset_y) / layer_tileheight));
 
 		float y = row2 * layer_tileheight + offset_y;
 		float xStart = col1 * layer_tilewidth + offset_x;
 		final float[] vertices = this.vertices;
 
-
-	
 		for (int row = row2; row >= row1; row--) {
-			
+
 			float x = xStart;
 			for (int col = col1; col < col2; col++) {
-				
+
 				final TiledMapTileLayer.Cell cell = layer.getCell(col, row);
 				if (cell == null) {
 					x += layer_tilewidth;
@@ -212,9 +215,9 @@ public class TileLayerRenderer {
 						}
 						}
 					}
-					
+
 					batch.draw(region.getTexture(), vertices, 0, NUM_VERTICES);
-					
+
 				}
 				x += layer_tilewidth;
 			}

@@ -233,7 +233,7 @@ public abstract class GameObject extends Group {
 	public void draw(Batch batch, float parentAlpha) {
 		if (sprite != null && !sprite.isEmpty() && !sprite.equals(NO_SPRITE)) {
 			Sprite render = layer.getGameSprite(sprite);
-			render.setPosition(MathUtils.floor(getX()), MathUtils.floor(getY()));
+			render.setPosition(MathUtils.round(getX()), MathUtils.round(getY()));
 			render.setRotation(getRotation());
 			render.setAlpha(getColor().a * parentAlpha);
 			render.setOrigin(getOriginX(), getOriginY());
@@ -340,7 +340,19 @@ public abstract class GameObject extends Group {
 	
 	private boolean isNumeric(String s) {  
 	    return s != null && s.matches("[-+]?\\d*\\.?\\d+");  
-	}  
+	} 
+	
+	/**
+	 * use this to pass messages to this object.
+	 * Must be overridden 
+	 * @param type
+	 * @param args
+	 * @return
+	 */
+	public boolean passGameMessage(int type,Object...args) {
+		//TODO OVERRIDE ---
+		return false;
+	}
 
 	public static class GameObjectChangeType {
 		public static final int MANAGER = 0; //value -1 means removed  1 = added

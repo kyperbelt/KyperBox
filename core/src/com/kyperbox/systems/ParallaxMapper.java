@@ -18,6 +18,8 @@ public class ParallaxMapper extends LayerSystem {
 	private float last_y;
 	private float diff_x;
 	private float diff_y;
+	
+	private boolean ignore_zoom;
 
 	public ParallaxMapper() {
 		this(null);
@@ -30,6 +32,16 @@ public class ParallaxMapper extends LayerSystem {
 		last_y = 0;
 		diff_x = 0;
 		diff_y = 0;
+		ignore_zoom = true;
+		
+	}
+	
+	public boolean ignoreZoom() {
+		return ignore_zoom;
+	}
+	
+	public void setIgnoreZoom(boolean ignore_zoom) {
+		this.ignore_zoom = ignore_zoom;
 	}
 
 	public void setCamLayer(GameLayer cam_layer) {
@@ -110,11 +122,16 @@ public class ParallaxMapper extends LayerSystem {
 		Vector2 pos = cam.getPosition();
 		if(pos.x!=last_x || pos.y != last_y) {
 			//cam pos changed
-			diff_x = pos.x - last_x;
-			diff_y = pos.y - last_y;
+			diff_x = (pos.x - last_x);
+			diff_y = (pos.y - last_y);
 			
 			last_x = pos.x;
 			last_y = pos.y;
+			
+			if(!ignore_zoom) {
+				diff_x*=cam.getZoom();
+				diff_y*=cam.getZoom();
+			}
 			
 			for (int i = 0; i < parallax_mappings.size; i++) {
 				ParallaxData pd = parallax_mappings.get(i);

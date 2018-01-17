@@ -2,11 +2,10 @@ package com.kyperbox.objects;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapProperties;
-import com.badlogic.gdx.math.Interpolation;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -15,7 +14,6 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.kyperbox.GameState;
 import com.kyperbox.KyperBoxGame;
-import com.kyperbox.objects.GameObject.GameObjectChangeType;
 import com.kyperbox.systems.LayerSystem;
 
 public class GameLayer extends Group{
@@ -91,13 +89,30 @@ public class GameLayer extends Group{
 	
 	@Override
 	public void act(float delta) {
+		systems.sort(KyperBoxGame.getPriorityComperator());
 		for(int i = 0;i < systems.size;i++) {
 			LayerSystem system = systems.get(i);
 			if(system.isActive())
 				system.update(delta);
 		}
-		cam.update(delta);
 		super.act(delta);
+		cam.update(delta);
+	}
+	
+	@Override
+	public void draw(Batch batch, float parentAlpha) {
+		for(int i = 0;i < systems.size;i++) {
+			LayerSystem system = systems.get(i);
+			if(system.isActive())
+				system.preDraw(batch, parentAlpha);
+		}
+		super.draw(batch, parentAlpha);
+		
+		for(int i = 0;i < systems.size;i++) {
+			LayerSystem system = systems.get(i);
+			if(system.isActive())
+				system.postDraw(batch, parentAlpha);
+		}
 	}
 	
 	/**
@@ -221,6 +236,7 @@ public class GameLayer extends Group{
 		public static final int LEFT = 3;
 		
 		private GameLayer layer;
+		private Viewport view;
 		
 		private Vector2 position;
 		private Vector2 return_pos;
@@ -229,40 +245,25 @@ public class GameLayer extends Group{
 		private Vector2 follow_bounds_pos;
 		private Vector2 follow_bounds_size;
 		private Rectangle cam_follow_bounds;
+		private Rectangle cam_bounds;
 		
-		//action vars
-		private Vector2 goto_pos;
-		private float shake_current_stregth;
-		private float shake_max_strength;
-		private float shake_duration;
-		private float shake_elapsed;
-		
-		private boolean moving_to;
-		private float moving_duration;
-		private float moving_elapsed;
-		private Interpolation interpolation;
-		
-		private GameObject follow;
 		
 		private LayerCamera(GameLayer layer) {
 			this.layer = layer;
 			position = new Vector2();
 			return_pos = new Vector2();
-			goto_pos = new Vector2();
 			offset = new Vector2();
-			
-			
-			Viewport view = layer.getState().getGame().getView();
+			cam_bounds = new Rectangle();
+			view = layer.getState().getGame().getView();
 			virtual_size = new Vector2(view.getWorldWidth(),view.getWorldHeight());
-			interpolation = Interpolation.linear;
-			shake_current_stregth = 0;
-			shake_max_strength = 0;
-			shake_duration = 0;
-			shake_elapsed = 0;
-			
 			follow_bounds_size = new Vector2(32, 32);
 			follow_bounds_pos  = new Vector2(follow_bounds_size.cpy().scl(-.5f));
 			cam_follow_bounds = new Rectangle(follow_bounds_pos.x, follow_bounds_pos.y, follow_bounds_size.x, follow_bounds_size.y);
+		}
+		
+		public Rectangle getViewBounds() {
+			cam_bounds.set((getPosition().x+getXOffset()/getZoom()), (getPosition().y+getYOffset()/getZoom()), view.getWorldWidth()/getZoom(), view.getWorldHeight()/getZoom());
+			return cam_bounds;
 		}
 		
 		public void setCamFollowBounds(float x,float y,float width,float height) {
@@ -278,6 +279,8 @@ public class GameLayer extends Group{
 		
 		
 		public Vector2 project(Vector2 coords) {
+			Viewport view = layer.getState().getGame().getView();
+			view.project(coords);
 			coords.scl(getZoom());
 			coords.set(coords.x + position.x, coords.y + position.y);
 			return coords;
@@ -290,12 +293,9 @@ public class GameLayer extends Group{
 			return coords;
 		}
 		
-		public void setInterpolation(Interpolation interpolation) {
-			this.interpolation = interpolation;
-		}
-		
 		public void setPosition(float x,float y) {
-			position.set(-(x+offset.x), -(y+offset.y));
+			position.set(-(x*getZoom()+offset.x), -(y*getZoom()+offset.y));
+			//layer.setPosition(position.x, position.y);
 		}
 		
 		public void setCentered() {
@@ -304,7 +304,7 @@ public class GameLayer extends Group{
 		}
 		
 		public Vector2 getPosition() {
-			return_pos.set(-(position.x)-offset.x, -(position.y)-offset.y);
+			return_pos.set((-(position.x)-offset.x)/getZoom(), (-(position.y)-offset.y)/getZoom());
 			return return_pos;
 		}
 		
@@ -320,117 +320,89 @@ public class GameLayer extends Group{
 			offset.set(x_offset, y_offset);
 		}
 		
-		public void shake(float strength,float duration) {
-			if(!isShaking())
-				goto_pos.set(getPosition().x,getPosition().y);
-			this.shake_max_strength = strength;
-			this.shake_duration = duration;
-			this.shake_elapsed = 0;
-		
-		}
-		
-		public boolean isShaking() {
-			return shake_duration > 0;
-		}
-		
-		public void moveTo(float x,float y) {
-			moveTo(x,y,1f);
-		}
-		
-		public void moveTo(float x,float y,float duration) {
-			if(moving_to)
-				return;
-			goto_pos.set(-(x+offset.x), -(y+offset.y));
-			moving_to = true;
-			moving_duration = duration;
-			moving_elapsed = 0;
-		}
-		
-		public boolean isMoving() {
-			return moving_to;
-		}
 		
 		public void setZoom(float zoom) {
+			return_pos = getPosition();
 			layer.setScale(zoom);
+			setPosition(return_pos.x, return_pos.y);
 		}
 		
 		public float getZoom() {
-			return layer.getScaleX();
+			return (layer.getScaleX()+layer.getScaleY())*.5f;
 		}
 		
-		/**
-		 * set the object to follow
-		 * @param follow
-		 * @param follow_speed
-		 */
-		public void follow(GameObject follow) {
-			this.follow = follow;
+		public void translate(float x,float y) {
+			Vector2 p = getPosition();
+			setPosition(p.x+x, p.y+y);
 		}
-		
 		
 		public void update(float delta) {
 			
-			//process screenshake
-			if(isShaking()) {
-				shake_elapsed+=delta;
-				
-				shake_current_stregth = shake_max_strength * ((shake_duration - shake_elapsed)/shake_duration);
-				
-				if(shake_elapsed >= shake_duration) {
-					shake_duration = 0;
-					shake_max_strength = 0;
-					shake_current_stregth = 0;
-					setPosition(goto_pos.x, goto_pos.y);
-				}else {
-					setPosition(goto_pos.x+(MathUtils.random.nextFloat()-.5f)*2*shake_current_stregth, 
-							goto_pos.y+(MathUtils.random.nextFloat() -.5f)*2*shake_current_stregth);
-				}
-			}else if(moving_to) { //process moveTo
-				moving_elapsed+=delta;
-				position.interpolate(goto_pos, moving_elapsed/moving_duration, interpolation);
-				if(moving_elapsed>=moving_duration) {
-					moving_to = false;
-					moving_elapsed = 0;
-					moving_duration = 0;
-				}
-			}else if(follow!=null) {
-				
-				goto_pos.set(MathUtils.floor(follow.getX()+follow.getWidth()*.5f),MathUtils.floor(follow.getY()+follow.getHeight()*.5f));
-				goto_pos = project(goto_pos);
-				float hw = follow.getWidth()*.5f;
-				float hh = follow.getHeight()*.5f;
-				if(!getCamFollowBounds().contains(goto_pos)) {
-					if(goto_pos.x < cam_follow_bounds.x) {
-						setPosition((follow.getX()+hw-(follow_bounds_pos.x))*getZoom(), 
-								getPosition().y);
-						layer.gameObjectChanged(follow, GameObjectChangeType.FOLLOW_BOUNDS_REACHED, LEFT);
-					}
-						
-					if(goto_pos.x > cam_follow_bounds.x+cam_follow_bounds.width) {
-						setPosition((follow.getX()+hw-(follow_bounds_pos.x+follow_bounds_size.x))*getZoom(), 
-								getPosition().y);
-						layer.gameObjectChanged(follow, GameObjectChangeType.FOLLOW_BOUNDS_REACHED, RIGHT);
-					}
-						
-					if(goto_pos.y < cam_follow_bounds.y) {
-						setPosition(getPosition().x,(follow.getY()+hh-(follow_bounds_pos.y))*getZoom());
-						layer.gameObjectChanged(follow, GameObjectChangeType.FOLLOW_BOUNDS_REACHED, DOWN);
-					}
-						
-					if(goto_pos.y > cam_follow_bounds.y+cam_follow_bounds.height) {
-						setPosition(getPosition().x,(follow.getY()+hh-(follow_bounds_pos.y+follow_bounds_size.y))*getZoom());
-						layer.gameObjectChanged(follow, GameObjectChangeType.FOLLOW_BOUNDS_REACHED, UP);
-					}
-					
-				}
-			}
+//		    Vector2 pos = getPosition();
+//			//process screenshake
+//			if(isShaking()) {
+//				shake_elapsed+=delta;
+//				
+//				shake_current_stregth = shake_max_strength * ((shake_duration - shake_elapsed)/shake_duration);
+//				
+//				if(shake_elapsed >= shake_duration) {
+//					shake_duration = 0;
+//					shake_max_strength = 0;
+//					shake_current_stregth = 0;
+//					setPosition(goto_pos.x, goto_pos.y);
+//				}else {
+//					setPosition(goto_pos.x+(MathUtils.random.nextFloat()-.5f)*2*shake_current_stregth, 
+//							goto_pos.y+(MathUtils.random.nextFloat() -.5f)*2*shake_current_stregth);
+//				}
+//			}else if(moving_to) { //process moveTo
+//				moving_elapsed+=delta;
+//				if(moving_elapsed>=moving_duration) {
+//					moving_to = false;
+//					moving_elapsed = 0;
+//					moving_duration = 0;
+//				}
+//			}
 			
+//			else if(follow!=null) {
+//				
+//				goto_pos.set(MathUtils.floor(follow.getX()+follow.getWidth()*.5f),MathUtils.floor(follow.getY()+follow.getHeight()*.5f));
+//				goto_pos = project(goto_pos);
+//				float hw = follow.getWidth()*.5f;
+//				float hh = follow.getHeight()*.5f;
+//				if(!getCamFollowBounds().contains(goto_pos)) {
+//					if(goto_pos.x < cam_follow_bounds.x) {
+//						setPosition((follow.getX()+hw-(follow_bounds_pos.x))*getZoom(), 
+//								getPosition().y);
+//						layer.gameObjectChanged(follow, GameObjectChangeType.FOLLOW_BOUNDS_REACHED, LEFT);
+//					}
+//						
+//					if(goto_pos.x > cam_follow_bounds.x+cam_follow_bounds.width) {
+//						setPosition((follow.getX()+hw-(follow_bounds_pos.x+follow_bounds_size.x))*getZoom(), 
+//								getPosition().y);
+//						layer.gameObjectChanged(follow, GameObjectChangeType.FOLLOW_BOUNDS_REACHED, RIGHT);
+//					}
+//						
+//					if(goto_pos.y < cam_follow_bounds.y) {
+//						setPosition(getPosition().x,(follow.getY()+hh-(follow_bounds_pos.y))*getZoom());
+//						layer.gameObjectChanged(follow, GameObjectChangeType.FOLLOW_BOUNDS_REACHED, DOWN);
+//					}
+//						
+//					if(goto_pos.y > cam_follow_bounds.y+cam_follow_bounds.height) {
+//						setPosition(getPosition().x,(follow.getY()+hh-(follow_bounds_pos.y+follow_bounds_size.y))*getZoom());
+//						layer.gameObjectChanged(follow, GameObjectChangeType.FOLLOW_BOUNDS_REACHED, UP);
+//					}
+//					
+//				}
+//			}
 			
-			//set the layer position
+//			//set the layer position
 			layer.setPosition(position.x, position.y);
 		
 		}
+
+		
 	}
+	
 	
 	@Override
 	protected void drawDebugBounds(ShapeRenderer shapes) {

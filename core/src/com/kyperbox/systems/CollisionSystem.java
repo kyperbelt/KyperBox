@@ -5,6 +5,15 @@ import com.kyperbox.objects.GameObject;
 
 public abstract class CollisionSystem extends LayerSystem {
 
+	private boolean parent_collisions;
+	
+	public void setParentCollisions(boolean parent_collisions) {
+		this.parent_collisions = parent_collisions;
+	}
+	
+	public boolean isParentCollisions() {
+		return parent_collisions;
+	}
 	/**
 	 * get all the possible collisions for the given object
 	 * 
@@ -21,6 +30,8 @@ public abstract class CollisionSystem extends LayerSystem {
 	 */
 	protected boolean shouldCollide(GameObject a, GameObject b) {
 		if (a == b || a.ignoresCollision() || b.ignoresCollision())
+			return false;
+		if(!isParentCollisions()&&(a.getParent() == b || b.getParent() == a)) 
 			return false;
 		return (((a.getFilter() & b.getGroup()) != 0) && ((a.getGroup() & b.getFilter()) != 0));
 	}

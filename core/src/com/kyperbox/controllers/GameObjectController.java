@@ -23,6 +23,7 @@ public abstract class GameObjectController implements Poolable,Priority{
 	/**
 	 * called when the manager is removed
 	 * all managers are removed when an GameObject is removed
+	 * TODO: see if it causes problems to call remove on a controller without having it be removed from the gameobject
 	 * @param object
 	 */
 	public abstract void remove(GameObject object);

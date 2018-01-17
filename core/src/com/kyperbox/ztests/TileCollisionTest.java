@@ -4,12 +4,15 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.kyperbox.GameState;
 import com.kyperbox.KyperBoxGame;
+import com.kyperbox.controllers.PoiController;
 import com.kyperbox.controllers.TileCollisionController;
 import com.kyperbox.input.InputDefaults;
 import com.kyperbox.input.KeyboardMapping;
 import com.kyperbox.managers.StateManager;
 import com.kyperbox.objects.BasicGameObject;
 import com.kyperbox.objects.GameLayer;
+import com.kyperbox.objects.GameObject;
+import com.kyperbox.systems.GameCameraSystem;
 import com.kyperbox.systems.ParallaxMapper;
 import com.kyperbox.systems.TileCollisionSystem;
 
@@ -32,6 +35,10 @@ public class TileCollisionTest extends KyperBoxGame {
 		getInput().addInputMapping(InputDefaults.MOVE_DOWN, new KeyboardMapping(Keys.DOWN));
 		getInput().addInputMapping(InputDefaults.START, new KeyboardMapping(Keys.W));
 		getInput().addInputMapping(InputDefaults.STOP, new KeyboardMapping(Keys.S));
+		getInput().addInputMapping(InputDefaults.ACTION_BUTTON, new KeyboardMapping(Keys.SPACE));
+		
+		getInput().addInputMapping(InputDefaults.ENTER, new KeyboardMapping(Keys.Z));
+		getInput().addInputMapping(InputDefaults.EXIT, new KeyboardMapping(Keys.X));
 		
 		
 		//register test game state
@@ -40,6 +47,9 @@ public class TileCollisionTest extends KyperBoxGame {
 			ParallaxMapper parallax;
 			GameLayer playground;
 			BasicGameObject player;
+			GameCameraSystem game_cam;
+			PoiController poi_test2;
+			
 
 			private float speed = 300f;
 
@@ -72,6 +82,19 @@ public class TileCollisionTest extends KyperBoxGame {
 					playground.getCamera().setZoom(playground.getCamera().getZoom()*.9f);
 				}
 				
+				if(getInput().inputJustPressed(InputDefaults.ACTION_BUTTON)) {
+					debugRender(!getDebugRender());
+				}
+				
+				if(getInput().inputJustPressed(InputDefaults.ENTER)) {
+					game_cam.addShake(20f, 1f);
+				}
+				
+				if(getInput().inputJustPressed(InputDefaults.EXIT)) {
+				}
+				
+				
+				//playground.getCamera().setPosition(player.getX(), player.getY());
 
 			}
 
@@ -84,6 +107,8 @@ public class TileCollisionTest extends KyperBoxGame {
 				parallax.addMapping("parallax_back", 0, 0f, true);
 				state.getBackgroundLayer().addLayerSystem(parallax);
 				state.getPlaygroundLayer().addLayerSystem(new TileCollisionSystem("platformer_tiles"));
+				game_cam = new GameCameraSystem(3);
+				state.getPlaygroundLayer().addLayerSystem(game_cam);
 				
 				debugRender(true);
 			}
@@ -96,15 +121,25 @@ public class TileCollisionTest extends KyperBoxGame {
 				state.saveStateData();
 				// layers
 				playground = state.getPlaygroundLayer();
-				playground.getCamera().setZoom(2f);
+				playground.getCamera().setZoom(1f);
+				
 				player = (BasicGameObject) playground.getGameObject("player");
+				GameObject player2 = playground.getGameObject("player2");
+				game_cam.addFocus(player);
+				game_cam.addFocus(player2);
+				
 				//tile collision controller
 				TileCollisionController tcc = new TileCollisionController();
 				//tcc.collideWithVoid(false);
 				player.addGameObjectController(tcc);
+				playground.getGameObject("poi_test").addGameObjectController(new PoiController("Player"));
+				poi_test2 = new PoiController("Player2");
+				poi_test2.setDuration(5f);
+				playground.getGameObject("poi_test2").addGameObjectController(poi_test2);
 				player.setCollisionBounds(player.getWidth()*.2f, 0, player.getWidth()*.6f, player.getHeight()*.7f);
 				playground.getCamera().setCentered();
-				playground.getCamera().follow(player);
+				//offset the camera to the left
+				//playground.getCamera().setOffset(playground.getCamera().getXOffset()+300, playground.getCamera().getYOffset());
 
 			}
 

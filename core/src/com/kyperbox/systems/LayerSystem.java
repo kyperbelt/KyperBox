@@ -1,5 +1,6 @@
 package com.kyperbox.systems;
 
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -86,6 +87,9 @@ public abstract class LayerSystem implements Priority {
 	public void drawDebug(ShapeRenderer shapes) {
 		
 	}
+	
+	public void preDraw(Batch batch,float parentAlpha) {/*TODO: override*/}
+	public void postDraw(Batch batch,float parentAlpha) {/*TODO:override*/}
 	
 	public void refresh() {
 		GameLayer layer = getLayer();
