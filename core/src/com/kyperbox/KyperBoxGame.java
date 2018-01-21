@@ -7,12 +7,15 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.BitmapFontLoader.BitmapFontParameter;
 import com.badlogic.gdx.assets.loaders.ParticleEffectLoader;
 import com.badlogic.gdx.assets.loaders.ParticleEffectLoader.ParticleEffectParameter;
+import com.badlogic.gdx.assets.loaders.ShaderProgramLoader;
+import com.badlogic.gdx.assets.loaders.ShaderProgramLoader.ShaderProgramParameter;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.tiles.AnimatedTiledMapTile;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -29,14 +32,20 @@ import com.kyperbox.util.UserData;
 
 public abstract class KyperBoxGame extends ApplicationAdapter {
 	
+
+	public static String TAG = "KyperBox->";
+	
 	public static final String IMAGE_FOLDER = "image";
 	public static final String MUSIC_FOLDER = "music";
 	public static final String SFX_FOLDER = "sound";
 	public static final String TMX_FOLDER = "maps";
 	public static final String PARTICLE_FOLDER = "particles";
+	public static final String SHADER_FOLDER = "shaders";
 	public static final String GAME_ATLAS = "game.atlas";
-	public static final String TAG = "KyperBox->";
 	public static final String FILE_SEPARATOR = "/";
+	
+	public static final String VERTEX_SUFFIX = ".vert";
+	public static final String FRAGMENT_SUFFIX = ".frag";
 	
 	private static final String GAME_DATA_NAME = "GAME_GLOBALS";
 	
@@ -105,6 +114,7 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 		assets = new AssetManager();
 		assets.setLoader(TiledMap.class	, new KyperMapLoader(assets.getFileHandleResolver()));
 		assets.setLoader(ParticleEffect.class, new ParticleEffectLoader(assets.getFileHandleResolver()));
+		assets.setLoader(ShaderProgram.class, new ShaderProgramLoader(assets.getFileHandleResolver(), VERTEX_SUFFIX, FRAGMENT_SUFFIX));
 		sound = new SoundManager(this);
 
 		
@@ -254,6 +264,9 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	//ASSET METHODS
 	//========================================
 	
+	public ShaderProgram getShader(String name) {
+		return assets.get(SHADER_FOLDER+FILE_SEPARATOR+name,ShaderProgram.class);
+	}
 	
 	public ParticleEffect getParticleEffect(String name) {
 		return assets.get(PARTICLE_FOLDER+FILE_SEPARATOR+name,ParticleEffect.class);
@@ -277,6 +290,13 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	
 	public BitmapFont getFont(String name) {
 		return assets.get(name,BitmapFont.class);
+	}
+	
+	public void loadShader(String name) {
+		ShaderProgramParameter param = new ShaderProgramParameter();
+		param.fragmentFile = SHADER_FOLDER+FILE_SEPARATOR+name+FRAGMENT_SUFFIX;
+		param.vertexFile = SHADER_FOLDER+FILE_SEPARATOR+name+VERTEX_SUFFIX;
+		assets.load(SHADER_FOLDER+FILE_SEPARATOR+name, ShaderProgram.class,param);
 	}
 	
 	public void loadParticleEffect(String name,String atlas) {

@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
@@ -14,6 +15,7 @@ import com.badlogic.gdx.graphics.g2d.ParticleEffectPool.PooledEffect;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
@@ -60,16 +62,19 @@ public class GameState extends Group{
 	private TiledMap map_data;
 	private float time_scale;
 	
+	private ShaderProgram shader;
+	
 	private ObjectMap<String,BitmapFont> 				fonts;
 	private ObjectMap<String,ParticleEffectPool> 		particle_effects; /*delete ref*/ private Array<String> pvalues;
 	private ObjectMap<String,Sprite> 					sprites;
 	private ObjectMap<String,Animation<String>>			animations;
+	private ObjectMap<String,ShaderProgram>				shaders;          /*delete ref*/ private Array<String> svalues;
 	
 	public GameState(String tmx) {
 		this(tmx,new StateManager() {
 			
 			@Override
-			public void update(float delta) {
+			public void update(GameState state,float delta) {
 				
 			}
 			
@@ -101,6 +106,8 @@ public class GameState extends Group{
 		particle_effects = new ObjectMap<String, ParticleEffectPool>();
 		pvalues = new Array<String>();
 		time_scale = 1f;
+		shaders = new ObjectMap<String, ShaderProgram>();
+		svalues = new Array<String>();
 	}
 
 	public void init() {
@@ -141,6 +148,8 @@ public class GameState extends Group{
 		//do preload
 		loadFonts(map_data, map_data.getProperties().get("atlas",String.class));
 		loadParticleEffects(map_data, map_data.getProperties().get("atlas",String.class));
+		loadShaders(map_data);
+		
 		//load UI
 		loadUi(map_data.getLayers().get("uiground"), game.getAtlas(atlas_name));
 		//load foreground
@@ -161,6 +170,14 @@ public class GameState extends Group{
 			manager.init(this);
 		}
 		log("initiated");
+	}
+	
+	public void setStateShader(ShaderProgram shader) {
+		this.shader = shader;
+	}
+	
+	public ShaderProgram getStateShader() {
+		return shader;
 	}
 	
 	public float getTimeScale() {
@@ -238,6 +255,13 @@ public class GameState extends Group{
 		return null;
 	}
 	
+	public ShaderProgram getShader(String name) {
+		if(shaders.containsKey(name))
+			return shaders.get(name);
+		error("Shader -> not found ["+name+"].");
+		return null;
+	}
+	
 	/**
 	 * get the tmx map data used to create this game state
 	 * @return
@@ -294,7 +318,7 @@ public class GameState extends Group{
 	public void update(float delta) {
 	
 		if(manager!=null) {
-			manager.update(delta);
+			manager.update(this,delta);
 		}
 		
 	}
@@ -305,6 +329,17 @@ public class GameState extends Group{
 		super.act(delta*time_scale);
 	}
 	
+	
+	@Override
+	public void draw(Batch batch, float parentAlpha) {
+		ShaderProgram ps = batch.getShader();
+		if(shader!=null) {
+			batch.setShader(shader);
+		}	
+		super.draw(batch, parentAlpha);
+		if(shader!=null || batch.getShader()!=ps)
+			batch.setShader(ps);
+	}
 	
 	/**
 	 * get the manager that is running this state
@@ -387,6 +422,19 @@ public class GameState extends Group{
 		}
 	}
 	
+	public void unloadShaders() {
+		AssetManager am = game.getAssetManager();
+		unload_helper.clear();
+		shaders.clear();
+		for (int i = 0; i < svalues.size; i++) {
+			unload_helper.add(svalues.get(i));
+		}
+		svalues.clear();
+		for (int i = 0; i < unload_helper.size; i++) {
+			am.unload(unload_helper.get(i));
+		}
+	}
+	
 	/**
 	 * disable all the layers from this state. 
 	 * They no longer receive touch inputs
@@ -455,7 +503,27 @@ public class GameState extends Group{
 		}
 	}
 	
-	
+	private void loadShaders(TiledMap data) {
+		MapObjects objects = data.getLayers().get("preload").getObjects();
+		String scheck = "Shader";
+		for (MapObject o : objects) {
+			String name = o.getName();
+			MapProperties properties = o.getProperties();
+			String type = properties.get("type",String.class);
+			if(type!=null&&type.equals(scheck)) {
+				String file = properties.get("shader_name",String.class);
+				if(file!=null) {
+					game.loadShader(file);
+					game.getAssetManager().finishLoading();
+					if(!shaders.containsKey(name)) {
+						ShaderProgram sp = game.getShader(file);
+						shaders.put(name, sp);
+						svalues.add(KyperBoxGame.SHADER_FOLDER+KyperBoxGame.FILE_SEPARATOR+file);
+					}
+				}
+			}
+		}
+	}
 	
 	/*
 	 * LOAD UI ---------------------------------------

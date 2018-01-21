@@ -15,7 +15,7 @@ public class StateManagerAdapter extends StateManager{
 	}
 
 	@Override
-	public void update(float delta) {
+	public void update(GameState state,float delta) {
 		//TODO: OVERRIDE
 	}
 

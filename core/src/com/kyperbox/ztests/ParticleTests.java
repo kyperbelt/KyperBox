@@ -31,7 +31,7 @@ public class ParticleTests extends KyperBoxGame{
 			private ParticleController torch_fire;
 			
 			@Override
-			public void update(float delta) {
+			public void update(GameState state,float delta) {
 				
 				if(getInput().inputJustPressed(InputDefaults.ENTER)) {
 					cam.setZoom(Math.max(.1f, cam.getZoom()-.1f));
@@ -105,7 +105,7 @@ public class ParticleTests extends KyperBoxGame{
 		
 		registerGameState("tile_collision.tmx",new StateManagerAdapter() {
 			@Override
-			public void update(float delta) {
+			public void update(GameState state,float delta) {
 				if(getInput().inputJustPressed(InputDefaults.JUMP_BUTTON)) {
 					setGameState("particles.tmx");
 				}

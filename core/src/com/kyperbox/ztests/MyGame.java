@@ -51,7 +51,7 @@ public class MyGame extends KyperBoxGame{
 			}
 			
 			@Override
-			public void update(float delta) {
+			public void update(GameState state,float delta) {
 				if(player!=null) {
 					PlatformerController pc = player.getController(PlatformerController.class);
 					if(getInput().inputPressed("move_right")) {

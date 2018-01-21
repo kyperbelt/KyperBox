@@ -31,7 +31,7 @@ public abstract class StateManager {
 	/**
 	 * called every update
 	 */
-	public abstract void update(float delta);
+	public abstract void update(GameState state, float delta);
 	
 	/**
 	 * called when the 

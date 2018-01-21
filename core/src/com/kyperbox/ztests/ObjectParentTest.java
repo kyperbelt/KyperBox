@@ -37,7 +37,7 @@ public class ObjectParentTest extends KyperBoxGame{
 			
 			
 			@Override
-			public void update(float delta) {
+			public void update(GameState state,float delta) {
 				if(getInput().inputPressed(move_left)) {
 					rpg_man_controller.moveLeft();
 				}

@@ -60,6 +60,9 @@
   <property name="speed_horizontal" type="float" default="0"/>
   <property name="speed_vertical" type="float" default="0"/>
  </objecttype>
+ <objecttype name="Shader" color="#55ff00">
+  <property name="shader_name" type="string"/>
+ </objecttype>
  <objecttype name="Table" color="#ff00ff">
   <property name="background" type="string"/>
   <property name="children" type="string"/>

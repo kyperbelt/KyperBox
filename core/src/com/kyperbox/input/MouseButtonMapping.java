@@ -20,4 +20,12 @@ public class MouseButtonMapping implements InputMapping{
 		return m instanceof MouseButtonMapping && ((MouseButtonMapping)m).button == button;
 	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof InputMapping) {
+			return sameAs((InputMapping) obj);
+		}
+		return false;
+	}
+	
 }

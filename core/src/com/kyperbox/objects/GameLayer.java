@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.math.Rectangle;
@@ -23,6 +24,7 @@ public class GameLayer extends Group{
 	private LayerCamera cam;
 	private MapProperties layer_properties;
 	private float time_scale;
+	private ShaderProgram shader;
 	
 	public GameLayer(GameState state) {
 		systems = new Array<LayerSystem>();
@@ -30,6 +32,14 @@ public class GameLayer extends Group{
 		cam = new LayerCamera(this);
 		cam.setPosition(0, 0);
 		time_scale = 1f;
+	}
+	
+	public void setLayerShader(ShaderProgram shader) {
+		this.shader = shader;
+	}
+	
+	public ShaderProgram getLayerShader() {
+		return shader;
 	}
 	
 	public void setLayerProperties(MapProperties properties) {
@@ -110,6 +120,12 @@ public class GameLayer extends Group{
 	
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
+		
+		ShaderProgram current_shader = batch.getShader();
+		
+		if(current_shader!=shader && shader!=null)
+			batch.setShader(shader);
+		
 		for(int i = 0;i < systems.size;i++) {
 			LayerSystem system = systems.get(i);
 			if(system.isActive())

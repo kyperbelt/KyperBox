@@ -3,7 +3,7 @@ package com.kyperbox.desktop;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.kyperbox.KyperBoxGame;
-import com.kyperbox.ztests.ParticleTests;
+import com.kyperbox.ztests.TileCollisionTest;
 
 public class DesktopLauncher {
 	public static boolean DEPLOYMENT = true;
@@ -14,7 +14,7 @@ public class DesktopLauncher {
 			AutoPacking.pack("game", "image", "game");
 		}
 		//game
-		KyperBoxGame game = new ParticleTests();
+		KyperBoxGame game = new TileCollisionTest();
 		
 		//config
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();

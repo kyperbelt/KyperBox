@@ -75,7 +75,7 @@ public class CollisionTest extends KyperBoxGame{
 			
 			
 			@Override
-			public void update(float delta) {
+			public void update(GameState state,float delta) {
 				elapsed+=delta;
 				
 				if(getInput().inputPressed(action_button)&&elapsed >= interval) {

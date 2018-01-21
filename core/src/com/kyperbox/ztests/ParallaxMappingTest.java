@@ -29,7 +29,7 @@ public class ParallaxMappingTest extends KyperBoxGame{
 			private float cam_speed = 250f;
 			
 			@Override
-			public void update(float delta) {
+			public void update(GameState state,float delta) {
 				if(getInput().inputPressed(InputDefaults.MOVE_LEFT)) {
 					Vector2 cam_pos = playground.getCamera().getPosition();
 					playground.getCamera().setPosition(cam_pos.x-cam_speed*delta, cam_pos.y);
