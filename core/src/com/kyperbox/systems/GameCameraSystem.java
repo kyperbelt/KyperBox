@@ -223,16 +223,15 @@ public class GameCameraSystem extends LayerSystem {
 
 		// adjust midpoint to include prominent point of interest
 		if (updatePois(getCam())) {
-			focus_midpoint.lerp(poi_midpoint, highest_weight * .5f);
+			focus_midpoint.lerp(poi_midpoint, Math.max(.1f, highest_weight*.5f));
 		}
 
-		// set cam pos to midpoint to include all points of interest.
-		
-		obj_check.set(cam_pos.x + (((focus_midpoint.x - cam_pos.x) * x_speed) * delta),
-				cam_pos.y + ((focus_midpoint.y - cam_pos.y) * y_speed) * delta);
+		//interpolate to cam position
+		obj_check.set(cam_pos.x + (((focus_midpoint.x - cam_pos.x) * x_speed) * delta)*getCam().getZoom(),
+				cam_pos.y + ((focus_midpoint.y - cam_pos.y) * y_speed) * delta*getCam().getZoom());
 
 		if (!calculateShake(delta)) {
-			if (feathering) {
+			if (feathering) { //TODO: feathering is not used.. remove or find use
 				feather_elapsed += delta;
 				getCam().setPosition(cam_pos.x + (((focus_midpoint.x - cam_pos.x) * (x_speed * .5f)) * delta),
 						cam_pos.y + ((focus_midpoint.y - cam_pos.y) * (y_speed * .5f)) * delta);

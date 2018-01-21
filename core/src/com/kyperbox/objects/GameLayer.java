@@ -47,7 +47,7 @@ public class GameLayer extends Group{
 	 * @return
 	 */
 	public Sprite getGameSprite(String name) {
-		return state.getGame().getGameSprite(name);
+		return state.getGameSprite(name);
 	}
 	
 	/**
@@ -57,7 +57,7 @@ public class GameLayer extends Group{
 	 * @return
 	 */
 	public Sprite getGameSprite(String name,String atlas) {
-		return state.getGame().getGameSprite(name, atlas);
+		return state.getGameSprite(name, atlas);
 	}
 	
 	/**
@@ -66,7 +66,7 @@ public class GameLayer extends Group{
 	 * @return
 	 */
 	public Animation<String> getAnimation(String animation_name){
-		return state.getGame().getAnimation(animation_name);
+		return state.getAnimation(animation_name);
 	}
 	
 	public Actor getActor(String name) {

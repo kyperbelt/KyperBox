@@ -25,9 +25,16 @@ TempleTIles
   orig: 544, 416
   offset: 0, 0
   index: -1
+Torch
+  rotate: false
+  xy: 1802, 869
+  size: 99, 149
+  orig: 99, 149
+  offset: 0, 0
+  index: -1
 back_down
   rotate: false
-  xy: 1802, 980
+  xy: 1802, 829
   size: 84, 38
   orig: 84, 38
   offset: 0, 0
@@ -48,21 +55,21 @@ badlogic
   index: -1
 bomb
   rotate: false
-  xy: 1736, 372
+  xy: 163, 118
   size: 58, 24
   orig: 58, 24
   offset: 0, 0
   index: -1
 button_down
   rotate: false
-  xy: 2, 2
+  xy: 1818, 600
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 button_up
   rotate: false
-  xy: 88, 31
+  xy: 1844, 600
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
@@ -83,21 +90,21 @@ buy_up
   index: -1
 dash
   rotate: false
-  xy: 1822, 413
+  xy: 1736, 373
   size: 52, 23
   orig: 52, 23
   offset: 0, 0
   index: -1
 exit_down
   rotate: false
-  xy: 1802, 940
+  xy: 1903, 980
   size: 84, 38
   orig: 84, 38
   offset: 0, 0
   index: -1
 exit_up
   rotate: false
-  xy: 1888, 980
+  xy: 1802, 789
   size: 84, 38
   orig: 84, 38
   offset: 0, 0
@@ -111,7 +118,7 @@ freesiaUPC38
   index: -1
 greentexture
   rotate: false
-  xy: 1630, 524
+  xy: 2, 2
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
@@ -167,126 +174,126 @@ play_up
   index: -1
 player_action_0
   rotate: false
-  xy: 1888, 946
+  xy: 1903, 946
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 player_action_1
   rotate: false
-  xy: 1974, 986
+  xy: 1989, 986
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 player_action_2
   rotate: false
-  xy: 1680, 566
+  xy: 1818, 728
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 player_action_3
   rotate: false
-  xy: 1736, 338
+  xy: 1680, 566
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 player_climbing_0
   rotate: false
-  xy: 1802, 870
+  xy: 1736, 339
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 player_climbing_1
   rotate: false
-  xy: 1842, 906
+  xy: 1862, 404
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 player_climbing_2
   rotate: false
-  xy: 1922, 946
+  xy: 1903, 912
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 player_climbing_3
   rotate: false
-  xy: 2008, 986
+  xy: 1937, 946
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 player_falling_0
   rotate: false
-  xy: 1736, 304
+  xy: 1818, 694
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 player_falling_1
   rotate: false
-  xy: 1802, 836
+  xy: 1736, 305
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 player_jumping_0
   rotate: false
-  xy: 1736, 270
+  xy: 1896, 404
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 player_jumping_1
   rotate: false
-  xy: 1802, 802
+  xy: 1903, 878
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 player_jumping_2
   rotate: false
-  xy: 1736, 236
+  xy: 1937, 912
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 player_jumping_3
   rotate: false
-  xy: 1802, 768
+  xy: 1818, 660
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 player_walking_0
   rotate: false
-  xy: 1736, 202
+  xy: 1736, 271
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 player_walking_1
   rotate: false
-  xy: 1736, 168
+  xy: 1930, 404
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 player_walking_2
   rotate: false
-  xy: 1736, 134
+  xy: 1937, 878
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 player_walking_3
   rotate: false
-  xy: 1736, 100
+  xy: 1818, 626
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
@@ -300,14 +307,14 @@ pricedownBI48
   index: -1
 redtexture
   rotate: false
-  xy: 163, 91
+  xy: 88, 31
   size: 24, 24
   orig: 24, 24
   offset: 0, 0
   index: -1
 rpg_chest_down
   rotate: false
-  xy: 1802, 904
+  xy: 1822, 402
   size: 38, 34
   orig: 38, 34
   offset: 0, 0
@@ -321,9 +328,16 @@ rpg_man_down
   index: -1
 shoes
   rotate: false
-  xy: 163, 117
+  xy: 1802, 762
   size: 65, 25
   orig: 65, 25
+  offset: 0, 0
+  index: -1
+square_particle
+  rotate: false
+  xy: 1736, 237
+  size: 32, 32
+  orig: 32, 32
   offset: 0, 0
   index: -1
 upgrade

@@ -41,7 +41,7 @@ public class AnimationController extends GameObjectController{
 	 */
 	public void setAnimation(String animation,PlayMode playmode) {
 		animation_elapsed = 0f;
-		current_animation = daddy.getGame().getAnimation(animation);
+		current_animation = daddy.getState().getAnimation(animation);
 		current_animation.setPlayMode(playmode);
 	}
 	

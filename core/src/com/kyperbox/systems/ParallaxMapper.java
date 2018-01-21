@@ -129,8 +129,8 @@ public class ParallaxMapper extends LayerSystem {
 			last_y = pos.y;
 			
 			if(!ignore_zoom) {
-				diff_x*=cam.getZoom();
-				diff_y*=cam.getZoom();
+				diff_x/=cam.getZoom();
+				diff_y/=cam.getZoom();
 			}
 			
 			for (int i = 0; i < parallax_mappings.size; i++) {

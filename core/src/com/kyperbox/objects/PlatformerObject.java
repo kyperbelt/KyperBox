@@ -14,8 +14,8 @@ public class PlatformerObject extends GameObject {
 		super.init(properties);
 		anim_controller = new AnimationController();
 		platform_controller = new PlatformerController();
-		addGameObjectController(anim_controller);
-		addGameObjectController(platform_controller);
+		addController(anim_controller);
+		addController(platform_controller);
 		anim_controller.setPlaySpeed(3f);
 		
 		// create animation
@@ -26,17 +26,17 @@ public class PlatformerObject extends GameObject {
 	}
 
 	private void createAnimations() {
-		if (getGame().getAnimation("player_walking") == null) {
-			getGame().storeAnimation("player_walking",getGame().createGameAnimation("player_walking", 4, .25f));
+		if (getState().getAnimation("player_walking") == null) {
+			getState().storeAnimation("player_walking",getState().createGameAnimation("player_walking", 4, .25f));
 		}
-		if (getGame().getAnimation("player_jumping") == null) {
-			getGame().storeAnimation("player_jumping",getGame().createGameAnimation("player_jumping", 4, .25f));
+		if (getState().getAnimation("player_jumping") == null) {
+			getState().storeAnimation("player_jumping",getState().createGameAnimation("player_jumping", 4, .25f));
 		}
-		if (getGame().getAnimation("player_climbing") == null) {
-			getGame().storeAnimation("player_climbing",getGame().createGameAnimation("player_climbing", 4, .25f));
+		if (getState().getAnimation("player_climbing") == null) {
+			getState().storeAnimation("player_climbing",getState().createGameAnimation("player_climbing", 4, .25f));
 		}
-		if (getGame().getAnimation("player_falling") == null) {
-			getGame().storeAnimation("player_falling",getGame().createGameAnimation("player_falling", 2, .25f));
+		if (getState().getAnimation("player_falling") == null) {
+			getState().storeAnimation("player_falling",getState().createGameAnimation("player_falling", 2, .25f));
 		}
 	}
 

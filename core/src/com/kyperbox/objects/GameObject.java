@@ -161,6 +161,7 @@ public abstract class GameObject extends Group {
 	}
 
 	public void init(MapProperties properties) {
+		setOrigin(Align.center);
 		this.properties = properties;
 		bounds = new Rectangle(0, 0, getWidth(), getHeight());
 		ret_bounds = new Rectangle(bounds);
@@ -185,6 +186,20 @@ public abstract class GameObject extends Group {
 			controllers.get(i).update(this, delta);
 		setPosition(getX() + velocity.x * delta, getY() + velocity.y * delta);
 	}
+	
+	public float getAbsoluteX() {
+		if(getParent() != layer && getParent()!=null) {
+			return getParent().getX()+getX();
+		}
+		return getX();
+	}
+	
+	public float getAbsoluteY() {
+		if(getParent() != layer&& getParent()!=null) {
+			return getParent().getY()+getY();
+		}
+		return getY();
+	}
 
 	@Override
 	public void act(float delta) {
@@ -206,7 +221,7 @@ public abstract class GameObject extends Group {
 		this.sprite = sprite;
 	}
 
-	public void addGameObjectController(GameObjectController controller) {
+	public void addController(GameObjectController controller) {
 		if (getController(controller.getClass()) != null) {
 			layer.getState().error("Cannot add type [" + controller.getClass().getName() + "] more than once.");
 			return;

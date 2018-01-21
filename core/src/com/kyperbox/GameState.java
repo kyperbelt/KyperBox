@@ -1,11 +1,17 @@
 package com.kyperbox;
 
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
+import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
+import com.badlogic.gdx.graphics.g2d.ParticleEffectPool.PooledEffect;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapLayer;
@@ -14,6 +20,7 @@ import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
@@ -38,7 +45,9 @@ import com.kyperbox.util.KyperProgressBar;
 import com.kyperbox.util.SaveUtils;
 import com.kyperbox.util.UserData;
 
-public class GameState {
+public class GameState extends Group{
+	
+	private static Array<String> unload_helper = new Array<String>(); 
 	
 	private KyperBoxGame game;
 	private String tmx;
@@ -50,7 +59,10 @@ public class GameState {
 	private UserData state_data;
 	private TiledMap map_data;
 	
-	private ObjectMap<String,BitmapFont> fonts;
+	private ObjectMap<String,BitmapFont> 				fonts;
+	private ObjectMap<String,ParticleEffectPool> 		particle_effects; /*delete ref*/ private Array<String> pvalues;
+	private ObjectMap<String,Sprite> 					sprites;
+	private ObjectMap<String,Animation<String>>			animations;
 	
 	public GameState(String tmx) {
 		this(tmx,new StateManager() {
@@ -72,7 +84,8 @@ public class GameState {
 			
 			@Override
 			public void dispose(GameState state) {
-				
+				state.unloadFonts();
+				state.unloadParticles();
 			}
 		});
 	}
@@ -81,7 +94,11 @@ public class GameState {
 		this.tmx = tmx;
 		setManager(manager);
 
-		
+		sprites = new ObjectMap<String, Sprite>();
+		animations = new ObjectMap<String, Animation<String>>();
+		fonts = new ObjectMap<String, BitmapFont>(); //TODO: test load to avoid repeats
+		particle_effects = new ObjectMap<String, ParticleEffectPool>();
+		pvalues = new Array<String>();
 	}
 
 	public void init() {
@@ -107,8 +124,6 @@ public class GameState {
 		atlas_name = atlas_name.replace("/", "");
 		
 		state_data.setString("map_atlas", atlas_name);
-		
-		fonts = new ObjectMap<String, BitmapFont>();
 
 		//set layer properties
 		uiground.setLayerProperties(map_data.getLayers().get("uiground").getProperties());
@@ -123,6 +138,7 @@ public class GameState {
 
 		//do preload
 		loadFonts(map_data, map_data.getProperties().get("atlas",String.class));
+		loadParticleEffects(map_data, map_data.getProperties().get("atlas",String.class));
 		//load UI
 		loadUi(map_data.getLayers().get("uiground"), game.getAtlas(atlas_name));
 		//load foreground
@@ -133,16 +149,85 @@ public class GameState {
 		loadLayer(background,map_data.getLayers().get("background"));
 
 		//add layers to scene
-		game.addGameLayer(background);
-		game.addGameLayer(playground);
-		game.addGameLayer(foreground);
-		game.addGameLayer(uiground);
+		addActor(background);
+		addActor(playground);
+		addActor(foreground);
+		addActor(uiground);
 		
 		//init state manager
 		if(manager!=null) {
 			manager.init(this);
 		}
 		log("initiated");
+	}
+	
+	
+
+	/**
+	 * get a sprite so we dont keep creating new sprites
+	 * @param name
+	 * @return
+	 */
+	public Sprite getGameSprite(String name) {
+		return getGameSprite(name, KyperBoxGame.GAME_ATLAS);
+	}
+	
+	public Sprite getGameSprite(String name,String atlas) {
+		if(!sprites.containsKey(name))
+			sprites.put(name, game.getAtlas(atlas).createSprite(name));
+		return sprites.get(name);
+	}
+	
+	/**
+	 * store an animation for later use with getAnimation
+	 * @param animation_name
+	 * @param animation
+	 */
+	public void storeAnimation(String animation_name,Animation<String> animation) {
+		if(animations.containsKey(animation_name))
+			log("Animations->animation ["+animation_name+"] already exists and has been overriden!");
+		animations.put(animation_name, animation);
+	}
+
+	/**
+	 * create a game animation with the base name
+	 * and the number of frames. 
+	 * This method uses indexes (ex.calling (animation,3) = Animation0,Animation1,Animation2 - )
+	 * @param frames
+	 * @param frame_duration
+	 * @return
+	 */
+	public Animation<String> createGameAnimation(String name,int frames,float frame_duration){
+		String[] f = new String[frames];
+		for(int i = 0;i<f.length;i++) {
+			f[i]=name+"_"+i;
+		}
+		Animation<String> animations = new Animation<String>(frame_duration,f);
+		return animations;
+	}
+	
+	/**
+	 * returns a stored animation to avoid garbage collection. 
+	 * Animations may use the same sprites allowing multiple variations of the same
+	 * animation
+	 * @param name
+	 * @return
+	 */
+	public Animation<String> getAnimation(String name){
+		if(animations.containsKey(name)) {
+			return animations.get(name);
+		}else {
+			error("Animations->could not find["+name+"].");
+			return null;
+		}
+	}
+	
+	public PooledEffect getEffect(String name) {
+		if(particle_effects.containsKey(name)) {
+			return particle_effects.get(name).obtain();
+		}
+		error("ParticleEffect -> not found ["+name+"].");
+		return null;
 	}
 	
 	/**
@@ -199,18 +284,19 @@ public class GameState {
 	}
 	
 	public void update(float delta) {
-		
+	
 		if(manager!=null) {
 			manager.update(delta);
 		}
 		
-		uiground.act(delta);
-		foreground.act(delta);
-		playground.act(delta);
-		background.act(delta);
-		
-		
 	}
+	
+	@Override
+	public void act(float delta) {
+		update(delta);
+		super.act(delta);
+	}
+	
 	
 	/**
 	 * get the manager that is running this state
@@ -230,20 +316,27 @@ public class GameState {
 	 * removes and clears all layers and 
 	 * disposes of the manager
 	 */
-	public void remove() {
-		background.remove();
-		playground.remove();
-		foreground.remove();
-		uiground.remove();
+	public boolean remove() {
 		background.clear();
 		playground.clear();
 		foreground.clear();
 		uiground.clear();
+		
+		background.remove();
+		playground.remove();
+		foreground.remove();
+		uiground.remove();
+		
+		log("removed");
+		return super.remove();
+	}
+	
+	public void dispose() {
+		animations.clear();
+		sprites.clear();
 		if(manager!=null) {
 			manager.dispose(this);
 		}
-		
-		log("removed");
 	}
 	
 	public GameInput getInput() {
@@ -258,6 +351,34 @@ public class GameState {
 		KyperBoxGame.error(tmx, message);
 	}
 	
+	public void unloadFonts() {
+		Array<BitmapFont> fvalues = fonts.values().toArray();
+		AssetManager am = game.getAssetManager();
+		unload_helper.clear();
+		for (int i = 0; i < fvalues.size; i++) {
+			unload_helper.add(fvalues.get(i).getData().fontFile.path());
+		}
+		
+		fvalues.clear();
+		for (int i = 0; i < unload_helper.size; i++) {
+			am.unload(unload_helper.get(i));
+		}
+	}
+	
+	public void unloadParticles() {
+		AssetManager am = game.getAssetManager();
+		unload_helper.clear();
+		particle_effects.clear();
+		for (int i = 0; i < pvalues.size; i++) {
+	
+			unload_helper.add(pvalues.get(i));
+		}
+		pvalues.clear();
+		for (int i = 0; i < unload_helper.size; i++) {
+			am.unload(unload_helper.get(i));
+		}
+	}
+	
 	/**
 	 * disable all the layers from this state. 
 	 * They no longer receive touch inputs
@@ -266,16 +387,18 @@ public class GameState {
 	 */
 	public void disableLayers(boolean disable) {
 		if(disable) {
-			uiground.setTouchable(Touchable.disabled);
-			foreground.setTouchable(Touchable.disabled);
-			playground.setTouchable(Touchable.disabled);
-			background.setTouchable(Touchable.disabled);
+			this.setTouchable(Touchable.disabled);
+//			uiground.setTouchable(Touchable.disabled);
+//			foreground.setTouchable(Touchable.disabled);
+//			playground.setTouchable(Touchable.disabled);
+//			background.setTouchable(Touchable.disabled);
 		}
 		else {
-			uiground.setTouchable(Touchable.enabled);
-			foreground.setTouchable(Touchable.enabled);
-			playground.setTouchable(Touchable.enabled);
-			background.setTouchable(Touchable.enabled);
+			this.setTouchable(Touchable.enabled);
+//			uiground.setTouchable(Touchable.enabled);
+//			foreground.setTouchable(Touchable.enabled);
+//			playground.setTouchable(Touchable.enabled);
+//			background.setTouchable(Touchable.enabled);
 		}
 	}
 	/*
@@ -283,13 +406,14 @@ public class GameState {
 	 */
 	private void loadFonts(TiledMap data,String atlasname) {
 		MapObjects objects = data.getLayers().get("preload").getObjects();
+		String ffcheck = "Font";
 		for(MapObject o: objects) {
 			String name = o.getName();
 			BitmapFont font = null;
 			MapProperties properties = o.getProperties();
 			String type = properties.get("type",String.class);
 			String fontfile = properties.get("font_file",String.class);
-			if(fontfile!=null&&type!=null&&type.equals("Font")) {
+			if(fontfile!=null&&type!=null&&type.equals(ffcheck)) {
 				boolean markup = properties.get("markup",false,boolean.class);
 				game.loadFont(fontfile, atlasname);
 				game.getAssetManager().finishLoading();
@@ -299,6 +423,31 @@ public class GameState {
 			}
 		}
 	}
+	
+	private void loadParticleEffects(TiledMap data,String atlasname) {
+		MapObjects objects = data.getLayers().get("preload").getObjects();
+		String ppcheck = "Particle";
+		for(MapObject o:objects) {
+			String name = o.getName();
+			MapProperties properties = o.getProperties();
+			String type = properties.get("type",String.class);
+			if(type!=null&&type.equals(ppcheck)) {
+				String file = properties.get("particle_file",String.class);
+				if(file!=null) {
+					game.loadParticleEffect(file, atlasname);
+					game.getAssetManager().finishLoading();
+					if(!particle_effects.containsKey(name)) {
+						ParticleEffect pe = game.getParticleEffect(file);
+						pe.setEmittersCleanUpBlendFunction(false);
+						pvalues.add(KyperBoxGame.PARTICLE_FOLDER+KyperBoxGame.FILE_SEPARATOR+file);
+						particle_effects.put(name, new ParticleEffectPool(pe, 12, 48));
+					}
+				}
+			}
+		}
+	}
+	
+	
 	
 	/*
 	 * LOAD UI ---------------------------------------

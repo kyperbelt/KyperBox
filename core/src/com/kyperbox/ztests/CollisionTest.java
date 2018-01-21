@@ -81,7 +81,7 @@ public class CollisionTest extends KyperBoxGame{
 				if(getInput().inputPressed(action_button)&&elapsed >= interval) {
 					
 					elapsed = 0;
-					mouse_pos = playground.getCamera().unproject(mouse_pos.set(getInput().getMouseX(), getInput().getMouseY()));
+					mouse_pos = playground.getCamera().unproject(mouse_pos.set(getInput().getX(), getInput().getY()));
 					BasicGameObject test = test_objects.obtain();
 					test.setSize(32, 32);
 					test.setName(object_name_start+counter);
@@ -93,12 +93,12 @@ public class CollisionTest extends KyperBoxGame{
 					
 					
 					if(test.getController(PlatformerController.class)==null)
-						test.addGameObjectController(new PlatformerController());
+						test.addController(new PlatformerController());
 					else {
 						test.getController(PlatformerController.class).reset();
 					}
 					if(test.getController(CollisionController.class)==null)
-						test.addGameObjectController(new CollisionController());
+						test.addController(new CollisionController());
 					else {
 						test.getController(CollisionController.class).reset();
 					}

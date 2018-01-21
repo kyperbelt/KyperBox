@@ -448,7 +448,6 @@ public class KyperMapLoader extends BaseTmxMapLoader<AtlasTmxMapLoader.AtlasTile
 					if(tileElement.hasChild("objectgroup")) {
 						Element properties = tileElement.getChildByName("objectgroup").getChildByName("properties");
 						if (properties != null) {
-							Gdx.app.log(getClass().getSimpleName(), "loaded properties for tile:"+tile.getId());
 							loadProperties(tile.getProperties(), properties);
 						}
 					}

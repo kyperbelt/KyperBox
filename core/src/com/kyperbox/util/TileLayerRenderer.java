@@ -29,7 +29,6 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.viewport.Viewport;
 import com.kyperbox.objects.GameLayer.LayerCamera;
 import com.kyperbox.objects.GameObject;
 
@@ -66,13 +65,13 @@ public class TileLayerRenderer {
 
 	public void renderTileLayer(TiledMapTileLayer layer, Batch batch) {
 		LayerCamera cam = object.getGameLayer().getCamera();
-		Viewport view = object.getGame().getView();
 		pos.set(0, 0);
 		pos = cam.getPosition();
-		view_bounds.set((pos.x+ cam.getXOffset()/cam.getZoom() - layer.getTileWidth()),
-				(pos.y+ cam.getYOffset()/cam.getZoom() - layer.getTileHeight()),
-				(view.getWorldWidth() + (layer.getTileWidth() * 2))/cam.getZoom(),
-				(view.getWorldHeight() + (layer.getTileHeight() * 2))/cam.getZoom());
+//		view_bounds.set((pos.x+ cam.getXOffset()/cam.getZoom() - layer.getTileWidth()),
+//				(pos.y+ cam.getYOffset()/cam.getZoom() - layer.getTileHeight()),
+//				(view.getWorldWidth() + (layer.getTileWidth() * 2))/cam.getZoom(),
+//				(view.getWorldHeight() + (layer.getTileHeight() * 2))/cam.getZoom());
+		view_bounds = cam.getViewBounds();
 
 		unit_scale = (object.getScaleX() + object.getScaleY()) * .5f;
 		final Color batchColor = batch.getColor();

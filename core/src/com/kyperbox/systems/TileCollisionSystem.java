@@ -128,7 +128,7 @@ public class TileCollisionSystem extends LayerSystem{
 					
 					tiles = tile_layer.getCollisionsForSide(minx, miny, maxx, maxy);
 					if(addTiles(tiles, tcc)) {
-						object.setPosition(tiles.first().getRight()-(object_bounds.getX()-object.getX())+1, object.getY());
+						object.setPosition(tiles.first().getRight()-(object_bounds.getX()-object.getX()), object.getY());
 						object.setVelocity(0, pvel.y);
 						pvel = object.getVelocity();
 					}
@@ -144,7 +144,7 @@ public class TileCollisionSystem extends LayerSystem{
 					
 					tiles = tile_layer.getCollisionsForSide(minx, miny, maxx, maxy);
 					if(addTiles(tiles, tcc)) {
-						object.setPosition(tiles.first().getLeft()-object_bounds.getWidth()-(object_bounds.getX()-object.getX())-1, object.getY()); 
+						object.setPosition(tiles.first().getLeft()-object_bounds.getWidth()-(object_bounds.getX()-object.getX()), object.getY()); 
 						object.setVelocity(0, pvel.y);
 						pvel = object.getVelocity();
 					}
@@ -161,7 +161,7 @@ public class TileCollisionSystem extends LayerSystem{
 					
 					tiles = tile_layer.getCollisionsForSide(minx, miny, maxx, maxy);
 					if(addTiles(tiles, tcc)) {
-						object.setPosition(object.getX(), tiles.first().getTop()+(object_bounds.getY()-object.getY())+1);
+						object.setPosition(object.getX(), tiles.first().getTop()+(object_bounds.getY()-object.getY()));
 						object.setVelocity(pvel.x, 0);
 						pvel = object.getVelocity();
 					}
@@ -177,7 +177,7 @@ public class TileCollisionSystem extends LayerSystem{
 					
 					tiles = tile_layer.getCollisionsForSide(minx, miny, maxx, maxy);
 					if(addTiles(tiles, tcc)) {
-						object.setPosition(object.getX(), tiles.first().getBot()-object_bounds.getHeight()+(object_bounds.getY()-object.getY())-1); 
+						object.setPosition(object.getX(), tiles.first().getBot()-object_bounds.getHeight()+(object_bounds.getY()-object.getY())); 
 						object.setVelocity(pvel.x, 0);
 						pvel = object.getVelocity();
 					}

@@ -5,12 +5,13 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.BitmapFontLoader.BitmapFontParameter;
+import com.badlogic.gdx.assets.loaders.ParticleEffectLoader;
+import com.badlogic.gdx.assets.loaders.ParticleEffectLoader.ParticleEffectParameter;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.tiles.AnimatedTiledMapTile;
@@ -22,7 +23,6 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.kyperbox.input.GameInput;
 import com.kyperbox.managers.Priority.PriorityComparator;
 import com.kyperbox.managers.StateManager;
-import com.kyperbox.objects.GameLayer;
 import com.kyperbox.util.KyperMapLoader;
 import com.kyperbox.util.SaveUtils;
 import com.kyperbox.util.UserData;
@@ -33,6 +33,7 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	public static final String MUSIC_FOLDER = "music";
 	public static final String SFX_FOLDER = "sound";
 	public static final String TMX_FOLDER = "maps";
+	public static final String PARTICLE_FOLDER = "particles";
 	public static final String GAME_ATLAS = "game.atlas";
 	public static final String TAG = "KyperBox->";
 	public static final String FILE_SEPARATOR = "/";
@@ -49,9 +50,6 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	private Preferences game_prefs;
 	
 	private static PriorityComparator prio_compare;
-
-	private ObjectMap<String,Sprite> sprites;
-	private ObjectMap<String,Animation<String>>animations;
 	
 	private UserData global_data;
 	
@@ -106,10 +104,10 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 		
 		assets = new AssetManager();
 		assets.setLoader(TiledMap.class	, new KyperMapLoader(assets.getFileHandleResolver()));
+		assets.setLoader(ParticleEffect.class, new ParticleEffectLoader(assets.getFileHandleResolver()));
 		sound = new SoundManager(this);
 
-		sprites = new ObjectMap<String, Sprite>();
-		animations = new ObjectMap<String, Animation<String>>();
+		
 
 		packages = new Array<String>();
 		packages.add("com.kyperbox.objects");
@@ -182,10 +180,13 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 			public void run() {
 				for(GameState gs: current_gamestates)
 					gs.remove();
-				current_gamestates.clear();
 				GameState state = game_states.get(tmx);
 				state.init();
+				for(GameState gs: current_gamestates)
+					gs.dispose();
+				current_gamestates.clear();
 				current_gamestates.add(state);
+				game_stage.addActor(state);
 			}
 		});
 	}
@@ -198,6 +199,7 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 		GameState state = game_states.get(tmx);
 		state.init();
 		current_gamestates.add(state);
+		game_stage.addActor(state);
 	}
 	
 	public GameState popGameState() {
@@ -208,6 +210,7 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 			@Override
 			public void run() {
 				popped_state.remove();
+				popped_state.dispose();
 			}
 		});
 		
@@ -229,14 +232,10 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 		AnimatedTiledMapTile.updateAnimationBaseTime();
 		float delta = Gdx.graphics.getDeltaTime();
 		if(current_gamestates.size > 0)
-			current_gamestates.peek().update(delta);
+			current_gamestates.peek().act(delta);
 		game_stage.draw();
 		
 		
-	}
-	
-	protected void addGameLayer(GameLayer layer) {
-		game_stage.addActor(layer);
 	}
 	
 	private static void clear() {
@@ -256,6 +255,10 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	//========================================
 	
 	
+	public ParticleEffect getParticleEffect(String name) {
+		return assets.get(PARTICLE_FOLDER+FILE_SEPARATOR+name,ParticleEffect.class);
+	}
+	
 	public Sound getSound(String name) {
 		return assets.get(SFX_FOLDER+FILE_SEPARATOR+name,Sound.class);
 	}
@@ -274,6 +277,12 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	
 	public BitmapFont getFont(String name) {
 		return assets.get(name,BitmapFont.class);
+	}
+	
+	public void loadParticleEffect(String name,String atlas) {
+		ParticleEffectParameter param = new ParticleEffectParameter();
+		param.atlasFile = atlas;
+		assets.load(PARTICLE_FOLDER+FILE_SEPARATOR+name, ParticleEffect.class, param);
 	}
 	
 	public void loadFont(String name,String atlas) {
@@ -314,66 +323,7 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	public void resize(int width, int height) {
 		game_stage.getViewport().update(width, height);
 	}
-	
 
-	/**
-	 * get a sprite so we dont keep creating new sprites
-	 * @param name
-	 * @return
-	 */
-	public Sprite getGameSprite(String name) {
-		return getGameSprite(name, GAME_ATLAS);
-	}
-	
-	public Sprite getGameSprite(String name,String atlas) {
-		if(!sprites.containsKey(name))
-			sprites.put(name, getAtlas(atlas).createSprite(name));
-		return sprites.get(name);
-	}
-	
-	/**
-	 * store an animation for later use with getAnimation
-	 * @param animation_name
-	 * @param animation
-	 */
-	public void storeAnimation(String animation_name,Animation<String> animation) {
-		if(animations.containsKey(animation_name))
-			log("Animations", "animation ["+animation_name+"] already exists and has been overriden!");
-		animations.put(animation_name, animation);
-	}
-
-	/**
-	 * create a game animation with the base name
-	 * and the number of frames. 
-	 * This method uses indexes (ex.calling (animation,3) = Animation0,Animation1,Animation2 - )
-	 * @param frames
-	 * @param frame_duration
-	 * @return
-	 */
-	public Animation<String> createGameAnimation(String name,int frames,float frame_duration){
-		String[] f = new String[frames];
-		for(int i = 0;i<f.length;i++) {
-			f[i]=name+"_"+i;
-		}
-		Animation<String> animations = new Animation<String>(frame_duration,f);
-		return animations;
-	}
-	
-	/**
-	 * returns a stored animation to avoid garbage collection. 
-	 * Animations may use the same sprites allowing multiple variations of the same
-	 * animation
-	 * @param name
-	 * @return
-	 */
-	public Animation<String> getAnimation(String name){
-		if(animations.containsKey(name)) {
-			return animations.get(name);
-		}else {
-			error("Animations", "not found["+name+"].");
-			return null;
-		}
-	}
 	
 	public abstract void initiate();
 }

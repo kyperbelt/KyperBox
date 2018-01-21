@@ -1,6 +1,8 @@
 package com.kyperbox.ztests;
 
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.kyperbox.GameState;
 import com.kyperbox.KyperBoxGame;
@@ -15,6 +17,7 @@ import com.kyperbox.objects.GameObject;
 import com.kyperbox.systems.GameCameraSystem;
 import com.kyperbox.systems.ParallaxMapper;
 import com.kyperbox.systems.TileCollisionSystem;
+import com.kyperbox.util.BakedEffects;
 
 public class TileCollisionTest extends KyperBoxGame {
 
@@ -105,6 +108,7 @@ public class TileCollisionTest extends KyperBoxGame {
 				parallax.addMapping("mountains", .6f, 0f, true);
 				parallax.addMapping("mountain_far", .2f, 0f, true);
 				parallax.addMapping("parallax_back", 0, 0f, true);
+				parallax.setIgnoreZoom(false);
 				state.getBackgroundLayer().addLayerSystem(parallax);
 				state.getPlaygroundLayer().addLayerSystem(new TileCollisionSystem("platformer_tiles"));
 				game_cam = new GameCameraSystem(3);
@@ -125,17 +129,23 @@ public class TileCollisionTest extends KyperBoxGame {
 				
 				player = (BasicGameObject) playground.getGameObject("player");
 				GameObject player2 = playground.getGameObject("player2");
+				player2.addAction(Actions.repeat(-1, BakedEffects.shake(1f, 10f, true)));
 				game_cam.addFocus(player);
-				game_cam.addFocus(player2);
+				//game_cam.addFocus(player2);
 				
 				//tile collision controller
 				TileCollisionController tcc = new TileCollisionController();
 				//tcc.collideWithVoid(false);
-				player.addGameObjectController(tcc);
-				playground.getGameObject("poi_test").addGameObjectController(new PoiController("Player"));
+				player.addController(tcc);
+				playground.getGameObject("poi_test").addController(new PoiController("Player"));
 				poi_test2 = new PoiController("Player2");
 				poi_test2.setDuration(5f);
-				playground.getGameObject("poi_test2").addGameObjectController(poi_test2);
+				playground.getGameObject("poi_test2").addController(poi_test2);
+				playground.getGameObject("poi_test2").setOrigin(Align.center);
+				playground.getGameObject("poi_test2").addAction(Actions.repeat(-1,
+						Actions.sequence(BakedEffects.spiral(6f, 3, 200, playground.getGameObject("poi_test"), -1,false,true),
+								BakedEffects.spiral(6f, -3, 200, playground.getGameObject("poi_test"), 1,false,true))));
+				playground.getGameObject("poi_test").addAction(Actions.repeat(-1, BakedEffects.pulse(playground.getGameObject("poi_test"), 1.5f, .8f, 30)));
 				player.setCollisionBounds(player.getWidth()*.2f, 0, player.getWidth()*.6f, player.getHeight()*.7f);
 				playground.getCamera().setCentered();
 				//offset the camera to the left

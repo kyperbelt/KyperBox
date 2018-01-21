@@ -98,11 +98,11 @@ public class GameInput{
 		return inputs_last_pressed.get(input)&&!inputPressed(input);
 	}
 	
-	public float getMouseX() {
+	public float getX() {
 		return Gdx.input.getX();
 	}
 	
-	public float getMouseY() {
+	public float getY() {
 		return Gdx.input.getY();
 	}
 	
