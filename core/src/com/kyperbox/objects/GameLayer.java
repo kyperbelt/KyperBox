@@ -22,12 +22,14 @@ public class GameLayer extends Group{
 	private GameState state;
 	private LayerCamera cam;
 	private MapProperties layer_properties;
+	private float time_scale;
 	
 	public GameLayer(GameState state) {
 		systems = new Array<LayerSystem>();
 		this.state = state;
 		cam = new LayerCamera(this);
 		cam.setPosition(0, 0);
+		time_scale = 1f;
 	}
 	
 	public void setLayerProperties(MapProperties properties) {
@@ -86,6 +88,13 @@ public class GameLayer extends Group{
 		return (GameObject) getActor(name);
 	}
 	
+	public float getTimeScale() {
+		return time_scale;
+	}
+	
+	public void setTimeScale(float time_scale) {
+		this.time_scale = Math.max(0, time_scale);
+	}
 	
 	@Override
 	public void act(float delta) {
@@ -93,10 +102,10 @@ public class GameLayer extends Group{
 		for(int i = 0;i < systems.size;i++) {
 			LayerSystem system = systems.get(i);
 			if(system.isActive())
-				system.update(delta);
+				system.update(delta*time_scale);
 		}
-		super.act(delta);
-		cam.update(delta);
+		super.act(delta*time_scale);
+		cam.update(delta*time_scale);
 	}
 	
 	@Override

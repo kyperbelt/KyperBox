@@ -58,6 +58,7 @@ public class GameState extends Group{
 	private GameLayer uiground;
 	private UserData state_data;
 	private TiledMap map_data;
+	private float time_scale;
 	
 	private ObjectMap<String,BitmapFont> 				fonts;
 	private ObjectMap<String,ParticleEffectPool> 		particle_effects; /*delete ref*/ private Array<String> pvalues;
@@ -99,6 +100,7 @@ public class GameState extends Group{
 		fonts = new ObjectMap<String, BitmapFont>(); //TODO: test load to avoid repeats
 		particle_effects = new ObjectMap<String, ParticleEffectPool>();
 		pvalues = new Array<String>();
+		time_scale = 1f;
 	}
 
 	public void init() {
@@ -108,7 +110,7 @@ public class GameState extends Group{
 		map_data = game.getTiledMap(tmx);
 		state_data = new UserData(tmx+"(data)");
 		
-		
+		time_scale = 1f;
 		
 		background = new GameLayer(this);
 		background.setName("background_");
@@ -161,7 +163,13 @@ public class GameState extends Group{
 		log("initiated");
 	}
 	
+	public float getTimeScale() {
+		return time_scale;
+	}
 	
+	public void setTimeScale(float time_scale) {
+		this.time_scale = Math.max(0f, time_scale);
+	}
 
 	/**
 	 * get a sprite so we dont keep creating new sprites
@@ -293,8 +301,8 @@ public class GameState extends Group{
 	
 	@Override
 	public void act(float delta) {
-		update(delta);
-		super.act(delta);
+		update(delta*time_scale);
+		super.act(delta*time_scale);
 	}
 	
 	

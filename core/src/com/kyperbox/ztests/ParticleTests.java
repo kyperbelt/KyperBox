@@ -61,6 +61,7 @@ public class ParticleTests extends KyperBoxGame{
 			public void init(GameState state) {
 				torch = (BasicGameObject) state.getPlaygroundLayer().getGameObject("torch");
 				
+				state.setTimeScale(2f);
 				
 				torch_fire = new ParticleController("fire");
 				
