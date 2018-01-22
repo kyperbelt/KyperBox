@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" tiledversion="2017.12.07" orientation="orthogonal" renderorder="right-down" width="100" height="30" tilewidth="32" tileheight="32" infinite="0" nextobjectid="84">
+<map version="1.0" tiledversion="2017.12.07" orientation="orthogonal" renderorder="right-down" width="100" height="30" tilewidth="32" tileheight="32" infinite="0" nextobjectid="86">
  <properties>
   <property name="atlas" value="image/game.atlas"/>
  </properties>
@@ -371,7 +371,7 @@
    </objectgroup>
   </tile>
  </tileset>
- <tileset firstgid="222" name="Backgrounds" tilewidth="544" tileheight="160" tilecount="5" columns="0">
+ <tileset firstgid="222" name="Backgrounds" tilewidth="640" tileheight="360" tilecount="6" columns="0">
   <grid orientation="orthogonal" width="1" height="1"/>
   <tile id="1">
    <image width="272" height="160" source="../../../input_assets/game/parallax-mountain-bg.png"/>
@@ -388,8 +388,11 @@
   <tile id="5">
    <image width="544" height="160" source="../../../input_assets/game/parallax-mountain-trees.png"/>
   </tile>
+  <tile id="6">
+   <image width="640" height="360" source="../../../input_assets/game/SunsetTempleBackground.png"/>
+  </tile>
  </tileset>
- <tileset firstgid="228" name="Objects" tilewidth="99" tileheight="149" tilecount="4" columns="0">
+ <tileset firstgid="229" name="Objects" tilewidth="99" tileheight="149" tilecount="4" columns="0">
   <grid orientation="orthogonal" width="1" height="1"/>
   <tile id="0">
    <image width="38" height="34" source="../../../input_assets/game/rpg_chest_down.png"/>
@@ -404,9 +407,17 @@
    <image width="99" height="149" source="../../../input_assets/game/Torch.png"/>
   </tile>
  </tileset>
- <objectgroup name="background"/>
+ <objectgroup name="background">
+  <object id="84" name="background" type="ScrollingBackground" gid="228" x="-32" y="960" width="1344" height="736">
+   <properties>
+    <property name="image" value="SunsetTempleBackground"/>
+    <property name="repeat_horizontal" type="bool" value="true"/>
+    <property name="speed_horizontal" type="float" value="100"/>
+   </properties>
+  </object>
+ </objectgroup>
  <objectgroup name="playground">
-  <object id="82" name="torch" type="BasicGameObject" gid="231" x="192" y="736" width="99" height="149">
+  <object id="82" name="torch" type="BasicGameObject" gid="232" x="192" y="736" width="99" height="149">
    <properties>
     <property name="sprite" value="Torch"/>
    </properties>
@@ -414,7 +425,7 @@
  </objectgroup>
  <objectgroup name="foreground"/>
  <objectgroup name="uiground"/>
- <objectgroup name="preload">
+ <objectgroup name="preload" locked="1">
   <object id="1" name="ScreenSize" type="Viewport" x="0" y="240" width="1280" height="720"/>
   <object id="60" name="game_font" type="Font" x="-256" y="-64">
    <properties>

@@ -122,9 +122,15 @@ public class GameLayer extends Group{
 	public void draw(Batch batch, float parentAlpha) {
 		
 		ShaderProgram current_shader = batch.getShader();
+		ShaderProgram state_shader = getState().getStateShader();
 		
-		if(current_shader!=shader && shader!=null)
+		if(current_shader!=shader && shader!=null) {
 			batch.setShader(shader);
+		}
+		else if(shader == null && state_shader!=null && current_shader!= state_shader) {
+			batch.setShader(state_shader);
+		}
+			
 		
 		for(int i = 0;i < systems.size;i++) {
 			LayerSystem system = systems.get(i);

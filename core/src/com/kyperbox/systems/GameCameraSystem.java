@@ -11,6 +11,9 @@ import com.kyperbox.objects.GameObject;
 import com.kyperbox.objects.GameObject.GameObjectChangeType;
 
 public class GameCameraSystem extends LayerSystem {
+	
+	//TODO: create a distance equation so that instead of 10% of distance you reach 
+	//		Math.max(.01f,1f-( distance/threshold )) * distance_to_move;
 
 	// dynamic vars
 	// private boolean dynamic_zoom;

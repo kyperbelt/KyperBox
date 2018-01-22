@@ -47,7 +47,7 @@ public class ParticleTests extends KyperBoxGame{
 				}
 				
 				if(getInput().inputJustPressed(InputDefaults.JUMP_BUTTON)) {
-					setGameState("tile_collision.tmx");
+					transitionTo("tile_collision.tmx",1f,0);
 				}
 				
 				float mx = getInput().getX();
@@ -107,7 +107,7 @@ public class ParticleTests extends KyperBoxGame{
 			@Override
 			public void update(GameState state,float delta) {
 				if(getInput().inputJustPressed(InputDefaults.JUMP_BUTTON)) {
-					setGameState("particles.tmx");
+					transitionTo("particles.tmx",.8f,1);
 				}
 			}
 		});

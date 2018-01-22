@@ -21,16 +21,7 @@ public class GameInput{
 		mappings = new ObjectMap<String, Array<InputMapping>>();
 		input_check = new Array<String>();
 		
-		registerInput(InputDefaults.MOVE_UP);
-		registerInput(InputDefaults.MOVE_DOWN);
-		registerInput(InputDefaults.MOVE_LEFT);
-		registerInput(InputDefaults.MOVE_RIGHT);
-		registerInput(InputDefaults.ACTION_BUTTON);
-		registerInput(InputDefaults.JUMP_BUTTON);
-		registerInput(InputDefaults.EXIT);
-		registerInput(InputDefaults.ENTER);
-		registerInput(InputDefaults.STOP);
-		registerInput(InputDefaults.START);
+		InputDefaults.addDefaults(this);
 		
 	}
 	

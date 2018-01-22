@@ -1,7 +1,6 @@
 package com.kyperbox.ztests;
 
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.utils.Align;
@@ -119,7 +118,6 @@ public class TileCollisionTest extends KyperBoxGame {
 				parallax.addMapping("mountains", .6f, 0f, true);
 				parallax.addMapping("mountain_far", .2f, 0f, true);
 				parallax.addMapping("parallax_back", 0, 0f, true);
-				parallax.setIgnoreZoom(false);
 				state.getBackgroundLayer().addLayerSystem(parallax);
 				state.getPlaygroundLayer().addLayerSystem(new TileCollisionSystem("platformer_tiles"));
 				game_cam = new GameCameraSystem(3);
