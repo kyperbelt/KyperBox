@@ -3,6 +3,7 @@ package com.kyperbox.util;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.kyperbox.KyperBoxGame;
+import com.kyperbox.yarn.Dialogue.VariableStorage;
 
 /**
  * A data table that stores string pairs for later retrieval. global instance in
@@ -11,7 +12,7 @@ import com.kyperbox.KyperBoxGame;
  * 
  *
  */
-public class UserData {
+public class UserData implements VariableStorage{
 
 	private static final String NAME = "$USERDATA_NAME";
 	private static final String NULL_STRING = "NULL_STRING";
@@ -35,13 +36,9 @@ public class UserData {
 	}
 
 	public void put(String name, Object object) {
-		if (variables.containsKey(name)) {
-			KyperBoxGame.error(name, "[" + name + "] already exists in " + getName() + ".");
-		} else {
-			variables.put(name, object);
-		}
+		variables.put(name, object);
 	}
-
+	
 	public String getString(String name) {
 		if (variables.containsKey(name))
 			return (String) variables.get(name);
@@ -103,5 +100,23 @@ public class UserData {
 		if (MYFRIEND == null)
 			MYFRIEND = new Json();
 		return MYFRIEND.toJson(variables);
+	}
+
+	@Override
+	public void setValue(String name, Object value) {
+		put(name, value);
+	}
+
+	@Override
+	public <t> t getValue(String name, Class<t> type) {
+		if (variables.containsKey(name))
+			return type.cast(variables.get(name));
+		KyperBoxGame.error("UserData", " value not found ["+name+"]");
+		return null;
+	}
+
+	@Override
+	public void clear() {
+		variables.clear();
 	}
 }
