@@ -1,6 +1,7 @@
 package com.kyperbox.yarn;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
 
 public class Dialogue {
 
@@ -64,7 +65,7 @@ public class Dialogue {
 	 * something went wrong
 	 *
 	 */
-	public class YarnRuntimeException extends RuntimeException {
+	public static class YarnRuntimeException extends RuntimeException {
 		private static final long serialVersionUID = -5732778106783039900L;
 
 		public YarnRuntimeException(String message) {
@@ -154,11 +155,39 @@ public class Dialogue {
 	 * variable storage TODO: try to use {@link com.kyperbox.util.UserData UserData}
 	 */
 	public interface VariableStorage {
-		public void setValue(String name, Object value);
+		public void setValue(String name, Value value);
 
-		public <t> t getValue(String name, Class<t> type);
+		public Value getValue(String name);
 
 		public void clear();
+	}
+	
+	public abstract class BaseVariableStorage implements VariableStorage{
+		
+	}
+	
+	public class MemoryVariableStorage extends BaseVariableStorage{
+		
+		ObjectMap<String, Value> variables = new ObjectMap<String, Value>();
+
+		@Override
+		public void setValue(String name, Value value) {
+			variables.put(name, value);
+		}
+
+		@Override
+		public Value getValue(String name) {
+			Value value = Value.NULL;
+			if(variables.containsKey(name))
+				value = variables.get(name);
+			return value;
+		}
+
+		@Override
+		public void clear() {
+			variables.clear();
+		}
+		
 	}
 
 	/**

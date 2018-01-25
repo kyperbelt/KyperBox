@@ -3,6 +3,7 @@ package com.kyperbox.desktop;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.kyperbox.KyperBoxGame;
+import com.kyperbox.ztests.TileCollisionTest;
 import com.kyperbox.ztests.YarnTests;
 
 public class DesktopLauncher {

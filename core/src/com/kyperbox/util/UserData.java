@@ -2,29 +2,29 @@ package com.kyperbox.util;
 
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.kyperbox.KyperBoxGame;
 import com.kyperbox.yarn.Dialogue.VariableStorage;
+import com.kyperbox.yarn.Value;
+import com.kyperbox.yarn.Value.Type;
 
 /**
  * A data table that stores string pairs for later retrieval. global instance in
  * {@link com.kyperbox.KyperBoxGame KyperBoxGame} and each
- * {@link com.kyperbox.GameState GameState} has its own instance.
- * 
+ * {@link com.kyperbox.GameState GameState} has its own instance. TODO:
+ * interface with yarn storage
  *
  */
-public class UserData implements VariableStorage{
+public class UserData implements VariableStorage {
 
 	private static final String NAME = "$USERDATA_NAME";
-	private static final String NULL_STRING = "NULL_STRING";
 
-	private ObjectMap<String, Object> variables;
+	private ObjectMap<String, Value> variables;
 	private static Json MYFRIEND;
 
 	private String name;
 
 	public UserData(String name) {
 		this.name = name;
-		variables = new ObjectMap<String, Object>();
+		variables = new ObjectMap<String, Value>();
 	}
 
 	public void setName(String name) {
@@ -36,87 +36,87 @@ public class UserData implements VariableStorage{
 	}
 
 	public void put(String name, Object object) {
-		variables.put(name, object);
+		setValue(name, new Value(object));
 	}
-	
+
 	public String getString(String name) {
-		if (variables.containsKey(name))
-			return (String) variables.get(name);
-		else
-			return NULL_STRING;
+		if (variables.containsKey(name)) {
+			Value val = variables.get(name);
+			return val.getType() == Type.STRING?val.getStringValue():val.asString();
+		}
+		return Value.NULL.asString();
 	}
 
 	public float getFloat(String name) {
-		if (variables.containsKey(name))
-			return (Float) (variables.get(name));
-		else
-			return -1f;
+		if(variables.containsKey(name)) {
+			Value val = variables.get(name);
+			return val.getType() == Type.NUMBER?val.getNumberValue():val.asNumber();
+		}
+		return Value.NULL.asNumber();
 	}
 
 	public int getInt(String name) {
-		if (variables.containsKey(name))
-			return (Integer) (variables.get(name));
-		else
-			return -1;
+		return (int) getFloat(name);
 	}
 
 	public boolean getBoolean(String name) {
-		if (variables.containsKey(name))
-			return (Boolean) (variables.get(name));
-		else
-			return false;
+		if (variables.containsKey(name)) {
+			Value val = variables.get(name);
+			return val.getType() == Type.BOOL?val.getBoolValue():val.asBool();
+		}
+		return Value.NULL.asBool();
 	}
 
 	public void setFloat(String name, float value) {
-		variables.put(name, value);
+		put(name, value);
 	}
 
 	public void setInt(String name, int value) {
-		variables.put(name, value);
+		put(name, value);
 	}
 
 	public void setBoolean(String name, boolean value) {
-		variables.put(name, value);
+		put(name, value);
 	}
 
 	public void setString(String name, String value) {
-		variables.put(name, value);
+		put(name, value);
 	}
 
 	@SuppressWarnings("unchecked")
 	public boolean loadFromJson(String json) {
 		if (MYFRIEND == null)
 			MYFRIEND = new Json();
-		ObjectMap<String, Object> vv = MYFRIEND.fromJson(ObjectMap.class, json);
+		ObjectMap<String, Value> vv = MYFRIEND.fromJson(ObjectMap.class, json);
 		if (vv != null)
-			setName((String) vv.remove(NAME));
+			setName(vv.remove(NAME).asString());
 		variables = vv != null ? vv : variables;
 		return vv != null;
 
 	}
 
 	public String toJson() {
-		variables.put(NAME, getName());
+		put(NAME, getName());
 		if (MYFRIEND == null)
 			MYFRIEND = new Json();
 		return MYFRIEND.toJson(variables);
 	}
 
-	@Override
-	public void setValue(String name, Object value) {
-		put(name, value);
-	}
-
-	@Override
-	public <t> t getValue(String name, Class<t> type) {
-		if (variables.containsKey(name))
-			return type.cast(variables.get(name));
-		KyperBoxGame.error("UserData", " value not found ["+name+"]");
-		return null;
-	}
-
-	@Override
 	public void clear() {
 		variables.clear();
+	}
+
+	@Override
+	public void setValue(String name, Value value) {
+		variables.put(name, value);
+	}
+
+	@Override
+	public Value getValue(String name) {
+		Value value = Value.NULL;
+		if (variables.containsKey(name)) {
+		   value =  variables.get(name);
+		}
+		return value;
 	}
 }

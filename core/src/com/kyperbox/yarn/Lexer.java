@@ -188,7 +188,7 @@ public class Lexer {
 
 	}
 
-	public TokenList tokenise(String title, String text) {
+	public TokenList tokenise(String text) {
 
 		//setup
 		indentation_stack = new Array<Lexer.IntBoolPair>();
@@ -212,6 +212,7 @@ public class Lexer {
 		}
 		
 		Token end_of_input = new Token(TokenType.EndOfInput, current_state,line_number,0);
+		//tokens.reverse();
 		tokens.add(end_of_input);
 
 		return tokens;
@@ -360,7 +361,7 @@ public class Lexer {
 		}
 		
 		TokenList list_to_return = new TokenList(line_tokens);
-		list_to_return.reverse();
+		//list_to_return.reverse();
 		
 		return list_to_return;
 	}
@@ -402,7 +403,7 @@ public class Lexer {
 		public static TokeniserException expectedTokens(int line_number,int column_number,LexerState state) {
 			Array<String> names = new Array<String>();
 			for (TokenRule rule : state.token_rules) {
-				names.add(rule.type.toString());
+				names.add(rule.type.name());
 			}
 			
 			String name_list;
