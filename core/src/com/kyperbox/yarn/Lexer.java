@@ -212,7 +212,12 @@ public class Lexer {
 		}
 		
 		Token end_of_input = new Token(TokenType.EndOfInput, current_state,line_number,0);
+		
+		//=====================================
+		//TODO: TO REVERSE INPUT PLEAS EUSE THIS
 		//tokens.reverse();
+		//TODO: REVERSE TOKENS 
+		//====================================
 		tokens.add(end_of_input);
 
 		return tokens;

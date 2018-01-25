@@ -13,12 +13,15 @@ public class YarnTests extends KyperBoxGame {
 		Testerman
 	}
 
-	String test_text = "This is test text\r\n" + 
-			"-> this is an option << (1+1) >> \r\n" + 
-			"\r\n" + 
-			"//these are comments\r\n" + 
-			"\r\n" + 
-			"[[second_node |test_node]]";
+	String test_text = "title: start\r\n" + 
+			"---\r\n" + 
+			"A: Hey, I'm a character in a script!\r\n" + 
+			"B: And I am too! You are talking to me!\r\n" + 
+			"-> What's going on\r\n" + 
+			"    A: Why this is a demo of the script system!\r\n" + 
+			"    B: And you're in it!\r\n" + 
+			"-> Um ok\r\n" + 
+			"===";
 
 	@Override
 	public void initiate() {

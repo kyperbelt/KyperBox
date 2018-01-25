@@ -123,7 +123,7 @@ public class Library {
 			return invokeWithArray(params);
 		}
 
-		public Value invokeWithArray(Value... params) {
+		public Value invokeWithArray(Value[] params) {
 			int length = 0;
 			if (params != null)
 				length = params.length;

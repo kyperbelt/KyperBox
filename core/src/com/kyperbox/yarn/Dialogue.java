@@ -2,20 +2,69 @@ package com.kyperbox.yarn;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.kyperbox.yarn.Library.ReturningFunc;
 
 public class Dialogue {
 
-	private VariableStorage continuity;
+	protected VariableStorage continuity;
+
+	
+	public YarnLogger debug_logger;
+	public YarnLogger error_logger;
+	
+	//node we start from
+	public static final String DEFAULT_START = "Start";
+	
+	//loader contains all the nodes we're going to run
+	protected Loader loader;
+	
+	//the program is the compiled yarn program
+	protected Program program;
+	
+	//the library contains all the functions and operators we know about
+	public Library library;
+	
+	//collection of nodes that we've seen
+	public ObjectMap<String, Integer> visited_node_count = new ObjectMap<String, Integer>();
+	
+	public Dialogue(VariableStorage continuity) {
+		this.continuity = continuity;
+			
+	}
+	
+	/**
+	 * A function exposed to yarn that returns the number of times a node has been run.
+	 * if no parameters are supplied, returns the number of times the current node has been run.
+	 */
+	protected ReturningFunc yarnFunctionNodeVisitCount = new ReturningFunc() {
+		@Override
+		public Object invoke(Value... params) {
+			return null;
+		}
+	};
+	
+	protected ReturningFunc yarnFunctionIsNodeVisited = new ReturningFunc() {
+		@Override
+		public Object invoke(Value... params) {
+			return null;
+		}
+	};
+	
+	
+	
+	
+//	======================================================================================
+	
 	
 	/**
 	 * indicates something the client should do
 	 */
-	public abstract class RunnerResult{}
+	public static abstract class RunnerResult{}
 	
 	/**
 	 * the client should run a line of dialogue
 	 */
-	public class LineResult extends RunnerResult{
+	public static class LineResult extends RunnerResult{
 		public Line line;
 		public LineResult(String text) {
 			line = new Line(text);
@@ -25,7 +74,7 @@ public class Dialogue {
 	/**
 	 * client should run and parse command
 	 */
-	public class CommandResult extends RunnerResult{
+	public static class CommandResult extends RunnerResult{
 		public Command command;
 		public CommandResult(String text) {
 			command = new Command(text);
@@ -36,7 +85,7 @@ public class Dialogue {
 	 * Client should show a list of options and call
 	 * the chooser choose before asking for the next line. 
 	 */
-	public class OptionResult extends RunnerResult{
+	public static class OptionResult extends RunnerResult{
 		public Options options;
 		public OptionChooser chooser;
 		public OptionResult(Array<String> options,OptionChooser chooser) {
@@ -48,19 +97,13 @@ public class Dialogue {
 	/**
 	 * end of node reached
 	 */
-	public class NodeCompleteResult extends RunnerResult{
+	public static class NodeCompleteResult extends RunnerResult{
 		public String next_node;
+		public NodeCompleteResult(String next_node) {
+			this.next_node = next_node;
+		}
 	}
 	
-	public YarnLogger debug_logger;
-	public YarnLogger error_logger;
-	
-	//node we start from
-	public static final String DEFAULT_START = "Start";
-	
-	
-	
-//	======================================================================================
 	/**
 	 * something went wrong
 	 *
@@ -85,25 +128,23 @@ public class Dialogue {
 	/**
 	 * option chooser lets client tell dialogue the response selected by the user
 	 */
-	public interface OptionChooser {
+	public static interface OptionChooser {
 		public void choose(int selected_option_index);
 	}
 
 	/**
 	 * logger to let the client send output to the console logging/error logging
 	 */
-	public interface YarnLogger {
+	public static interface YarnLogger {
 		public void log(String message);
-
-		public void error(String message);
 	}
 
 	/**
-	 * ]
+	 * 
 	 * 
 	 * information that the client should handle
 	 */
-	public class Line {
+	public static class Line {
 		private String text;
 
 		public Line(String text) {
@@ -119,7 +160,7 @@ public class Dialogue {
 		}
 	}
 
-	public class Options {
+	public static class Options {
 		private Array<String> options;
 
 		public Options(Array<String> options) {
@@ -135,7 +176,7 @@ public class Dialogue {
 		}
 	}
 
-	public class Command {
+	public static class Command {
 		private String command;
 
 		public Command(String command) {
@@ -154,7 +195,7 @@ public class Dialogue {
 	/**
 	 * variable storage TODO: try to use {@link com.kyperbox.util.UserData UserData}
 	 */
-	public interface VariableStorage {
+	public static interface VariableStorage {
 		public void setValue(String name, Value value);
 
 		public Value getValue(String name);
@@ -162,11 +203,11 @@ public class Dialogue {
 		public void clear();
 	}
 	
-	public abstract class BaseVariableStorage implements VariableStorage{
+	public static abstract class BaseVariableStorage implements VariableStorage{
 		
 	}
 	
-	public class MemoryVariableStorage extends BaseVariableStorage{
+	public static class MemoryVariableStorage extends BaseVariableStorage{
 		
 		ObjectMap<String, Value> variables = new ObjectMap<String, Value>();
 
@@ -194,7 +235,7 @@ public class Dialogue {
 	 * a line localized into the current locale that is used in lines, options and
 	 * shortcut options. Anything that is user-facing.
 	 */
-	public class LocalisedLine {
+	public static class LocalisedLine {
 		private String code;
 		private String text;
 		private String comment;
