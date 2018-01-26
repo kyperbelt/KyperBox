@@ -61,6 +61,7 @@ public class Value implements Comparable<Value> {
 		if (value instanceof Boolean) {
 			type = Type.BOOL;
 			setBoolValue((Boolean) value);
+			return;
 		}
 
 		String error = String.format("Attempted to create a Value using a %s; currently, "

@@ -2,6 +2,7 @@ package com.kyperbox.util;
 import java.io.IOException;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -139,6 +140,7 @@ public class TiledObjectTypes {
 		public static final String BOOLEAN = "bool";
 		public static final String FLOAT = "float";
 		public static final String STRING = "string";
+		public static final String COLOR = "color";
 		
 		private String name;
 		private String type;
@@ -169,6 +171,8 @@ public class TiledObjectTypes {
 				return Boolean.parseBoolean(value);
 			else if(type.equals(FLOAT))
 				return Float.parseFloat(value);
+			else if(type.equals(COLOR))
+				return new Color(Integer.parseUnsignedInt(value.substring(1), 16));
 			else
 				return value;
 		}

@@ -672,7 +672,7 @@ public class Lexer {
 		}
 	}
 
-	protected class Regex {
+	protected static class Regex {
 
 		private Pattern pattern;
 

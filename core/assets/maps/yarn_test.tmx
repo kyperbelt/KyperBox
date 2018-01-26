@@ -1,0 +1,457 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" tiledversion="2017.12.07" orientation="orthogonal" renderorder="right-down" width="100" height="30" tilewidth="32" tileheight="32" infinite="0" nextobjectid="83">
+ <properties>
+  <property name="atlas" value="image/game.atlas"/>
+ </properties>
+ <tileset firstgid="1" name="TempleTIles" tilewidth="32" tileheight="32" tilecount="221" columns="17">
+  <image source="../../../input_assets/game/TempleTIles.png" width="544" height="416"/>
+  <tile id="76">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="77">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="78">
+   <objectgroup draworder="index"/>
+  </tile>
+  <tile id="79">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="80">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="81">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="solid" type="bool" value="true"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="82">
+   <objectgroup draworder="index"/>
+  </tile>
+  <tile id="83">
+   <objectgroup draworder="index"/>
+   <animation>
+    <frame tileid="23" duration="250"/>
+    <frame tileid="9" duration="250"/>
+    <frame tileid="20" duration="250"/>
+   </animation>
+  </tile>
+  <tile id="94">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="type" type="int" value="0"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="95">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="type" type="int" value="0"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="96">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="type" type="int" value="0"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="97">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="type" type="int" value="0"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="102" type="1">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="type" type="int" value="0"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="103">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="type" type="int" value="0"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="104" type="1">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="type" type="int" value="0"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="105">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="type" type="int" value="0"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="106">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="type" type="int" value="0"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="107">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="type" type="int" value="0"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="110">
+   <objectgroup draworder="index"/>
+  </tile>
+  <tile id="111">
+   <objectgroup draworder="index"/>
+  </tile>
+  <tile id="112">
+   <objectgroup draworder="index"/>
+  </tile>
+  <tile id="113">
+   <objectgroup draworder="index"/>
+  </tile>
+  <tile id="114">
+   <objectgroup draworder="index"/>
+  </tile>
+  <tile id="115">
+   <objectgroup draworder="index"/>
+  </tile>
+  <tile id="119">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="type" type="int" value="0"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="120">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="type" type="int" value="0"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="121">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="type" type="int" value="0"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="122">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="type" type="int" value="0"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="123">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="type" type="int" value="0"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="124">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="type" type="int" value="0"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="127">
+   <objectgroup draworder="index"/>
+  </tile>
+  <tile id="128">
+   <objectgroup draworder="index"/>
+  </tile>
+  <tile id="129">
+   <objectgroup draworder="index"/>
+  </tile>
+  <tile id="130">
+   <objectgroup draworder="index"/>
+  </tile>
+  <tile id="131">
+   <objectgroup draworder="index"/>
+  </tile>
+  <tile id="132">
+   <objectgroup draworder="index"/>
+  </tile>
+  <tile id="136">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="type" type="int" value="0"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="137">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="type" type="int" value="0"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="138">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="type" type="int" value="0"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="139">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="type" type="int" value="0"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="140">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="type" type="int" value="0"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="141">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="type" type="int" value="0"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="153">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="type" type="int" value="0"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="154">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="type" type="int" value="0"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="155">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="type" type="int" value="0"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="156">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="type" type="int" value="0"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="157">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="type" type="int" value="0"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="158">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="type" type="int" value="0"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="170">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="type" type="int" value="0"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="171">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="type" type="int" value="0"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="172">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="type" type="int" value="0"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="173">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="type" type="int" value="0"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="174">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="type" type="int" value="0"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="175">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="type" type="int" value="0"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="187">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="type" type="int" value="0"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="188">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="type" type="int" value="0"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="189">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="type" type="int" value="0"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="190">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="type" type="int" value="0"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="191">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="type" type="int" value="0"/>
+    </properties>
+   </objectgroup>
+  </tile>
+  <tile id="192">
+   <objectgroup draworder="index">
+    <properties>
+     <property name="type" type="int" value="0"/>
+    </properties>
+   </objectgroup>
+  </tile>
+ </tileset>
+ <tileset firstgid="222" name="Backgrounds" tilewidth="544" tileheight="160" tilecount="5" columns="0">
+  <grid orientation="orthogonal" width="1" height="1"/>
+  <tile id="1">
+   <image width="272" height="160" source="../../../input_assets/game/parallax-mountain-bg.png"/>
+  </tile>
+  <tile id="2">
+   <image width="544" height="160" source="../../../input_assets/game/parallax-mountain-foreground-trees.png"/>
+  </tile>
+  <tile id="3">
+   <image width="272" height="160" source="../../../input_assets/game/parallax-mountain-montain-far.png"/>
+  </tile>
+  <tile id="4">
+   <image width="544" height="160" source="../../../input_assets/game/parallax-mountain-mountains.png"/>
+  </tile>
+  <tile id="5">
+   <image width="544" height="160" source="../../../input_assets/game/parallax-mountain-trees.png"/>
+  </tile>
+ </tileset>
+ <tileset firstgid="228" name="Objects" tilewidth="49" tileheight="49" tilecount="3" columns="0">
+  <grid orientation="orthogonal" width="1" height="1"/>
+  <tile id="0">
+   <image width="38" height="34" source="../../../input_assets/game/rpg_chest_down.png"/>
+  </tile>
+  <tile id="1">
+   <image width="49" height="49" source="../../../input_assets/game/rpg_man_down.png"/>
+  </tile>
+  <tile id="2">
+   <image width="32" height="32" source="../../../input_assets/game/player_walking_0.png"/>
+  </tile>
+ </tileset>
+ <objectgroup name="background"/>
+ <objectgroup name="playground"/>
+ <objectgroup name="foreground"/>
+ <objectgroup name="uiground">
+  <object id="78" name="diag" type="Label" x="96" y="320" width="608" height="64">
+   <properties>
+    <property name="font" value="game_font"/>
+    <property name="text" value="dialogue"/>
+   </properties>
+  </object>
+  <object id="80" name="next" type="TextButton" x="832" y="480" width="416" height="160">
+   <properties>
+    <property name="bg_down" value="button_down"/>
+    <property name="bg_up" value="button_up"/>
+    <property name="font" value="game_font"/>
+    <property name="text" value="next"/>
+   </properties>
+  </object>
+  <object id="81" name="option1" type="TextButton" x="64" y="576" width="704" height="96">
+   <properties>
+    <property name="bg_down" value="windowbackground"/>
+    <property name="bg_up" value="windowbackground"/>
+    <property name="font" value="game_font"/>
+    <property name="text" value="option1"/>
+   </properties>
+  </object>
+  <object id="82" name="option2" type="TextButton" x="64" y="736" width="704" height="96">
+   <properties>
+    <property name="bg_down" value="windowbackground"/>
+    <property name="bg_up" value="windowbackground"/>
+    <property name="font" value="game_font"/>
+    <property name="text" value="option2"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="preload" locked="1">
+  <object id="1" name="ScreenSize" type="Viewport" x="0" y="240" width="1280" height="720"/>
+  <object id="60" name="game_font" type="Font" x="0" y="32">
+   <properties>
+    <property name="font_file" value="Impact48.fnt"/>
+   </properties>
+  </object>
+  <object id="64" name="instruction_font" type="Font" x="96" y="32">
+   <properties>
+    <property name="font_file" value="freesiaUPC38.fnt"/>
+   </properties>
+  </object>
+  <object id="77" name="grayscale" type="Shader" x="-320" y="32">
+   <properties>
+    <property name="shader_name" value="grayscale"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>

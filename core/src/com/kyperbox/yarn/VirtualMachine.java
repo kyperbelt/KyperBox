@@ -63,9 +63,17 @@ public class VirtualMachine {
 		state.current_node_name = name;
 		return true;
 	}
+	
+	public String currentNodeName() {
+		return state.current_node_name;
+	}
 
 	public void stop() {
 		setExecutionState(ExecutionState.Stopped);
+	}
+	
+	public boolean hasOptions() {
+		return state.current_options.size >0;
 	}
 
 	/**
@@ -341,6 +349,7 @@ public class VirtualMachine {
 	}
 
 	public void resetState() {
+		System.out.println("state has been reset===");
 		state = new State();
 	}
 

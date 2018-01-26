@@ -192,7 +192,6 @@ public class Parser {
 		//defined in the yarn editor
 		private Array<String> node_tags;
 
-		private ArrayIterable<Statement> _statements;
 		private Array<Statement> statements = new Array<Statement>();
 
 		protected Node(String name, ParseNode parent, Parser p) {
@@ -216,10 +215,8 @@ public class Parser {
 		}
 
 		/** read_only private accesor for statements */
-		public ArrayIterable<Statement> getStatements() {
-			if (_statements == null)
-				_statements = new Array.ArrayIterable<Statement>(statements, false);
-			return _statements;
+		public Array<Statement> getStatements() {
+			return statements;
 		}
 
 		public Array<String> getNodeTags() {
@@ -537,7 +534,7 @@ public class Parser {
 
 		}
 
-		public Expression getExpression() {
+		public Expression getCondition() {
 			return condition;
 		}
 
@@ -577,7 +574,6 @@ public class Parser {
 	protected static class Block extends ParseNode {
 
 		//readonly
-		private ArrayIterable<Statement> _statements;
 		private Array<Statement> statements = new Array<Parser.Statement>();
 
 		protected Block(ParseNode parent, Parser p) {
@@ -597,10 +593,8 @@ public class Parser {
 			p.expectSymbol(TokenType.Dedent);
 		}
 
-		public ArrayIterable<Statement> getStatements() {
-			if (_statements == null)
-				_statements = new ArrayIterable<Parser.Statement>(statements, false);
-			return _statements;
+		public Array<Statement> getStatements() {
+			return statements;
 		}
 
 		@Override
