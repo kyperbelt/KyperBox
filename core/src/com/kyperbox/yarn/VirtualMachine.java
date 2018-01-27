@@ -223,7 +223,7 @@ public class VirtualMachine {
 			//run a node
 			String node_name;
 
-			if (String.valueOf(instruction.operandA()) == null || String.valueOf(instruction.operandA()).isEmpty()) {
+			if (instruction.operandA() == null || String.valueOf(instruction.operandA()).isEmpty()) {
 				//get a string from the stack, and jump to a node with that name
 				node_name = state.peekValue().asString();
 			} else {

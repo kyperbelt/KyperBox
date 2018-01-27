@@ -5,6 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Array;
 import com.kyperbox.GameState;
 import com.kyperbox.KyperBoxGame;
 import com.kyperbox.managers.StateManager;
@@ -12,24 +13,22 @@ import com.kyperbox.yarn.Dialogue;
 import com.kyperbox.yarn.Dialogue.LineResult;
 import com.kyperbox.yarn.Dialogue.NodeCompleteResult;
 import com.kyperbox.yarn.Dialogue.OptionResult;
-import com.kyperbox.yarn.Dialogue.RunnerResult;
 import com.kyperbox.yarn.Dialogue.YarnLogger;
 
 public class YarnTests extends KyperBoxGame {
 	
 	Dialogue dialogue;
 	String file_path = "example.json";
-	RunnerResult current_result = null;
+	OptionResult current_options= null;
+	LineResult current_line;
 	Label dialogue_label;
 	TextButton next,optionA,optionB;
 	OptionResult r;
-	private boolean waiting;
-	private boolean complete = false;
+	boolean running = true;
 	
 	@Override
 	public void initiate() {
 		dialogue = new Dialogue(getGlobals());
-		waiting = false;
 		
 		dialogue.debug_logger = new YarnLogger() {
 			@Override
@@ -53,83 +52,87 @@ public class YarnTests extends KyperBoxGame {
 			
 			@Override
 			public void update(GameState state, float delta) {
+				if(running)
+					dialogue.update();
 				
-				if(!complete)
-				dialogue.update();
-				
-				if(current_result ==  null)
-					current_result = dialogue.getNextResult();
-				
-				if(current_result!=null) {
-					if(current_result instanceof LineResult && !waiting) {
+				if(dialogue.hasNext()) {
+					if(dialogue.checkNext() instanceof LineResult && dialogue.checkNext()!=current_line) {
+						current_line = dialogue.checkNext(LineResult.class);
+						dialogue_label.setText(current_line.line.getText());
 						
-						LineResult line_result = (LineResult) current_result;
-						log("Yarn", line_result.line.getText());
-						dialogue_label.setText(line_result.line.getText());
-						next.setVisible(true);
-						//current_result = dialogue.getNextResult();
-						
-					}
-					
-					if(current_result instanceof OptionResult) {
-						OptionResult op_result = (OptionResult) current_result;
-						next.setVisible(false);
-						if(op_result.options.getOptions().size > 0) {
-							optionA.setText(op_result.options.getOptions().first());
+						//check to see if we have an option coming up
+						if(dialogue.optionsAvailable()) {
+							//remove line from stack to get options
+							dialogue.getNext();
+							current_options = dialogue.getNext(OptionResult.class);
+							
+							//populate option text
+							Array<String> ops = current_options.options.getOptions();
+							optionA.setText(ops.first());
+							if(ops.size > 1)
+								optionB.setText(ops.get(1));
+							
+							//show options
 							optionA.setVisible(true);
-						}
-						if(op_result.options.getOptions().size > 1) {
-							optionB.setText(op_result.options.getOptions().get(1));
 							optionB.setVisible(true);
+							
+							
+						}else {
+							next.setVisible(true);
+						}
+						
+					}else if(dialogue.checkNext() instanceof NodeCompleteResult) {
+
+						//node is complete and there is more pop it off check if its the last node
+						if(dialogue.getNext(NodeCompleteResult.class).next_node == null) {
+							System.out.println("complete");
+							running = false;
 						}
 					}
-					
-					if(current_result instanceof NodeCompleteResult) {
-						complete = true;
-					}
-					
-					waiting = true;
 				}
+				
 			}
 			
 			@Override
 			public void init(GameState state) {
+				
 				dialogue_label = (Label) state.getUiLayer().getActor("diag");
 				next = (TextButton) state.getUiLayer().getActor("next");
 				next.addListener(new ClickListener() {
 					@Override
 					public void clicked(InputEvent event, float x, float y) {
-						waiting = false;
+						//NEXT button!
+						//pop the line and set the next to false
+						if(dialogue.checkNext() == current_line)
+							dialogue.getNext();
 						next.setVisible(false);
-						current_result = null;
 					}
 				});
 				
 				optionA = (TextButton) state.getUiLayer().getActor("option1");
 				optionA.addListener(new ClickListener() {@Override
 				public void clicked(InputEvent event, float x, float y) {
-					OptionResult option= (OptionResult) current_result;
-					option.chooser.choose(0);
+					current_options.chooser.choose(0);
 					optionA.setVisible(false);
 					optionB.setVisible(false);
-					current_result = null;
-					waiting = false;
 				}});
 				optionB = (TextButton) state.getUiLayer().getActor("option2");
 				optionB.addListener(new ClickListener() {@Override
 				public void clicked(InputEvent event, float x, float y) {
-					OptionResult option= (OptionResult) current_result;
-					option.chooser.choose(1);
+					current_options.chooser.choose(1);
 					optionA.setVisible(false);
 					optionB.setVisible(false);
-					current_result = null;
-					waiting = false;
 				}});
+				
+				
+				//disable all buttons
 				
 				optionA.setVisible(false);
 				optionB.setVisible(false);
 				
 				next.setVisible(false);
+				
+				//start dialogue
 				dialogue.run();
 			}
 			
