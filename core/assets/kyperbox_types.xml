@@ -32,6 +32,10 @@
   <property name="text" type="string"/>
   <property name="wrap" type="bool" default="false"/>
  </objecttype>
+ <objecttype name="NumberObject" color="#ff0000">
+  <property name="place" type="int" default="0"/>
+  <property name="value" type="int" default="0"/>
+ </objecttype>
  <objecttype name="Particle" color="#55ff00">
   <property name="particle_file" type="string"/>
  </objecttype>

@@ -40,8 +40,9 @@ public class ParticleSystem extends LayerSystem {
 	@Override
 	public void gameObjectAdded(GameObject object, GameObject parent) {
 		ParticleController pc = object.getController(ParticleController.class);
-		if (pc != null) {
+		if (pc != null && !effects.containsKey(object)) {
 			PooledEffect pe = getLayer().getState().getEffect(pc.getEffectName());
+			pe.reset();
 			effects.put(object, pe);
 
 			pe.setEmittersCleanUpBlendFunction(false);
@@ -67,6 +68,7 @@ public class ParticleSystem extends LayerSystem {
 		ParticleController pc = object.getController(ParticleController.class);
 		if (pc != null && !effects.containsKey(object)) {
 			PooledEffect pe = getLayer().getState().getEffect(pc.getEffectName());
+			pe.reset();
 			effects.put(object, pe);
 
 			pe.setEmittersCleanUpBlendFunction(false);
@@ -85,8 +87,7 @@ public class ParticleSystem extends LayerSystem {
 		} else if (effects.containsKey(object)) {
 			PooledEffect pe = effects.get(object);
 			effects.removeKey(object);
-			pre_draws.removeValue(pe, true);
-			post_draws.removeValue(pe, true);
+			removeEffect(pe);
 			pe.free();
 		}
 	}
@@ -96,10 +97,14 @@ public class ParticleSystem extends LayerSystem {
 		if (effects.containsKey(object)) {
 			PooledEffect pe = effects.get(object);
 			effects.removeKey(object);
-			pre_draws.removeValue(pe, true);
-			post_draws.removeValue(pe, true);
+			removeEffect(pe);
 			pe.free();
 		}
+	}
+	
+	public void removeEffect(PooledEffect pe) {
+		while(pre_draws.removeValue(pe, true));
+		while(post_draws.removeValue(pe, true));
 	}
 
 	@Override

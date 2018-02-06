@@ -40,6 +40,9 @@ public abstract class GameObject extends Group {
 	private boolean flip_x;
 	private boolean flip_y;
 
+	private boolean change_sprite;
+	private Sprite render;
+	
 	public GameObject() {
 		controllers = new Array<GameObjectController>();
 		sprite = NO_SPRITE;
@@ -51,6 +54,8 @@ public abstract class GameObject extends Group {
 		ignore_collision = false;
 		group = 1;
 		filter = -1;
+		change_sprite = true;
+		render = null;
 	}
 	
 	public void setGroup(int group) {
@@ -112,7 +117,8 @@ public abstract class GameObject extends Group {
 		if (getDebug()) {
 			shapes.setColor(debug_bounds);
 			Rectangle b = bounds;
-			shapes.rect(b.x + getX(), b.y + getY(), b.width, b.height);
+			if(b!=null)
+				shapes.rect(b.x + getX(), b.y + getY(), b.width, b.height);
 		}
 		super.drawDebug(shapes);
 	}
@@ -219,6 +225,9 @@ public abstract class GameObject extends Group {
 
 	public void setSprite(String sprite) {
 		this.sprite = sprite;
+		change_sprite = true;
+		if(sprite == null || sprite.isEmpty())
+			this.sprite = NO_SPRITE;
 	}
 
 	public void addController(GameObjectController controller) {
@@ -246,8 +255,18 @@ public abstract class GameObject extends Group {
 
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
-		if (sprite != null && !sprite.isEmpty() && !sprite.equals(NO_SPRITE)) {
-			Sprite render = layer.getGameSprite(sprite);
+		
+		if(change_sprite&&!sprite.equals(NO_SPRITE)) {
+			render = layer.getGameSprite(sprite);
+			change_sprite = false;
+		}else if(change_sprite&&sprite.equals(NO_SPRITE)) {
+			render = null;
+			change_sprite = false;
+		}
+		
+		
+		if (render != null ) {
+			
 			render.setPosition(MathUtils.round(getX()), MathUtils.round(getY()));
 			render.setRotation(getRotation());
 			render.setAlpha(getColor().a * parentAlpha);

@@ -121,6 +121,17 @@ public class GameState extends Group {
 	}
 
 	public void init() {
+		if(background!=null) {
+			background.remove();
+			playground.remove();
+			foreground.remove();
+			uiground.remove();
+			background = null;
+			playground = null;
+			foreground = null;
+			uiground = null;
+		}
+		
 		if (tmx != null) {
 			//load game state
 			game.loadTiledMap(tmx);
@@ -741,7 +752,7 @@ public class GameState extends Group {
 			LabelStyle ls = new LabelStyle();
 			String font_name = properties.get("font", "", String.class);
 			String text = properties.get("text", "", String.class);
-			Color color = properties.get("color", Color.class);
+			Color color = new Color((int) Long.parseLong(properties.get("color",String.class).replaceAll("#", ""),16));
 			boolean wrap = properties.get("wrap", new Boolean(false), Boolean.class);
 			if (font_name != null && !font_name.isEmpty()) {
 				BitmapFont font = fonts.get(font_name);
@@ -931,15 +942,21 @@ public class GameState extends Group {
 			float r = object_properties.get("rotation", new Float(0), Float.class);
 
 			for (String package_name : game.getObjectPackages()) {
+				boolean failed = false;;
 				try {
 					game_object = (GameObject) Class.forName(package_name + "." + type).newInstance();
 				} catch (InstantiationException e) {
-					e.printStackTrace();
+					failed = true;
 				} catch (IllegalAccessException e) {
-					e.printStackTrace();
+					failed = true;
 				} catch (ClassNotFoundException e) {
-					e.printStackTrace();
+					failed = true;
 				}
+				
+				if(failed) {
+					error(package_name+" did not contain ["+type+".class].");
+				}
+				
 				if (game_object != null) {
 					break;
 				}

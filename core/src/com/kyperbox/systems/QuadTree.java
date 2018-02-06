@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.Pool;
@@ -32,8 +31,6 @@ public class QuadTree extends CollisionSystem {
 	private GameObject check_object;
 	private IntArray remove_objects;
 	private boolean culling;
-	private float follow_x;
-	private float follow_y;
 	
 	/**
 	 * create a quadtree collision manager with a default max_depth of 4 and a
@@ -49,8 +46,6 @@ public class QuadTree extends CollisionSystem {
 		check_object.init(null);
 		remove_objects = new IntArray();
 		culling = true;
-		follow_x  =0;
-		follow_y  =0;
 		bounds = new Rectangle(x - PAD, y - PAD, width + PAD * 2, height + PAD * 2);
 		objects =  new Array<GameObject>();
 		follow_view = false;
@@ -123,16 +118,8 @@ public class QuadTree extends CollisionSystem {
 		root.clear();
 		remove_objects.clear();
 		if(follow_view) {
-			Vector2 view_pos = getLayer().getCamera().getPosition();
-			if(follow_x!=view_pos.x) {
-				root.translate(view_pos.x - follow_x , 0);
-				follow_x = view_pos.x;
-			}
-				
-			if(follow_y!=view_pos.y) {
-				root.translate(0, view_pos.y - follow_y);
-				follow_y = view_pos.y;
-			}
+			Rectangle view_bounds = getLayer().getCamera().getViewBounds();
+			root.getBounds().setPosition(view_bounds.getX()+bounds.getX(),view_bounds.getY()+bounds.getY());
 				
 		}
 		for (int i = 0; i < objects.size; i++) {
