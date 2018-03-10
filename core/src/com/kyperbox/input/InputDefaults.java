@@ -23,6 +23,10 @@ public class InputDefaults {
 	public static final String UI_LEFT = 			"ui_left";
 	public static final String UI_RIGHT =			"ui_right";
 	
+	public static final String X = 					"xX";
+	public static final String Y = 					"yY";
+	public static final String Z = 					"zZ";
+	
 	/**
 	 * if you for some reason want to delete all default mappings
 	 * @param input - your GameInput instance
@@ -49,6 +53,10 @@ public class InputDefaults {
 		input.removeInput(UI_DOWN);
 		input.removeInput(UI_LEFT);
 		input.removeInput(UI_RIGHT);
+		
+		input.removeInput(X);
+		input.removeInput(Y);
+		input.removeInput(Z);
 	}
 	
 	public static void addDefaults(GameInput input) {
@@ -73,6 +81,10 @@ public class InputDefaults {
 		input.registerInput(UI_DOWN);
 		input.registerInput(UI_LEFT);
 		input.registerInput(UI_RIGHT);
+		
+		input.registerInput(X);
+		input.registerInput(Y);
+		input.registerInput(Z);
 	}
 
 }

@@ -2,7 +2,7 @@ package com.kyperbox.input;
 
 import com.badlogic.gdx.Gdx;
 
-public class MouseButtonMapping implements InputMapping{
+public class MouseButtonMapping extends InputMapping{
 	private int button;
 	public MouseButtonMapping(int button) {
 		this.button = button;

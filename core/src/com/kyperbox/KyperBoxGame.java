@@ -2,6 +2,7 @@ package com.kyperbox;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.BitmapFontLoader.BitmapFontParameter;
@@ -25,11 +26,11 @@ import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.kyperbox.input.GameInput;
 import com.kyperbox.managers.Priority.PriorityComparator;
+import com.kyperbox.umisc.KyperMapLoader;
+import com.kyperbox.umisc.SaveUtils;
+import com.kyperbox.umisc.UserData;
 import com.kyperbox.managers.StateManager;
 import com.kyperbox.managers.TransitionManager;
-import com.kyperbox.util.KyperMapLoader;
-import com.kyperbox.util.SaveUtils;
-import com.kyperbox.util.UserData;
 
 public abstract class KyperBoxGame extends ApplicationAdapter {
 
@@ -58,6 +59,10 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	private Array<GameState> current_gamestates;
 	private Array<String> packages;
 	private Preferences game_prefs;
+	
+	public static boolean DEBUG_LOGGING = true; //TURN OFF -- preface all logging with this
+	
+	private InputMultiplexer input_multiplexer;
 
 	private static PriorityComparator prio_compare;
 
@@ -131,24 +136,39 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 		global_data = new UserData(GAME_DATA_NAME);
 		input = new GameInput();
 
-		Gdx.input.setInputProcessor(game_stage);
+		input_multiplexer = new InputMultiplexer();
+		input_multiplexer.addProcessor(game_stage);
+		input_multiplexer.addProcessor(input);
+		Gdx.input.setInputProcessor(input_multiplexer);
 
 		initiate();
 	}
 
+	/**
+	 * get the prefferences used for this game
+	 * @return
+	 */
 	public Preferences getGamePreferences() {
 		return game_prefs;
 	}
 
-	public boolean getDebugRender() {
+	/**
+	 * check if the debug render is on
+	 * @return
+	 */
+	public boolean getDebugEnabled() {
 		return game_stage.isDebugAll();
 	}
 
-	public void debugRender(boolean enable) {
+	/**
+	 * enable or disable debug rendering
+	 * @param enable
+	 */
+	public void debugEnabled(boolean enable) {
 		game_stage.setDebugAll(enable);
 	}
 
-	public Stage getGameState() {
+	public Stage getGameStage() {
 		return game_stage;
 	}
 
@@ -156,14 +176,24 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 		return view;
 	}
 
+	/**
+	 * get the global data for this game. 
+	 * @return
+	 */
 	public UserData getGlobals() {
 		return global_data;
 	}
 
+	/**
+	 * save the global data to the preferences
+	 */
 	public void saveGlobals() {
 		SaveUtils.saveToPrefs(game_prefs, global_data);
 	}
 
+	/**
+	 * try to load global data from the game preferences
+	 */
 	public void loadGlobals() {
 		SaveUtils.loadFromPrefs(game_prefs, global_data);
 	}
@@ -172,6 +202,11 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 		return input;
 	}
 
+	/**
+	 * register the package to look for objects when loading the gamestates.
+	 * You may register as many packages as you need
+	 * @param object_package
+	 */
 	public void registerObjectPackage(String object_package) {
 		packages.add(object_package);
 	}
@@ -180,27 +215,47 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 		return packages;
 	}
 
+	/**
+	 * register a game state
+	 * @param name - name of the game state - this will be used for logging and storing data
+	 * @param tmx - the tmx associated with this state. 
+	 * @param manager - the manager for this gamestate - this handles all the logic
+	 */
 	public void registerGameState(String name, String tmx, StateManager manager) {
 		game_states.put(name, new GameState(name, tmx, manager));
 		game_states.get(name).setGame(this);
 	}
 
+	/**
+	 * register a gamestate and use its tmx file as its name
+	 * @param tmx - the tmx associated with this state
+	 * @param manager - the manager for this gamestate - this handles the logic
+	 */
 	public void registerGameState(String tmx, StateManager manager) {
 		registerGameState(tmx, tmx, manager);
 	}
 
+	/**
+	 * register a gamestate with no name and manager
+	 * @param tmx - the tmx associated with this gamestate
+	 */
 	public void registerGameState(String tmx) {
 		game_states.put(tmx, new GameState(tmx));
 		game_states.get(tmx).setGame(this);
 	}
 
-	public void setGameState(final String tmx) {
+	/**
+	 * clear all other states currently in the state stack and
+	 * set the state to the one given
+	 * @param state_name - the name of the gamestate to set it to
+	 */
+	public void setGameState(final String state_name) {
 		Gdx.app.postRunnable(new Runnable() {
 			@Override
 			public void run() {
 				for (GameState gs : current_gamestates)
 					gs.remove();
-				GameState state = game_states.get(tmx);
+				GameState state = game_states.get(state_name);
 				state.init();
 				for (GameState gs : current_gamestates)
 					gs.dispose();
@@ -211,6 +266,12 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 		});
 	}
 
+	/**
+	 * push a gamestate on to the state stack. Gamestates have state specific flags to 
+	 * indicate whether it should halt the update/render of the state directly under it
+	 * 
+	 * @param state - the gamestate to use
+	 */
 	public void pushGameState(final GameState state) {
 		Gdx.app.postRunnable(new Runnable() {
 
@@ -227,10 +288,20 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 		});
 	}
 
+	/**
+	 * * push a gamestate on to the state stack. Gamestates have state specific flags to 
+	 * indicate whether it should halt the update/render of the state directly under it
+	 * 
+	 * @param state_name - the name of the gamestate to use
+	 */
 	public void pushGameState(String state_name) {
 		pushGameState(game_states.get(state_name));
 	}
 
+	/**
+	 * pop the topmost state on the statestack
+	 * @return - the popped state in case you would like to refference it
+	 */
 	public GameState popGameState() {
 		final GameState popped_state = current_gamestates.pop();
 		if (current_gamestates.peek() != null)
@@ -246,6 +317,12 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 		return popped_state;
 	}
 
+	/**
+	 * transition to another state
+	 * @param state - state to transition to
+	 * @param duration - duration of transition (*2 for in out)
+	 * @param type - type of TransitionManager.Type
+	 */
 	public void transitionTo(String state, float duration, int type) {
 		if (transition_state.getManager() == null || !(transition_state.getManager() instanceof TransitionManager)) {
 			transition_state.setManager(new TransitionManager());
@@ -260,6 +337,11 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 
 	}
 
+	/**
+	 * get the gamestate by name
+	 * @param name
+	 * @return
+	 */
 	public GameState getState(String name) {
 		if (game_states.containsKey(name))
 			return game_states.get(name);
@@ -267,10 +349,18 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 		return null;
 	}
 
+	/**
+	 * get the sound manager
+	 * @return
+	 */
 	public SoundManager getSoundManager() {
 		return sound;
 	}
 
+	/**
+	 * get the assetmanager
+	 * @return
+	 */
 	public AssetManager getAssetManager() {
 		return assets;
 	}
@@ -282,7 +372,14 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 		AnimatedTiledMapTile.updateAnimationBaseTime();
 		float delta = Gdx.graphics.getDeltaTime();
 		if (current_gamestates.size > 0)
-			current_gamestates.peek().act(delta);
+			for (int i = 0; i < current_gamestates.size; i++) {
+				GameState cs = current_gamestates.get(i);
+				if(i+1 < current_gamestates.size) {
+					if(!current_gamestates.get(i+1).haltsUpdate())
+						cs.act(delta);
+				}else
+					cs.act(delta);
+			}
 		game_stage.draw();
 
 	}
@@ -303,30 +400,65 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	//ASSET METHODS
 	//========================================
 
+	/**
+	 * get a shader program from the shaders folder
+	 * @param name - name of the shader
+	 * @return
+	 */
 	public ShaderProgram getShader(String name) {
 		return assets.get(SHADER_FOLDER + FILE_SEPARATOR + name, ShaderProgram.class);
 	}
 
+	/**
+	 * get a particle effect from the particles folder
+	 * @param name
+	 * @return
+	 */
 	public ParticleEffect getParticleEffect(String name) {
 		return assets.get(PARTICLE_FOLDER + FILE_SEPARATOR + name, ParticleEffect.class);
 	}
 
+	/**
+	 * get a sound from the sounds folder
+	 * @param name
+	 * @return
+	 */
 	public Sound getSound(String name) {
 		return assets.get(SFX_FOLDER + FILE_SEPARATOR + name, Sound.class);
 	}
 
+	/**
+	 * get a music file from the music folder
+	 * @param name
+	 * @return
+	 */
 	public Music getMusic(String name) {
 		return assets.get(MUSIC_FOLDER + FILE_SEPARATOR + name, Music.class);
 	}
 
+	/**
+	 * get a texture atlas from the image folder
+	 * @param name
+	 * @return
+	 */
 	public TextureAtlas getAtlas(String name) {
 		return assets.get(IMAGE_FOLDER + FILE_SEPARATOR + name, TextureAtlas.class);
 	}
 
+	/**
+	 * get a tiledmap from the maps folder
+	 * @param name
+	 * @return
+	 */
 	public TiledMap getTiledMap(String name) {
 		return assets.get(TMX_FOLDER + FILE_SEPARATOR + name, TiledMap.class);
 	}
 
+	/**
+	 * get a bitmap font
+	 * @param name
+	 * @return
+	 */
 	public BitmapFont getFont(String name) {
 		return assets.get(name, BitmapFont.class);
 	}

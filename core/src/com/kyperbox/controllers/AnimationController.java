@@ -17,7 +17,6 @@ public class AnimationController extends GameObjectController{
 		daddy = object;
 		current_animation =null;
 		play_speed = 1f;
-		daddy.getState().log("init animation controller");
 	}
 	
 	/**

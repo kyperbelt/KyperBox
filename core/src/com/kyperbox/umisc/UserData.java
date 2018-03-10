@@ -1,4 +1,4 @@
-package com.kyperbox.util;
+package com.kyperbox.umisc;
 
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -35,11 +35,14 @@ public class UserData {
 	}
 
 	public void put(String name, Object object) {
-		if (variables.containsKey(name)) {
-			KyperBoxGame.error(name, "[" + name + "] already exists in " + getName() + ".");
-		} else {
-			variables.put(name, object);
+		if (variables.containsKey(name) && KyperBoxGame.DEBUG_LOGGING) {
+			KyperBoxGame.error(name, "[" + name + "] already exists in " + getName() + ". it was overriden.");
 		}
+		variables.put(name, object);
+	}
+
+	public boolean contains(String name) {
+		return variables.containsKey(name);
 	}
 
 	public String getString(String name) {
@@ -69,6 +72,26 @@ public class UserData {
 		else
 			return false;
 	}
+	
+	public Object get(String name) {
+		if (variables.containsKey(name))
+			return (Boolean) (variables.get(name));
+		return null;
+	}
+	
+	public <t> t get(String name,Class<t> clazz){
+		if (variables.containsKey(name))
+			return clazz.cast(variables.get(name));
+		return null;
+	}
+	
+	public <t> t get(String name,t dvalue,Class<t> clazz) {
+		t ret = get(name,clazz);
+		if(ret == null)
+			return dvalue;
+		else
+			return ret;
+	} 
 
 	public void setFloat(String name, float value) {
 		variables.put(name, value);
@@ -84,6 +107,14 @@ public class UserData {
 
 	public void setString(String name, String value) {
 		variables.put(name, value);
+	}
+	
+	public Object remove(String name) {
+		return variables.remove(name);
+	}
+	
+	public void clear() {
+		variables.clear();
 	}
 
 	@SuppressWarnings("unchecked")

@@ -8,14 +8,17 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Pool.Poolable;
+import com.kyperbox.KyperBoxGame;
 import com.kyperbox.objects.BasicGameObject;
+import com.kyperbox.objects.GameLayer;
 import com.kyperbox.objects.GameObject;
+import com.kyperbox.objects.GameLayer.LayerCamera;
 import com.kyperbox.objects.GameObject.GameObjectChangeType;
 
 public class QuadTree extends CollisionSystem {
-	
+
 	//this padding is added for absolutely no reason TODO: remove? it doesnt bother me right now so im going to leave it.
-	private static final int PAD = 10;
+	private static final int PAD = 0;
 	// TODO: add bounds follow
 	// TODO: test with object controller
 	// TODO: add a recursive update check to clean up unused Quads
@@ -31,7 +34,7 @@ public class QuadTree extends CollisionSystem {
 	private GameObject check_object;
 	private IntArray remove_objects;
 	private boolean culling;
-	
+
 	/**
 	 * create a quadtree collision manager with a default max_depth of 4 and a
 	 * max_object count of 10.
@@ -47,7 +50,7 @@ public class QuadTree extends CollisionSystem {
 		remove_objects = new IntArray();
 		culling = true;
 		bounds = new Rectangle(x - PAD, y - PAD, width + PAD * 2, height + PAD * 2);
-		objects =  new Array<GameObject>();
+		objects = new Array<GameObject>();
 		follow_view = false;
 		final QuadTree m = this;
 		quad_pool = new Pool<QuadTree.Quad>() {
@@ -85,23 +88,25 @@ public class QuadTree extends CollisionSystem {
 		// I dont know how to implement this
 		// since layers at this moment dont have types so just adding properties seems
 		// dirty.
-		getLayer().getState().log("QuadTree: init");
+		if (KyperBoxGame.DEBUG_LOGGING)
+			getLayer().getState().log("QuadTree: init");
 	}
 
 	@Override
 	public void gameObjectAdded(GameObject object, GameObject parent) {
-		
+
 		objects.add(object);
-		
+
 	}
 
 	@Override
 	public void gameObjectChanged(GameObject object, int type, float value) {
-		if(type != GameObjectChangeType.LOCATION)
+		if (type != GameObjectChangeType.LOCATION)
 			return;
-		
-		if(culling&&!objects.contains(object, true))  {
-			if(root.bounds.overlaps(object.getCollisionBounds())) {
+
+		if (!objects.contains(object, true)) {
+			Rectangle o = object.getCollisionBounds();
+			if (root.bounds.overlaps(object.getCollisionBounds())) {
 				objects.add(object);
 			}
 		}
@@ -109,43 +114,52 @@ public class QuadTree extends CollisionSystem {
 
 	@Override
 	public void gameObjectRemoved(GameObject object, GameObject parent) {
-		object.getState().log("removed:"+object.getName()+" from quadtree");
-		objects.removeValue(object,true);
+		//object.getState().log("removed:"+object.getName()+" from quadtree");
+		objects.removeValue(object, true);
 	}
 
 	@Override
 	public void update(float delta) {
 		root.clear();
 		remove_objects.clear();
-		if(follow_view) {
-			Rectangle view_bounds = getLayer().getCamera().getViewBounds();
-			root.getBounds().setPosition(view_bounds.getX()+bounds.getX(),view_bounds.getY()+bounds.getY());
-				
+		
+		Rectangle view_bounds = getLayer().getCamera().getViewBounds();
+		
+		if (follow_view) {
+			
+			root.setPosition( bounds.getX() + view_bounds.getX(), bounds.getY() + view_bounds.getY());
+
 		}
 		for (int i = 0; i < objects.size; i++) {
-			if(culling&&!root.bounds.overlaps(objects.get(i).getCollisionBounds())) {
+			Rectangle rect = objects.get(i).getCollisionBounds();
+			if (culling && !root.bounds.overlaps(rect)) {
 				remove_objects.add(i);
-			}else
+			} else
 				root.place(objects.get(i));
-				
+
 		}
 		
+
 		for (int i = 0; i < remove_objects.size; i++) {
-			if(remove_objects.get(i)<objects.size)
+			if (remove_objects.get(i) < objects.size)
 				objects.removeIndex(remove_objects.get(i));
 		}
+		
+
+		
 	}
 
 	@Override
 	public void drawDebug(ShapeRenderer shapes) {
 		shapes.setColor(Color.SKY);
 		root.debugRender(shapes);
-		
+
 	}
 
 	@Override
 	public void onRemove() {
-		getLayer().getState().log("QuadTree: removed");
+		if (KyperBoxGame.DEBUG_LOGGING)
+			getLayer().getState().log("QuadTree: removed");
 		root.clear();
 		ret_list.clear();
 		objects.clear();
@@ -155,31 +169,34 @@ public class QuadTree extends CollisionSystem {
 	public Pool<Quad> getPool() {
 		return quad_pool;
 	}
-	
+
 	/**
-	 * if true then this quadtree bounds follow the camera view of the layer it belongs to. 
+	 * if true then this quadtree bounds follow the camera view of the layer it
+	 * belongs to.
+	 * 
 	 * @param follow_view
 	 */
 	public void setFollowView(boolean follow_view) {
 		this.follow_view = follow_view;
 	}
-	
+
 	public boolean isFollowingView() {
 		return follow_view;
 	}
-	
+
 	/**
-	 * if true, objects are culled when they are outside the bounds of the root {@link Quad} and added when they re-enter.
+	 * if true, objects are culled when they are outside the bounds of the root
+	 * {@link Quad} and added when they re-enter.
+	 * 
 	 * @param culling
 	 */
 	public void setCulling(boolean culling) {
 		this.culling = culling;
 	}
-	
+
 	public boolean isCulling() {
 		return culling;
 	}
-	
 
 	@Override
 	public Array<GameObject> getPossibleCollisions(GameObject object) {
@@ -187,7 +204,6 @@ public class QuadTree extends CollisionSystem {
 		root.assessPossibleCollisions(ret_list, object);
 		return ret_list;
 	}
-
 
 	public static class Quad implements Poolable {
 
@@ -229,10 +245,10 @@ public class QuadTree extends CollisionSystem {
 		}
 
 		public void divide() {
-			float x = bounds.getX();
-			float y = bounds.getY();
-			float s_w = bounds.getWidth() * .5f; // sub_ width
-			float s_h = bounds.getHeight() * .5f;// sub_ height
+			float x = this.bounds.getX();
+			float y = this.bounds.getY();
+			float s_w = this.bounds.getWidth() * .5f; // sub_ width
+			float s_h = this.bounds.getHeight() * .5f;// sub_ height
 
 			// init quads
 			quads[0] = pool.obtain();
@@ -279,10 +295,10 @@ public class QuadTree extends CollisionSystem {
 		}
 
 		public void assessPossibleCollisions(Array<GameObject> possible_collisions, GameObject object) {
-			
+
 			if (quads[0] != null) {
-				for(int i = 0;i < quads.length;i++)
-					if(quads[i].getBounds().overlaps(object.getCollisionBounds()))
+				for (int i = 0; i < quads.length; i++)
+					if (quads[i].getBounds().overlaps(object.getCollisionBounds()))
 						quads[i].assessPossibleCollisions(possible_collisions, object);
 			}
 			for (int i = 0; i < quad_objects.size; i++) {
@@ -292,7 +308,9 @@ public class QuadTree extends CollisionSystem {
 		}
 
 		public void debugRender(ShapeRenderer shapes) {
-			shapes.rect(bounds.x-manager.getLayer().getCamera().getPosition().x, bounds.y-manager.getLayer().getCamera().getPosition().y, bounds.width, bounds.height);
+			Rectangle view = manager.getLayer().getCamera().getViewBounds();
+			shapes.rect(this.bounds.x-view.x ,
+					this.bounds.y-view.y, this.bounds.width, this.bounds.height);
 			if (quads[0] != null) {
 				for (int i = 0; i < quads.length; i++) {
 					quads[i].debugRender(shapes);
@@ -314,13 +332,17 @@ public class QuadTree extends CollisionSystem {
 			}
 			return size;
 		}
-		
-		public void translate(float x,float y) {
-			bounds.setPosition(bounds.x+x, bounds.y+y);
-			if(quads[0] != null)
+
+		public void translate(float x, float y) {
+			bounds.setPosition(bounds.x + x, bounds.y + y);
+			if (quads[0] != null)
 				for (int i = 0; i < quads.length; i++) {
 					quads[i].translate(x, y);
 				}
+		}
+		
+		public void setPosition(float x,float y) {
+			bounds.setPosition(x, y);
 		}
 
 		/**

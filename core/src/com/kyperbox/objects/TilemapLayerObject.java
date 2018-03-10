@@ -9,7 +9,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Pool.Poolable;
 import com.kyperbox.controllers.TileCollisionController;
-import com.kyperbox.util.TileLayerRenderer;
+import com.kyperbox.umisc.TileLayerRenderer;
 
 public class TilemapLayerObject extends GameObject {
 

@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -16,6 +17,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.kyperbox.GameState;
 import com.kyperbox.KyperBoxGame;
 import com.kyperbox.controllers.GameObjectController;
+import com.kyperbox.input.GameInput;
 
 public abstract class GameObject extends Group {
 
@@ -31,10 +33,13 @@ public abstract class GameObject extends Group {
 	private int filter;
 	private Rectangle bounds;
 	private Rectangle ret_bounds;
+	private Polygon col_poly;
+	private Polygon ret_poly;
 
 	private Array<GameObjectController> controllers;
 	private MapProperties properties;
 	private Vector2 velocity;
+	private Vector2 position;
 
 	private Color debug_bounds;
 	private boolean flip_x;
@@ -42,7 +47,7 @@ public abstract class GameObject extends Group {
 
 	private boolean change_sprite;
 	private Sprite render;
-	
+
 	public GameObject() {
 		controllers = new Array<GameObjectController>();
 		sprite = NO_SPRITE;
@@ -56,22 +61,36 @@ public abstract class GameObject extends Group {
 		filter = -1;
 		change_sprite = true;
 		render = null;
+		position = new Vector2();
 	}
-	
+
+	public Vector2 getPosition() {
+		position.set(getX(), getY());
+		return position;
+	}
+
 	public void setGroup(int group) {
 		this.group = group;
 	}
-	
+
 	public void setFilter(int filter) {
 		this.filter = filter;
 	}
-	
+
+	public boolean isRemoved() {
+		return getParent() == null;
+	}
+
 	public int getGroup() {
 		return group;
 	}
-	
+
 	public int getFilter() {
 		return filter;
+	}
+
+	public void setAlpha(float alpha) {
+		setColor(getColor().r, getColor().g, getColor().b, alpha);
 	}
 
 	public boolean ignoresCollision() {
@@ -96,16 +115,35 @@ public abstract class GameObject extends Group {
 	}
 
 	public void setCollisionBounds(float x, float y, float w, float h) {
+		if (bounds == null)
+			return;
 		bounds.set(x, y, w, h);
+		col_poly = null;
 	}
 
 	public Rectangle getCollisionBounds() {
 		if (getParent() != null && getParent() != layer)
 			ret_bounds.set(getX() + getParent().getX() + bounds.x, getY() + getParent().getY() + bounds.y, bounds.width,
 					bounds.height);
-		else
-			ret_bounds.set(getX() + bounds.x, getY() + bounds.y, bounds.width, bounds.height);
+		else if (getCollisionPolygon() != null)
+			return getCollisionPolygon().getBoundingRectangle();
 		return ret_bounds;
+	}
+
+	public Polygon getCollisionPolygon() {
+		if (bounds != null && col_poly == null) {
+			ret_poly = new Polygon();
+			col_poly = new Polygon(new float[] { 0, 0, 0 + bounds.getWidth(), 0, 0 + bounds.getWidth(),
+					0 + bounds.getHeight(), 0, 0 + bounds.getHeight() });
+		}
+		if (col_poly == null)
+			return null;
+		col_poly.setOrigin(getOriginX(), getOriginY());
+		col_poly.setRotation(getRotation());
+		col_poly.setScale(getScaleX(), getScaleY());
+		col_poly.setPosition(getX() + bounds.getX(), getY() + bounds.getY());
+		ret_poly.setVertices(col_poly.getTransformedVertices());
+		return col_poly;
 	}
 
 	public void setDebugBoundsColor(Color color) {
@@ -116,9 +154,10 @@ public abstract class GameObject extends Group {
 	public void drawDebug(ShapeRenderer shapes) {
 		if (getDebug()) {
 			shapes.setColor(debug_bounds);
-			Rectangle b = bounds;
-			if(b!=null)
-				shapes.rect(b.x + getX(), b.y + getY(), b.width, b.height);
+			Polygon p = getCollisionPolygon();
+			if (bounds != null && p != null)
+				shapes.polygon(ret_poly.getTransformedVertices());
+			;
 		}
 		super.drawDebug(shapes);
 	}
@@ -140,7 +179,7 @@ public abstract class GameObject extends Group {
 		} else if (getParent() == null) {
 			addActor(child);
 		} else {
-			KyperBoxGame.error("GAMEOBJECT [" + getName()+"] ->", "Could not add child to child object.");
+			KyperBoxGame.error("GAMEOBJECT [" + getName() + "] ->", "Could not add child to child object.");
 		}
 
 	}
@@ -192,17 +231,17 @@ public abstract class GameObject extends Group {
 			controllers.get(i).update(this, delta);
 		setPosition(getX() + velocity.x * delta, getY() + velocity.y * delta);
 	}
-	
+
 	public float getAbsoluteX() {
-		if(getParent() != layer && getParent()!=null) {
-			return getParent().getX()+getX();
+		if (getParent() != layer && getParent() != null) {
+			return getParent().getX() + getX();
 		}
 		return getX();
 	}
-	
+
 	public float getAbsoluteY() {
-		if(getParent() != layer&& getParent()!=null) {
-			return getParent().getY()+getY();
+		if (getParent() != layer && getParent() != null) {
+			return getParent().getY() + getY();
 		}
 		return getY();
 	}
@@ -226,28 +265,30 @@ public abstract class GameObject extends Group {
 	public void setSprite(String sprite) {
 		this.sprite = sprite;
 		change_sprite = true;
-		if(sprite == null || sprite.isEmpty())
+		if (sprite == null || sprite.isEmpty())
 			this.sprite = NO_SPRITE;
 	}
 
 	public void addController(GameObjectController controller) {
 		if (getController(controller.getClass()) != null) {
-			layer.getState().error("Cannot add type [" + controller.getClass().getName() + "] more than once.");
+			if (KyperBoxGame.DEBUG_LOGGING)
+				layer.getState().error("->" + getName() + " :Cannot add type [" + controller.getClass().getName()
+						+ "] more than once.");
 			return;
 		}
-		
+
 		controllers.add(controller);
 		controllers.sort(KyperBoxGame.getPriorityComperator());
 		controller.init(this);
-		if(layer!=null) {
+		if (layer != null) {
 			layer.gameObjectChanged(this, GameObjectChangeType.MANAGER, 1);
 		}
 	}
-	
+
 	public void removeController(GameObjectController controller) {
-		if(controllers.removeValue(controller, true)) {
+		if (controllers.removeValue(controller, true)) {
 			controller.remove(this);
-			if(layer!=null) {
+			if (layer != null) {
 				layer.gameObjectChanged(this, GameObjectChangeType.MANAGER, -1);
 			}
 		}
@@ -255,18 +296,17 @@ public abstract class GameObject extends Group {
 
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
-		
-		if(change_sprite&&!sprite.equals(NO_SPRITE)) {
+
+		if (change_sprite && !sprite.equals(NO_SPRITE)) {
 			render = layer.getGameSprite(sprite);
 			change_sprite = false;
-		}else if(change_sprite&&sprite.equals(NO_SPRITE)) {
+		} else if (change_sprite && sprite.equals(NO_SPRITE)) {
 			render = null;
 			change_sprite = false;
 		}
-		
-		
-		if (render != null ) {
-			
+
+		if (render != null) {
+
 			render.setPosition(MathUtils.round(getX()), MathUtils.round(getY()));
 			render.setRotation(getRotation());
 			render.setAlpha(getColor().a * parentAlpha);
@@ -284,7 +324,7 @@ public abstract class GameObject extends Group {
 	public void setPosition(float x, float y) {
 		if (layer != null && (x != getX() || y != getY()))
 			layer.gameObjectChanged(this, GameObjectChangeType.LOCATION, 1);
-		super.setPosition(x, y);
+		super.setPosition(MathUtils.floor(x), MathUtils.floor(y));
 	}
 
 	/**
@@ -301,13 +341,15 @@ public abstract class GameObject extends Group {
 	}
 
 	public GameState getState() {
-		return layer.getState();
+		return layer != null ? layer.getState() : null;
 	}
 
 	@Override
 	public boolean remove() {
 		boolean l = false;
-		if (getParent() == layer) {
+		if (getParent() == null)
+			return l;
+		else if (getParent() == layer) {
 			layer.GameObjectRemoved(this, null);
 			onRemove();
 			l = layer.removeActor(this);
@@ -320,70 +362,79 @@ public abstract class GameObject extends Group {
 		}
 		return l;
 	}
-	
+
 	//map properties utility --------------------------
-	
+
 	public int[] getIntArray(String name) {
 		String[] strings = getStringArray(name);
-		if(strings == null)
+		if (strings == null)
 			return null;
 		int[] ints = new int[strings.length];
 		for (int i = 0; i < strings.length; i++) {
-			if(!isNumeric(strings[i]))
-				throw new GdxRuntimeException(String.format("GameObject [%s] could not create Int Array. %s is not a valid number.",getName(),strings[i]));
+			if (!isNumeric(strings[i]))
+				throw new GdxRuntimeException(
+						String.format("GameObject [%s] could not create Int Array. %s is not a valid number.",
+								getName(), strings[i]));
 			ints[i] = Integer.parseInt(strings[i]);
 		}
 		return ints;
 	}
-	
+
 	@Override
 	public void setBounds(float x, float y, float width, float height) {
 		setCollisionBounds(x, y, width, height);
 	}
-	
+
 	/**
 	 * comma delimited set of strings
+	 * 
 	 * @param name
 	 * @return
 	 */
 	public String[] getStringArray(String name) {
-		if(!getProperties().containsKey(name))
+		if (!getProperties().containsKey(name))
 			return null;
-		String[] strings = getProperties().get(name,String.class).trim().split(",");
+		String[] strings = getProperties().get(name, String.class).trim().split(",");
 		return strings;
 	}
-	
+
 	/**
-	 * comma delimited set of floats
-	 * ignores
+	 * comma delimited set of floats ignores
+	 * 
 	 * @param name
 	 * @return
 	 */
 	public float[] getFloatArray(String name) {
 		String[] strings = getStringArray(name);
-		if(strings == null)
+		if (strings == null)
 			return null;
 		float[] floats = new float[strings.length];
 		for (int i = 0; i < strings.length; i++) {
-			if(!isNumeric(strings[i]))
-				throw new GdxRuntimeException(String.format("GameObject [%s] could not create FloatArray. %s is not a valid float.",getName(),strings[i]));
+			if (!isNumeric(strings[i]))
+				throw new GdxRuntimeException(
+						String.format("GameObject [%s] could not create FloatArray. %s is not a valid float.",
+								getName(), strings[i]));
 			floats[i] = Float.parseFloat(strings[i]);
 		}
 		return floats;
 	}
-	
-	private boolean isNumeric(String s) {  
-	    return s != null && s.matches("[-+]?\\d*\\.?\\d+");  
-	} 
-	
+
+	private boolean isNumeric(String s) {
+		return s != null && s.matches("[-+]?\\d*\\.?\\d+");
+	}
+
+	public GameInput getGameInput() {
+		return getGame().getInput();
+	}
+
 	/**
-	 * use this to pass messages to this object.
-	 * Must be overridden 
+	 * use this to pass messages to this object. Must be overridden
+	 * 
 	 * @param type
 	 * @param args
 	 * @return
 	 */
-	public boolean passGameMessage(int type,Object...args) {
+	public boolean passGameMessage(int type, Object... args) {
 		//TODO OVERRIDE ---
 		return false;
 	}

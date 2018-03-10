@@ -15,7 +15,7 @@ public class DesktopLauncher {
 			AutoPacking.pack("game", "image", "game");
 		}
 		//game
-		KyperBoxGame game = new CollisionTest();
+		KyperBoxGame game = new ParticleTests();
 		
 		//config
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();

@@ -2,7 +2,7 @@ package com.kyperbox.input;
 
 import com.badlogic.gdx.Gdx;
 
-public class KeyboardMapping implements InputMapping{
+public class KeyboardMapping extends InputMapping{
 	
 	private int key;
 	

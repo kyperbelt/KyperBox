@@ -18,7 +18,7 @@ import com.kyperbox.objects.GameObject;
 import com.kyperbox.systems.GameCameraSystem;
 import com.kyperbox.systems.ParallaxMapper;
 import com.kyperbox.systems.TileCollisionSystem;
-import com.kyperbox.util.BakedEffects;
+import com.kyperbox.umisc.BakedEffects;
 
 public class TileCollisionTest extends KyperBoxGame {
 
@@ -87,7 +87,7 @@ public class TileCollisionTest extends KyperBoxGame {
 				}
 
 				if (getInput().inputJustPressed(InputDefaults.ACTION_BUTTON)) {
-					debugRender(!getDebugRender());
+					debugEnabled(!getDebugEnabled());
 				}
 
 				if (getInput().inputJustPressed(InputDefaults.ENTER)) {
@@ -122,7 +122,7 @@ public class TileCollisionTest extends KyperBoxGame {
 				state.getPlaygroundLayer().addLayerSystem(new TileCollisionSystem("platformer_tiles"));
 				game_cam = new GameCameraSystem(3);
 				state.getPlaygroundLayer().addLayerSystem(game_cam);
-				debugRender(true);
+				debugEnabled(true);
 			}
 
 			@Override

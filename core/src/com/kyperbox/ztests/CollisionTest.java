@@ -129,7 +129,7 @@ public class CollisionTest extends KyperBoxGame{
 				
 				
 				if(getInput().inputJustPressed(move_up)) {
-					debugRender(!getDebugRender());
+					debugEnabled(!getDebugEnabled());
 					if(Gdx.app.getLogLevel()!=Application.LOG_NONE)
 						Gdx.app.setLogLevel(Application.LOG_NONE);
 					else
@@ -180,7 +180,7 @@ public class CollisionTest extends KyperBoxGame{
 				
 			}
 		});
-		debugRender(true);
+		debugEnabled(true);
 		setGameState("collisiontest.tmx");
 		
 	}

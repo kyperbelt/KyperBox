@@ -1,4 +1,4 @@
-package com.kyperbox.util;
+package com.kyperbox.umisc;
 import java.io.IOException;
 
 import com.badlogic.gdx.Gdx;
@@ -7,8 +7,8 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.XmlReader.Element;
-import com.kyperbox.util.TiledObjectTypes.TiledObjectType;
-import com.kyperbox.util.TiledObjectTypes.TypeProperty;
+import com.kyperbox.umisc.TiledObjectTypes.TiledObjectType;
+import com.kyperbox.umisc.TiledObjectTypes.TypeProperty;
 
 public class TiledTemplates {
 	

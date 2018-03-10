@@ -51,7 +51,7 @@ public class ObjectParentTest extends KyperBoxGame{
 					rpg_man_controller.jump();
 				
 				if(getInput().inputJustPressed(move_down)) {
-					debugRender(!getDebugRender());
+					debugEnabled(!getDebugEnabled());
 				}
 			}
 			

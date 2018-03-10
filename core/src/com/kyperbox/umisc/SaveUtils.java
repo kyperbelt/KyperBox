@@ -1,4 +1,4 @@
-package com.kyperbox.util;
+package com.kyperbox.umisc;
 
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.files.FileHandle;
@@ -7,7 +7,7 @@ import com.badlogic.gdx.files.FileHandle;
  * Utilities for saving and loading Data
  *
  */
-public class SaveUtils {
+public final class SaveUtils {
 	
 	/**
 	 * load string from given filehandle

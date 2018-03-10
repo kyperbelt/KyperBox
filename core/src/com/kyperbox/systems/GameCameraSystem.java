@@ -50,6 +50,10 @@ public class GameCameraSystem extends LayerSystem {
 	private float shake_duration;
 	private float shake_elapsed;
 	private Vector2 prev_pos;
+	
+	//if axis locked it will not follow in that axis
+	private boolean lock_y;
+	private boolean lock_x;
 
 	public GameCameraSystem(float speed) {
 		setSpeed(speed);
@@ -61,6 +65,9 @@ public class GameCameraSystem extends LayerSystem {
 		this.feather_elapsed = 0f;
 		this.feathering = false;
 		this.highest_weight = 0;
+		
+		lock_x = false;
+		lock_y = false;
 
 		shake_strength = 0;
 		shake_duration = 0;
@@ -76,6 +83,30 @@ public class GameCameraSystem extends LayerSystem {
 		obj_check = new Vector2();
 		poi_midpoint = new Vector2();
 	}
+	
+	public void lockX() {
+		this.lock_x = true;
+	}
+	
+	public void lockY() {
+		this.lock_y = true;
+	}
+	
+	public boolean isXLocked() {
+		return lock_x;
+	}
+	
+	public boolean isYLocked() {
+		return lock_y;
+	} 
+	
+	public void unlockX() {
+		this.lock_x = false;
+	}
+	
+	public void unlockY() {
+		this.lock_y = false;
+	}
 
 	public void freshShake(float strength, float duration) {
 		this.shake_elapsed = 0;
@@ -83,6 +114,13 @@ public class GameCameraSystem extends LayerSystem {
 		this.shake_strength = strength;
 		Vector2 pos = getCam().getPosition();
 		this.prev_pos.set(pos.x, pos.y);
+	}
+	
+	public void stopShake() {
+		this.shake_duration = 0;
+		this.shake_duration = 0;
+		this.shake_strength = 0;
+		this.prev_pos.set(getCam().getPosition());
 	}
 	
 	public void addShake(float strength,float duration) {
@@ -243,7 +281,8 @@ public class GameCameraSystem extends LayerSystem {
 					feathering = false;
 				}
 			} else {
-				getCam().setPosition(obj_check.x,obj_check.y);
+				getCam().setPosition(MathUtils.floor(obj_check.x),MathUtils.floor(obj_check.y));
+				
 			}
 		}
 
@@ -309,7 +348,7 @@ public class GameCameraSystem extends LayerSystem {
 			if (right > left + view.width)
 				right = left + view.width;
 
-			focus_midpoint.set(left + (right - left) * .5f, bot + (top - bot) * .5f);
+			focus_midpoint.set(isXLocked()?focus_midpoint.x:left + (right - left) * .5f, isYLocked()?focus_midpoint.y:bot + (top - bot) * .5f);
 		}
 
 	}
