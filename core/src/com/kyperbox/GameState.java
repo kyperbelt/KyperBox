@@ -1,6 +1,9 @@
 package com.kyperbox;
 
+import java.util.Iterator;
+
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
@@ -25,7 +28,6 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton.ImageButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
@@ -43,9 +45,10 @@ import com.kyperbox.input.GameInput;
 import com.kyperbox.managers.StateManager;
 import com.kyperbox.objects.GameLayer;
 import com.kyperbox.objects.GameObject;
-import com.kyperbox.util.KyperProgressBar;
-import com.kyperbox.util.SaveUtils;
-import com.kyperbox.util.UserData;
+import com.kyperbox.umisc.ImageButton;
+import com.kyperbox.umisc.KyperProgressBar;
+import com.kyperbox.umisc.SaveUtils;
+import com.kyperbox.umisc.UserData;
 
 public class GameState extends Group {
 
@@ -63,6 +66,9 @@ public class GameState extends Group {
 	private TiledMap map_data;
 	private float time_scale;
 
+	/** halt the update of the state directly under this one in the state stack **/
+	private boolean halt_update;
+
 	private ShaderProgram shader;
 
 	private ObjectMap<String, BitmapFont> fonts;
@@ -72,6 +78,8 @@ public class GameState extends Group {
 	private ObjectMap<String, Animation<String>> animations;
 	private ObjectMap<String, ShaderProgram> shaders;
 	/* delete ref */ private Array<String> svalues;
+	private ObjectMap<String, String> musics;
+	private ObjectMap<String, String> sounds;
 
 	public GameState(String tmx) {
 		this(tmx, new StateManager() {
@@ -102,8 +110,8 @@ public class GameState extends Group {
 	public GameState(String name, String tmx, StateManager manager) {
 		this.tmx = tmx;
 		setManager(manager);
-		if(name!=null)
-		this.name = name;
+		if (name != null)
+			this.name = name;
 		else
 			this.name = "";
 		sprites = new ObjectMap<String, Sprite>();
@@ -114,14 +122,43 @@ public class GameState extends Group {
 		time_scale = 1f;
 		shaders = new ObjectMap<String, ShaderProgram>();
 		svalues = new Array<String>();
+		halt_update = true;
+		sounds = new ObjectMap<String, String>();
+		musics = new ObjectMap<String, String>();
 	}
 
 	public GameState(String tmx, StateManager manager) {
 		this(tmx, tmx, manager);
 	}
 
+	/**
+	 * set whether we should halt the update of the state directly under this one in
+	 * the state stack
+	 * <p>
+	 * default is true
+	 * 
+	 * @param halt_update
+	 */
+	public void shouldHaltUpdate(boolean halt_update) {
+		this.halt_update = halt_update;
+	}
+
+	protected boolean haltsUpdate() {
+		return halt_update;
+	}
+
+	/**
+	 * get the global user data for the entire game.
+	 * 
+	 * @return
+	 */
+	public UserData getGlobals() {
+		return game.getGlobals();
+	}
+
 	public void init() {
-		if(background!=null) {
+		//cleanup
+		if (background != null) {
 			background.remove();
 			playground.remove();
 			foreground.remove();
@@ -131,7 +168,7 @@ public class GameState extends Group {
 			foreground = null;
 			uiground = null;
 		}
-		
+
 		if (tmx != null) {
 			//load game state
 			game.loadTiledMap(tmx);
@@ -174,8 +211,10 @@ public class GameState extends Group {
 			loadMusic(map_data);
 			loadSound(map_data);
 
-			//load UI
+			//load UI actors
 			loadUi(map_data.getLayers().get("uiground"), game.getAtlas(atlas_name));
+			//load ui gameobjects
+			loadLayer(uiground, map_data.getLayers().get("uiground"));
 			//load foreground
 			loadLayer(foreground, map_data.getLayers().get("foreground"));
 			//load Playground
@@ -193,13 +232,13 @@ public class GameState extends Group {
 			if (manager != null) {
 				manager.init(this);
 			}
-			log("initiated");
-		}else {
-			
+			if (KyperBoxGame.DEBUG_LOGGING)
+				log("initiated");
+		} else {
 
 			state_data = new UserData(name + "(data)");
 			time_scale = 1f;
-			
+
 			background = new GameLayer(this);
 			background.setName("background_");
 			playground = new GameLayer(this);
@@ -208,27 +247,165 @@ public class GameState extends Group {
 			foreground.setName("foreground_");
 			uiground = new GameLayer(this);
 			uiground.setName("uiground_");
-			
+
 			//init manager
 			if (manager != null) {
 				manager.addLayerSystems(this);
 			}
-			
-			
+
 			//add layers to scene
 			addActor(background);
 			addActor(playground);
 			addActor(foreground);
 			addActor(uiground);
-			
-			
+
 			//init state manager
 			if (manager != null) {
 				manager.init(this);
 			}
-			log("initiated");
+			if (KyperBoxGame.DEBUG_LOGGING)
+				log("initiated");
 		}
 
+	}
+
+	/**
+	 * * play the music in the given tag - only one music per tag
+	 * 
+	 * @param tag
+	 *            - the tag to use for this music. tags control volume
+	 * @param music-
+	 *            name of the music loaded to state. (Note: this is the name given
+	 *            to the music object in tiled and not the name of the file)
+	 * @return - the music that was played
+	 */
+	public Music playMusic(int tag, String music, boolean looping) {
+		if (!musics.containsKey(music))
+			throw new IllegalArgumentException(String.format(
+					"Music[%1$s] not loaded to state[%2$s]- try calling playMusic from the soundmanager directly if you wish to play music loaded on to memory from a different state.",
+					music, name));
+		return getSoundManager().playMusic(tag, musics.get(music), looping);
+	}
+
+	/**
+	 * plays some music on the default SoundManager.Music tag
+	 * 
+	 * @param music
+	 *            - name of the music loaded to state. (Note: this is the name given
+	 *            to the music object in tiled and not the name of the file)
+	 * 
+	 * @param looping
+	 *            - weather or not the sounds should loop
+	 * @return - the music that was played
+	 */
+	public Music playMusic(String music, boolean looping) {
+		return playMusic(SoundManager.MUSIC, music, looping);
+	}
+
+	/**
+	 * play a sound on the given tag - you may even play sounds on tags that have
+	 * music currently playing on them.
+	 * 
+	 * @param tag
+	 * @param sound
+	 * 
+	 * @return soundid
+	 */
+	public long playSound(int tag, String sound) {
+		if (!sounds.containsKey(sound))
+			throw new IllegalArgumentException(String.format(
+					"Sound[%1$s] not loaded to state[%2$s] - try calling playSound from the soundmanager directly to play sounds loaded on to memory from a different state[you must use the filename]",
+					sound, name));
+		return getSoundManager().playSound(tag, sounds.get(sound));
+	}
+
+	/**
+	 * play a sound on the default soundmanager.SFX tag
+	 * 
+	 * @param sound
+	 * @return soundid
+	 */
+	public long playSound(String sound) {
+		return playSound(SoundManager.SFX, sound);
+	}
+
+	/**
+	 * stop all instances of the sound
+	 * 
+	 * @param sound
+	 */
+	public void stopSound(String sound) {
+		if (!sounds.containsKey(sound))
+			return;
+		getSoundManager().stopSound(sounds.get(sound));
+	}
+
+	/**
+	 * stop the sound with the given soundid
+	 * 
+	 * @param sound
+	 *            - name of sound
+	 * @param soundid
+	 *            - soundid to stop
+	 */
+	public void stopSound(String sound, long soundid) {
+		if (!sounds.containsKey(sound))
+			return;
+		getSoundManager().stopSound(sound, soundid);
+	}
+
+	/**
+	 * resumes music on the tag - does nothing if no music was playing on tag or if
+	 * tag did not exist
+	 * 
+	 * @param tag
+	 */
+	public void resumeMusicTag(int tag) {
+		getSoundManager().resumeMusic(tag);
+	}
+
+	/**
+	 * stops music playing on the tag
+	 * 
+	 * @param tag
+	 */
+	public void stopMusicTag(int tag) {
+		getSoundManager().stopMusic(tag);
+	}
+
+	/**
+	 * pause music playing on the tag
+	 * 
+	 * @param tag
+	 */
+	public void pauseMusicTag(int tag) {
+		getSoundManager().pauseMusic(tag);
+	}
+
+	/**
+	 * stops the music[loaded in state]
+	 * 
+	 * @param music
+	 */
+	public void stopMusic(String music) {
+		if (!musics.containsKey(music))
+			return;
+		getSoundManager().getMusic(musics.get(music)).stop();
+	}
+
+	public Music getMusic(String music) {
+		if (!musics.containsKey(music))
+			return null;
+		return getSoundManager().getMusic(musics.get(music));
+	}
+
+	/**
+	 * get the games soundmanager
+	 * 
+	 * @return
+	 */
+	public SoundManager getSoundManager() {
+		return game.getSoundManager();
 	}
 
 	public void setStateShader(ShaderProgram shader) {
@@ -281,7 +458,7 @@ public class GameState extends Group {
 	 * @param animation
 	 */
 	public void storeAnimation(String animation_name, Animation<String> animation) {
-		if (animations.containsKey(animation_name))
+		if (animations.containsKey(animation_name) && KyperBoxGame.DEBUG_LOGGING)
 			log("Animations->animation [" + animation_name + "] already exists and has been overriden!");
 		animations.put(animation_name, animation);
 	}
@@ -315,7 +492,8 @@ public class GameState extends Group {
 		if (animations.containsKey(name)) {
 			return animations.get(name);
 		} else {
-			error("Animations->could not find[" + name + "].");
+			if (KyperBoxGame.DEBUG_LOGGING)
+				error("Animations->could not find[" + name + "].");
 			return null;
 		}
 	}
@@ -324,14 +502,16 @@ public class GameState extends Group {
 		if (particle_effects.containsKey(name)) {
 			return particle_effects.get(name).obtain();
 		}
-		error("ParticleEffect -> not found [" + name + "].");
+		if (KyperBoxGame.DEBUG_LOGGING)
+			error("ParticleEffect -> not found [" + name + "].");
 		return null;
 	}
 
 	public ShaderProgram getShader(String name) {
 		if (shaders.containsKey(name))
 			return shaders.get(name);
-		error("Shader -> not found [" + name + "].");
+		if (KyperBoxGame.DEBUG_LOGGING)
+			error("Shader -> not found [" + name + "].");
 		return null;
 	}
 
@@ -456,15 +636,22 @@ public class GameState extends Group {
 		foreground.remove();
 		uiground.remove();
 
-		log("removed");
+		if (KyperBoxGame.DEBUG_LOGGING)
+			log("removed");
 		return super.remove();
 	}
 
 	public void dispose() {
+		state_data.clear();
 		animations.clear();
 		sprites.clear();
 		if (manager != null) {
 			manager.dispose(this);
+		}
+		if (tmx != null && !tmx.isEmpty()) {
+			map_data = null;
+			getGame().getAssetManager().unload(KyperBoxGame.TMX_FOLDER + KyperBoxGame.FILE_SEPARATOR + tmx);
+			
 		}
 	}
 
@@ -475,7 +662,7 @@ public class GameState extends Group {
 	public String getName() {
 		return name;
 	}
-	
+
 	public void setName(String state_name) {
 		this.name = state_name;
 	}
@@ -540,10 +727,26 @@ public class GameState extends Group {
 		}
 	}
 
-	private void unloadSound() {
+	public void unloadSound() {
+		Iterator<String> ss = sounds.values();
+		while (ss.hasNext()) {
+			String sss = ss.next();
+			getSoundManager().removeSound(sss);
+			String sound_file = KyperBoxGame.SFX_FOLDER + KyperBoxGame.FILE_SEPARATOR + sss;
+			game.getAssetManager().unload(sound_file);
+		}
+		sounds.clear();
 	}
 
-	private void unloadMusic() {
+	public void unloadMusic() {
+		Iterator<String> ms = musics.values();
+		while (ms.hasNext()) {
+			String mss = ms.next();
+			getSoundManager().removeMusic(mss);
+			String music_file = KyperBoxGame.MUSIC_FOLDER + KyperBoxGame.FILE_SEPARATOR + mss;
+			game.getAssetManager().unload(music_file);
+		}
+		musics.clear();
 	}
 
 	/**
@@ -580,6 +783,7 @@ public class GameState extends Group {
 	//	 ===========================================================================
 
 	private void loadFonts(TiledMap data, String atlasname) {
+		fonts.clear();
 		MapObjects objects = data.getLayers().get("preload").getObjects();
 		String ffcheck = "Font";
 		for (MapObject o : objects) {
@@ -623,6 +827,7 @@ public class GameState extends Group {
 	}
 
 	private void loadShaders(TiledMap data) {
+		svalues.clear();
 		MapObjects objects = data.getLayers().get("preload").getObjects();
 		String scheck = "Shader";
 		for (MapObject o : objects) {
@@ -645,9 +850,40 @@ public class GameState extends Group {
 	}
 
 	private void loadSound(TiledMap data) {
+		MapObjects objects = data.getLayers().get("preload").getObjects();
+		String scheck = "Sound";
+		for (MapObject o : objects) {
+			String name = o.getName();
+			MapProperties properties = o.getProperties();
+			String type = properties.get("type", String.class);
+			if (type != null && type.equals(scheck)) {
+				String file = properties.get("file", String.class);
+				if (file != null) {
+					game.loadSound(file);
+					sounds.put(name, file);
+				}
+			}
+		}
+		game.getAssetManager().finishLoading();
+
 	}
 
 	private void loadMusic(TiledMap data) {
+		MapObjects objects = data.getLayers().get("preload").getObjects();
+		String mcheck = "Music";
+		for (MapObject o : objects) {
+			String name = o.getName();
+			MapProperties properties = o.getProperties();
+			String type = properties.get("type", String.class);
+			if (type != null && type.equals(mcheck)) {
+				String file = properties.get("file", String.class);
+				if (file != null) {
+					game.loadMusic(file);
+					musics.put(name, file);
+				}
+			}
+		}
+		game.getAssetManager().finishLoading();
 	}
 
 	//	 /$$   /$$ /$$$$$$       /$$        /$$$$$$   /$$$$$$  /$$$$$$$ 
@@ -711,7 +947,8 @@ public class GameState extends Group {
 							child_actor.remove();
 							child_actor.setPosition(child_actor.getX() - x, child_actor.getY() - y);
 							//child_actor.setRotation(0);
-							log("child actor[" + child_actor.getName() + "] added to [" + name + "]");
+							if (KyperBoxGame.DEBUG_LOGGING)
+								log("child actor[" + child_actor.getName() + "] added to [" + name + "]");
 							t.addActor(child_actor);
 						} else {
 							MapProperties child_properties = child_object.getProperties();
@@ -752,7 +989,8 @@ public class GameState extends Group {
 			LabelStyle ls = new LabelStyle();
 			String font_name = properties.get("font", "", String.class);
 			String text = properties.get("text", "", String.class);
-			Color color = new Color((int) Long.parseLong(properties.get("color",String.class).replaceAll("#", ""),16));
+			Color color = new Color(
+					(int) Long.parseLong(properties.get("color", String.class).replaceAll("#", ""), 16));
 			boolean wrap = properties.get("wrap", new Boolean(false), Boolean.class);
 			if (font_name != null && !font_name.isEmpty()) {
 				BitmapFont font = fonts.get(font_name);
@@ -861,22 +1099,34 @@ public class GameState extends Group {
 			TextureRegion knob_before_texture = atlas.findRegion(knob_before);
 
 			int size = 1;
+			int size2 = 1;
 
 			if (bg_texture != null) {
-				size = (int) (bg_texture.getRegionWidth() * .33f);
-				style.background = new NinePatchDrawable(new NinePatch(bg_texture, size, size, size, size));
+				//size = (int) (bg_texture.getRegionWidth() * .33f);
+				//size2 = (int) (bg_texture.getRegionHeight() * .33f);
+				style.background = new NinePatchDrawable(new NinePatch(bg_texture, size, size, size2, size2));
+
+				style.background.setMinHeight(h);
+				style.background.setMinWidth(w);
 			}
 			if (knob_texture != null) {
-				size = (int) (knob_texture.getRegionWidth() * .33f);
-				style.knob = new NinePatchDrawable(new NinePatch(knob_texture, size, size, size, size));
+				//size = (int) (knob_texture.getRegionWidth() * .33f);
+				//size2 = (int) (knob_texture.getRegionHeight() * .33f);
+				style.knob = new NinePatchDrawable(new NinePatch(knob_texture, size, size, size2, size2));
 			}
 			if (knob_after_texture != null) {
-				size = (int) (knob_after_texture.getRegionWidth() * .33f);
-				style.knobAfter = new NinePatchDrawable(new NinePatch(knob_after_texture, size, size, size, size));
+				//size = (int) (knob_after_texture.getRegionWidth() * .33f);
+				//size2 = (int) (knob_after_texture.getRegionHeight() * .33f);
+				style.knobAfter = new NinePatchDrawable(new NinePatch(knob_after_texture, size, size, size2, size2));
+				style.knobAfter.setMinHeight(h);
+				style.knobAfter.setMinWidth(w);
 			}
 			if (knob_before_texture != null) {
-				size = (int) (knob_before_texture.getRegionWidth() * .33f);
-				style.knobBefore = new NinePatchDrawable(new NinePatch(knob_before_texture, size, size, size, size));
+				//size = (int) (knob_before_texture.getRegionWidth() * .33f);
+				//size2 = (int) (knob_before_texture.getRegionHeight() * .33f);
+				style.knobBefore = new NinePatchDrawable(new NinePatch(knob_before_texture, size, size, size2, size2));
+				style.knobBefore.setMinHeight(h);
+				style.knobBefore.setMinWidth(w);
 			}
 			if (knob_texture != null) {
 				//				 size = (int) (knob_texture.getRegionWidth()*.33f);
@@ -888,6 +1138,7 @@ public class GameState extends Group {
 			a = new KyperProgressBar(min, max, step_size, vertical, style);
 
 			KyperProgressBar p = (KyperProgressBar) a;
+
 			p.setFlipped(flipped);
 			p.setValue(p.getMaxValue() * .75f);
 
@@ -942,7 +1193,8 @@ public class GameState extends Group {
 			float r = object_properties.get("rotation", new Float(0), Float.class);
 
 			for (String package_name : game.getObjectPackages()) {
-				boolean failed = false;;
+				boolean failed = false;
+				;
 				try {
 					game_object = (GameObject) Class.forName(package_name + "." + type).newInstance();
 				} catch (InstantiationException e) {
@@ -952,11 +1204,12 @@ public class GameState extends Group {
 				} catch (ClassNotFoundException e) {
 					failed = true;
 				}
-				
-				if(failed) {
-					error(package_name+" did not contain ["+type+".class].");
+
+				if (failed) {
+					if (KyperBoxGame.DEBUG_LOGGING)
+						error(package_name + " did not contain [" + type + ".class].");
 				}
-				
+
 				if (game_object != null) {
 					break;
 				}
@@ -970,7 +1223,8 @@ public class GameState extends Group {
 				game_object.setSprite(sprite);
 				game_layer.addGameObject(game_object, object_properties);
 			} else {
-				log("unable to create object [" + name + "] of type [" + type + "].");
+				if (KyperBoxGame.DEBUG_LOGGING)
+					log("unable to create object [" + name + "] of type [" + type + "].");
 			}
 		}
 	}

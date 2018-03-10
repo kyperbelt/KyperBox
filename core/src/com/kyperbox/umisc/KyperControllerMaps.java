@@ -1,8 +1,8 @@
-package com.kyperbox;
+package com.kyperbox.umisc;
 
 import com.badlogic.gdx.controllers.Controller;
 
-public class ControllerMappings {
+public class KyperControllerMaps {
 	
 	private int button_a;
 	private int button_b;
@@ -107,6 +107,12 @@ public class ControllerMappings {
 		return extra4;
 	}
 	
+	public static KyperControllerMaps getMapsForController(Controller c) {
+		if(XBoxOneWindows.isXboxOneWindowsController(c))
+			return XBoxOneWindows.getMappings();
+		else return null;
+	}
+	
 	
 	
 	public static class XBoxOneWindows{
@@ -133,8 +139,8 @@ public class ControllerMappings {
 					controller.getName().toLowerCase().contains("windows");
 		}
 		
-		public static ControllerMappings getMappings() {
-			ControllerMappings mappings = new ControllerMappings();
+		public static KyperControllerMaps getMappings() {
+			KyperControllerMaps mappings = new KyperControllerMaps();
 			mappings.button_a = BUTTON_A;
 			mappings.button_b = BUTTON_B;
 			mappings.button_x = BUTTON_X;

@@ -1,7 +1,7 @@
 package com.kyperbox.managers;
 
 import com.kyperbox.GameState;
-import com.kyperbox.util.UserData;
+import com.kyperbox.umisc.UserData;
 
 public abstract class StateManager {
 	

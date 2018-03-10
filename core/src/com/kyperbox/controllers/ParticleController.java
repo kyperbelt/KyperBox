@@ -1,183 +1,116 @@
 package com.kyperbox.controllers;
 
+import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
+import com.badlogic.gdx.graphics.g2d.ParticleEffectPool.PooledEffect;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ArrayMap;
+import com.kyperbox.objects.GameLayer.LayerCamera;
 import com.kyperbox.objects.GameObject;
 
-public class ParticleController extends GameObjectController{
+public class ParticleController extends GameObjectController {
 	
-	private String effect;
-	private boolean post_draw;
-	private boolean complete;
-	private float x_scale_factor;
-	private float y_scale_factor;
-	private float motion_scale_factor;
-	private float relative_x;
-	private float relative_y;
-	private float duration;
-	private float elapsed;
-	private float removal_rate;
-	private boolean removed;
+	private ArrayMap<PooledEffect, ParticleSettings> particles;
+	private Array<PooledEffect> post_effects;
+	private Array<PooledEffect> pre_effects;
+	private GameObject parent;
 	
-	/**
-	 * particle effect controller.. Add this to object that you want to display particle
-	 * effects.
-	 * 
-	 * @param effect
-	 * @param post_draw
-	 */
-	public  ParticleController(String effect,boolean post_draw,float duration) {
-		this.effect = effect;
-		this.post_draw = post_draw;
-		this.x_scale_factor = 1f;
-		this.y_scale_factor = 1f;
-		this.motion_scale_factor = 1f;
-		this.relative_x = 0f;
-		this.relative_y = 0f;
-		this.duration = duration;
-		this.removal_rate = 2f;
+	public ParticleController() {
+		particles = new ArrayMap<ParticleEffectPool.PooledEffect, ParticleController.ParticleSettings>();
+		post_effects = new Array<ParticleEffectPool.PooledEffect>();
+		pre_effects = new Array<ParticleEffectPool.PooledEffect>();
 	}
 	
-	
-	
-	public ParticleController(String effect,boolean post_draw) {
-		this(effect,post_draw,-1);
+	public void addParticleEffect(PooledEffect pe,ParticleSettings settings) {
+		pe.reset(true);
+		pe.setEmittersCleanUpBlendFunction(false);
+		pe.scaleEffect(settings.scale);
+		particles.put(pe,settings);
+		if(parent!=null) {
+			LayerCamera cam = parent.getGameLayer().getCamera();
+			Vector2 campos = cam.getPosition();
+			pe.setPosition(parent.getX()+settings.xoff-campos.x-cam.getXOffset(), parent.getY()+settings.yoff-campos.y-cam.getYOffset());
+		}
 	}
 	
-	public ParticleController(String effect) {
-		this(effect, false);
+	public void removeComplete() {
+		int index = 0;
+		while (index < particles.size) {
+			if(particles.getKeyAt(index).isComplete()) {
+				PooledEffect pe = particles.getKeyAt(index);
+				particles.removeIndex(index);
+				pe.free();
+			}else
+				index++;
+		}
 	}
 	
-	public void setRemovalRate(float removal_rate) {
-		this.removal_rate = removal_rate;
+	public void clearAll() {
+		for (int i = 0; i < particles.size; i++) {
+			PooledEffect pe = particles.getKeyAt(i);
+			pe.free();
+		}
+		particles.clear();
+		post_effects.clear();
+		pre_effects.clear();
 	}
 	
-	public void setDuration(float duration) {
-		this.duration = duration;
-	}
-	
-	public void setRelativeX(float x) {
-		this.relative_x = x;
-	}
-	
-	public void setRelativeY(float y) {
-		this.relative_y = y;
-	}
-	
-	public void setRelativePos(float x,float y) {
-		this.setRelativeX(x);
-		this.setRelativeY(y);
-	}
-	
-	public float getRelativeX() {
-		return relative_x;
-	}
-	
-	public float getRelativeY() {
-		return relative_y;
-	}
-	
-	/**
-	 * if set to true this particle effect is drawn after the layer
-	 * if false then it is drawn before
-	 * @param post_draw
-	 */
-	public void setPostDraw(boolean post_draw) {
-		this.post_draw = post_draw;
-	}
-	
-	public void setEffect(String effect) {
-		this.effect = effect;
-	}
-	
-	public void setComplete(boolean complete) {
-		this.complete = complete;
-		elapsed = 0f;
-	}
-	
-	public float getDuration() {
-		return duration;
-	}
-	
-	public float getRemovalRate() {
-		return removal_rate;
-	}
-	
-	@Override
-	public void reset() {
-		elapsed = 0;
-		removed = false;
-		complete = false;
-		super.reset();
-	}
-	
-	public boolean isRemoved() {
-		return removed;
-	}
-	
-	public boolean isComplete() {
-		return complete;
-	}
-	
-	public String getEffectName() {
-		return effect;
-	}
-	
-	public boolean isPostDraw() {
-		return post_draw;
-	}
-	
-	public void setXScaleFactor(float x_scale_factor) {
-		this.x_scale_factor = x_scale_factor;
-	}
-	
-	public void setYScaleFactor(float y_scale_factor) {
-		this.y_scale_factor = y_scale_factor;
-	}
-	
-	public void setMotionScaleFactor(float motion_scale_factor) {
-		this.motion_scale_factor = motion_scale_factor;
-	}
-	
-	public float getXScaleFactor() {
-		return x_scale_factor;
-	}
-	
-	public float getYScaleFactor() {
-		return y_scale_factor;
-	}
-	
-	public float getMotionScaleFactor() {
-		return motion_scale_factor;
-	}
-
 	@Override
 	public void init(GameObject object) {
-		//setRelativePos(object.getOriginX(), object.getOriginY());
+		parent = object;
 	}
 
 	@Override
 	public void update(GameObject object, float delta) {
-		if(duration > 0&&!complete) {
-			elapsed+=delta;
-			if(elapsed >= duration) {
-				complete = true;
-				elapsed = 0f;
+		post_effects.clear();
+		pre_effects.clear();
+		LayerCamera cam = object.getGameLayer().getCamera();
+		Vector2 campos = cam.getPosition();
+		for (int i = 0; i < particles.size; i++) {
+			ParticleSettings ps = particles.getValueAt(i);
+			PooledEffect pe = particles.getKeyAt(i);
+			pe.update(delta);
+			pe.setPosition(object.getX()+ps.xoff-campos.x-cam.getXOffset(), object.getY()+ps.yoff-campos.y-cam.getYOffset());
+			if(ps.post_draw) {
+				post_effects.add(pe);
+			}else {
+				pre_effects.add(pe);
 			}
-		}
-		if(isComplete()) {
-			elapsed+=delta;
-			if(elapsed>removal_rate) {
-				object.removeController(this);
-				removed = true;
-				elapsed = 0f;
-			}
-			
-			
 		}
 	}
 
 	@Override
 	public void remove(GameObject object) {
-		
+		parent = null;
+		clearAll();
 	}
+	
+	public Array<PooledEffect> getPostDraw(){
+		return post_effects;
+	}
+	
+	public Array<PooledEffect> getPreDraw(){
+		return pre_effects;
+	}
+	
+	
+	public static class ParticleSettings{
+		public float xoff;
+		public float yoff;
+		public float scale;
+		public boolean post_draw;
+		
+		public ParticleSettings(boolean post_draw) {
+			this.scale = 1;
+			this.xoff = 0;
+			this.yoff = 0;
+			this.post_draw = post_draw;
+		}
+		
+		public ParticleSettings() {this(false);}
+	
+	}
+
+
 
 }

@@ -1,4 +1,4 @@
-package com.kyperbox.util;
+package com.kyperbox.umisc;
 
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.*;
 

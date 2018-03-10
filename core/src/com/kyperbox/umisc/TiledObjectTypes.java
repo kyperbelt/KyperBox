@@ -1,4 +1,4 @@
-package com.kyperbox.util;
+package com.kyperbox.umisc;
 import java.io.IOException;
 
 import com.badlogic.gdx.Gdx;

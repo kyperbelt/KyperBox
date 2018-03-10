@@ -1,4 +1,4 @@
-package com.kyperbox.util;
+package com.kyperbox.umisc;
 
 import java.io.IOException;
 
@@ -36,8 +36,8 @@ import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.XmlReader.Element;
 import com.kyperbox.KyperBoxGame;
-import com.kyperbox.util.TiledObjectTypes.TypeProperty;
-import com.kyperbox.util.TiledTemplates.TiledTemplate;
+import com.kyperbox.umisc.TiledObjectTypes.TypeProperty;
+import com.kyperbox.umisc.TiledTemplates.TiledTemplate;
 
 /**
  * clone of class AtlasTmxMapLoader by Justin Shapcott and Manuel Bua with
@@ -613,7 +613,8 @@ public class KyperMapLoader extends BaseTmxMapLoader<AtlasTmxMapLoader.AtlasTile
 					object = new RectangleMapObject(x, flipY ? y - height : y, width, height);
 				}
 			}
-			Gdx.app.log(getClass().getSimpleName(), "ObjectName:" + object_name + " template:" + template_name + " x:"
+			if(KyperBoxGame.DEBUG_LOGGING)
+				Gdx.app.log(getClass().getSimpleName(), "ObjectName:" + object_name + " template:" + template_name + " x:"
 					+ x + " y:" + y + " width:" + width + " height:" + height);
 			object.setName(object_name);
 			String rotation = element.getAttribute("rotation", null) != null ? element.getAttribute("rotation")

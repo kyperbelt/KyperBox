@@ -1,5 +1,7 @@
-package com.kyperbox.util;
+package com.kyperbox.umisc;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 
 public class KyperProgressBar extends ProgressBar{
@@ -26,5 +28,20 @@ public class KyperProgressBar extends ProgressBar{
 	public void setFlipped(boolean flipped) {
 		this.flipped = flipped;
 	}
+	
+	public void setAlpha(float alpha) {
+		setColor(getColor().r,getColor().g,getColor().b,alpha);
+	}
+	
+	@Override
+	public void draw(Batch batch, float parentAlpha) {
+		Color c = Color.WHITE;
+		
+		super.draw(batch, parentAlpha);
+		
+		batch.setColor(c);
+	}
+	
+	
 
 }

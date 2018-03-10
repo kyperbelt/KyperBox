@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapProperties;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -311,9 +312,9 @@ public class GameLayer extends Group{
 		
 		public Vector2 project(Vector2 coords) {
 			Viewport view = layer.getState().getGame().getView();
+			coords.set(-position.x +coords.x, coords.y - position.y).scl(getZoom());
 			view.project(coords);
-			coords.scl(getZoom());
-			coords.set(coords.x + position.x, coords.y + position.y);
+			
 			return coords;
 		}
 		
@@ -427,7 +428,7 @@ public class GameLayer extends Group{
 //			}
 			
 //			//set the layer position
-			layer.setPosition(position.x, position.y);
+			layer.setPosition(MathUtils.floor(position.x), MathUtils.floor(position.y));
 		
 		}
 

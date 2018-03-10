@@ -1,4 +1,4 @@
-package com.kyperbox.util;
+package com.kyperbox.umisc;
 
 import static com.badlogic.gdx.graphics.g2d.Batch.C1;
 import static com.badlogic.gdx.graphics.g2d.Batch.C2;

@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.kyperbox.GameState;
 import com.kyperbox.KyperBoxGame;
 import com.kyperbox.controllers.ParticleController;
+import com.kyperbox.controllers.ParticleController.ParticleSettings;
 import com.kyperbox.input.InputDefaults;
 import com.kyperbox.input.KeyboardMapping;
 import com.kyperbox.managers.StateManager;
@@ -17,6 +18,7 @@ public class ParticleTests extends KyperBoxGame{
 
 	@Override
 	public void initiate() {
+		debugEnabled(true);
 		
 		getInput().addInputMapping(InputDefaults.EXIT, new KeyboardMapping(Keys.Z));
 		getInput().addInputMapping(InputDefaults.ENTER, new KeyboardMapping(Keys.X));
@@ -41,9 +43,8 @@ public class ParticleTests extends KyperBoxGame{
 					cam.setZoom(Math.min(10f, cam.getZoom()+.1f));
 				}
 				
-				if(getInput().inputJustPressed(InputDefaults.ACTION_BUTTON) && torch_fire.isRemoved()) {
-					torch_fire.reset();
-					torch.addController(torch_fire);
+				if(getInput().inputJustPressed(InputDefaults.ACTION_BUTTON) ) {
+
 				}
 				
 				if(getInput().inputJustPressed(InputDefaults.JUMP_BUTTON)) {
@@ -63,17 +64,15 @@ public class ParticleTests extends KyperBoxGame{
 				
 				state.setTimeScale(2f);
 				
-				torch_fire = new ParticleController("fire");
+				torch_fire = new ParticleController();
+				ParticleSettings ps = new ParticleSettings();
+				ps.scale = 1.2f;
+				ps.xoff = torch.getWidth()*.5f;
+				ps.yoff = torch.getHeight()*.7f;
+				torch_fire.addParticleEffect(state.getEffect("fire"),ps);
 				
-				torch_fire.setRelativePos(torch.getOriginX(), torch.getHeight()*.75f);
-				torch_fire.setDuration(10f);
 				torch.addController(torch_fire);
 				
-				ParticleController torch_smoke = new ParticleController("smoke");
-				torch_smoke.setRelativePos(torch_fire.getRelativeX(), torch_fire.getRelativeY());
-				BasicGameObject smoke = new BasicGameObject();
-				smoke.addController(torch_smoke);
-				torch.addChild(smoke);
 				
 				cam = state.getPlaygroundLayer().getCamera();
 				cam.setCentered();
