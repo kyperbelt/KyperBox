@@ -370,7 +370,7 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 		clear();
 		input.update();
 		AnimatedTiledMapTile.updateAnimationBaseTime();
-		float delta = Gdx.graphics.getDeltaTime();
+		float delta = Math.min(Gdx.graphics.getDeltaTime(),1f);
 		if (current_gamestates.size > 0)
 			for (int i = 0; i < current_gamestates.size; i++) {
 				GameState cs = current_gamestates.get(i);

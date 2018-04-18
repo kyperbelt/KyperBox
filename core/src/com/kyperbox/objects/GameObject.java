@@ -127,6 +127,7 @@ public abstract class GameObject extends Group {
 					bounds.height);
 		else if (getCollisionPolygon() != null)
 			return getCollisionPolygon().getBoundingRectangle();
+		ret_bounds.setCenter(getOriginX(), getOriginY());
 		return ret_bounds;
 	}
 
@@ -135,13 +136,14 @@ public abstract class GameObject extends Group {
 			ret_poly = new Polygon();
 			col_poly = new Polygon(new float[] { 0, 0, 0 + bounds.getWidth(), 0, 0 + bounds.getWidth(),
 					0 + bounds.getHeight(), 0, 0 + bounds.getHeight() });
+			col_poly.setOrigin(bounds.getWidth()*.5f, bounds.getHeight()*.5f);
 		}
 		if (col_poly == null)
 			return null;
-		col_poly.setOrigin(getOriginX(), getOriginY());
-		col_poly.setRotation(getRotation());
+		
 		col_poly.setScale(getScaleX(), getScaleY());
 		col_poly.setPosition(getX() + bounds.getX(), getY() + bounds.getY());
+		col_poly.setRotation(getRotation());
 		ret_poly.setVertices(col_poly.getTransformedVertices());
 		return col_poly;
 	}
@@ -155,8 +157,9 @@ public abstract class GameObject extends Group {
 		if (getDebug()) {
 			shapes.setColor(debug_bounds);
 			Polygon p = getCollisionPolygon();
-			if (bounds != null && p != null)
+			if (bounds != null && p != null) {
 				shapes.polygon(ret_poly.getTransformedVertices());
+			}
 			;
 		}
 		super.drawDebug(shapes);
@@ -297,7 +300,7 @@ public abstract class GameObject extends Group {
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
 
-		if (change_sprite && !sprite.equals(NO_SPRITE)) {
+		if (change_sprite && !sprite.equals(NO_SPRITE) && layer!=null) {
 			render = layer.getGameSprite(sprite);
 			change_sprite = false;
 		} else if (change_sprite && sprite.equals(NO_SPRITE)) {

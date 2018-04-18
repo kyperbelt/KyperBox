@@ -311,12 +311,18 @@ public class GameState extends Group {
 	 * 
 	 * @return soundid
 	 */
-	public long playSound(int tag, String sound) {
+	public long playSound(int tag, String sound,boolean loop) {
 		if (!sounds.containsKey(sound))
 			throw new IllegalArgumentException(String.format(
 					"Sound[%1$s] not loaded to state[%2$s] - try calling playSound from the soundmanager directly to play sounds loaded on to memory from a different state[you must use the filename]",
 					sound, name));
-		return getSoundManager().playSound(tag, sounds.get(sound));
+		long id =  getSoundManager().playSound(tag, sounds.get(sound));
+		getSoundManager().loopSound(sound, id, loop);
+		return id;
+	}
+	
+	public long playSound(int tag,String sound) {
+		return playSound(tag,sound,false);
 	}
 
 	/**
@@ -327,6 +333,10 @@ public class GameState extends Group {
 	 */
 	public long playSound(String sound) {
 		return playSound(SoundManager.SFX, sound);
+	}
+	
+	public long playSound(String sound,boolean loop) {
+		return playSound(SoundManager.SFX, sound,loop);
 	}
 
 	/**
@@ -512,6 +522,13 @@ public class GameState extends Group {
 			return shaders.get(name);
 		if (KyperBoxGame.DEBUG_LOGGING)
 			error("Shader -> not found [" + name + "].");
+		return null;
+	}
+	
+	public BitmapFont getFont(String name) {
+		if(fonts.containsKey(name)) return fonts.get(name);
+		else if(KyperBoxGame.DEBUG_LOGGING)
+			error("Font -> not found ["+name+"].");
 		return null;
 	}
 
@@ -983,7 +1000,9 @@ public class GameState extends Group {
 			TextureRegion texture = atlas.findRegion(texture_name);
 			if (texture != null) {
 				a = new Image(texture);
+				a.setRotation(-r);
 			}
+			
 
 		} else if (type.equals("Label")) {
 			LabelStyle ls = new LabelStyle();

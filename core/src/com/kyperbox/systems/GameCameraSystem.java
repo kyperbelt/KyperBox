@@ -254,13 +254,21 @@ public class GameCameraSystem extends LayerSystem {
 	protected LayerCamera getCam() {
 		return getLayer().getCamera();
 	}
+	
+	public boolean isShaking() {
+		return shake_duration > 0;
+	}
 
 	@Override
 	public void update(float delta) {
 		Vector2 cam_pos = getCam().getPosition();
+		cam_pos.x = MathUtils.floor(cam_pos.x);
+		cam_pos.y = MathUtils.floor(cam_pos.y);
+		
+		Rectangle view = getCam().getViewBounds();
 
 		// adjust bounds to point of focus.
-		updateFocus(getCam());
+		updateFocus(cam_pos,view);
 
 		// adjust midpoint to include prominent point of interest
 		if (updatePois(getCam())) {
@@ -268,8 +276,11 @@ public class GameCameraSystem extends LayerSystem {
 		}
 
 		//interpolate to cam position
-		obj_check.set(cam_pos.x + (((focus_midpoint.x - cam_pos.x) * x_speed) * delta)*getCam().getZoom(),
-				cam_pos.y + ((focus_midpoint.y - cam_pos.y) * y_speed) * delta*getCam().getZoom());
+		float newxspeed = /*x_speed*delta;*/Math.min(x_speed*delta,1f);
+		float newyspeed = Math.min(y_speed*delta,1f);
+		obj_check.set(cam_pos.x + (focus_midpoint.x - cam_pos.x) * newxspeed,
+				cam_pos.y + (focus_midpoint.y - cam_pos.y) * newyspeed).scl(getCam().getZoom());
+		
 
 		if (!calculateShake(delta)) {
 			if (feathering) { //TODO: feathering is not used.. remove or find use
@@ -285,6 +296,7 @@ public class GameCameraSystem extends LayerSystem {
 				
 			}
 		}
+		
 
 	}
 
@@ -316,9 +328,8 @@ public class GameCameraSystem extends LayerSystem {
 		getCam().setPosition(0, 0);
 	}
 
-	private void updateFocus(LayerCamera cam) {
-		focus_midpoint.set(cam.getPosition().x, cam.getPosition().y);
-		Rectangle view = cam.getViewBounds();
+	private void updateFocus(Vector2 cam_pos, Rectangle view) {
+		focus_midpoint.set(cam_pos.x, cam_pos.y);
 
 		if (points_of_focus.size > 0) {
 			top = Float.NaN;
@@ -328,8 +339,8 @@ public class GameCameraSystem extends LayerSystem {
 
 			for (int i = 0; i < points_of_focus.size; i++) {
 				GameObject focus = points_of_focus.get(i);
-				float focus_top = focus.getTop();
-				float focus_right = focus.getRight();
+				float focus_top = focus.getY()+focus.getHeight();
+				float focus_right = focus.getX()+focus.getWidth();
 				float focus_left = focus.getX();
 				float focus_bot = focus.getY();
 
@@ -349,6 +360,8 @@ public class GameCameraSystem extends LayerSystem {
 				right = left + view.width;
 
 			focus_midpoint.set(isXLocked()?focus_midpoint.x:left + (right - left) * .5f, isYLocked()?focus_midpoint.y:bot + (top - bot) * .5f);
+			focus_midpoint.x = MathUtils.floor(focus_midpoint.x);
+			focus_midpoint.y = MathUtils.floor(focus_midpoint.y);
 		}
 
 	}

@@ -56,8 +56,13 @@ public class SoundManager {
 			sounds.put(sound, s);
 		} else
 			s = sounds.get(sound);
-
 		return s.play(tags.get(tag, 1f) * tags.get(MASTER, 1f));
+	}
+	
+	public void loopSound(String sound,long id,boolean loop) {
+		if(sounds.containsKey(sound)) {
+			sounds.get(sound).setLooping(id,loop);
+		}
 	}
 	
 	public float getTagVolume(int tag) {
