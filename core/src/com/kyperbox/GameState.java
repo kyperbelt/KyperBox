@@ -312,10 +312,13 @@ public class GameState extends Group {
 	 * @return soundid
 	 */
 	public long playSound(int tag, String sound,boolean loop) {
-		if (!sounds.containsKey(sound))
-			throw new IllegalArgumentException(String.format(
+		if (!sounds.containsKey(sound)) {
+			error(String.format(
 					"Sound[%1$s] not loaded to state[%2$s] - try calling playSound from the soundmanager directly to play sounds loaded on to memory from a different state[you must use the filename]",
 					sound, name));
+			return -1L;
+			
+		}
 		long id =  getSoundManager().playSound(tag, sounds.get(sound));
 		getSoundManager().loopSound(sound, id, loop);
 		return id;

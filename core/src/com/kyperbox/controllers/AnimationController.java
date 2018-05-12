@@ -75,7 +75,6 @@ public class AnimationController extends GameObjectController{
 		if(current_animation!=null) {
 			object.setSprite(current_animation.getKeyFrame(animation_elapsed));
 		}
-		
 	}
 
 	@Override

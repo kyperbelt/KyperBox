@@ -17,6 +17,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.tiles.AnimatedTiledMapTile;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -24,6 +25,8 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.kyperbox.ads.AdClient;
+import com.kyperbox.ads.MockAdClient;
 import com.kyperbox.input.GameInput;
 import com.kyperbox.managers.Priority.PriorityComparator;
 import com.kyperbox.umisc.KyperMapLoader;
@@ -35,6 +38,7 @@ import com.kyperbox.managers.TransitionManager;
 public abstract class KyperBoxGame extends ApplicationAdapter {
 
 	public static String TAG = "KyperBox->";
+	public static final String NOT_SUPPORTED = "[NOT SUPPORTED]";
 
 	public static final String IMAGE_FOLDER = "image";
 	public static final String MUSIC_FOLDER = "music";
@@ -48,6 +52,8 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	public static final String VERTEX_SUFFIX = ".vert";
 	public static final String FRAGMENT_SUFFIX = ".frag";
 
+	public static final MapProperties NULL_PROPERTIES = new MapProperties();
+
 	private static final String GAME_DATA_NAME = "GAME_GLOBALS";
 
 	protected Stage game_stage;
@@ -59,9 +65,9 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	private Array<GameState> current_gamestates;
 	private Array<String> packages;
 	private Preferences game_prefs;
-	
+
 	public static boolean DEBUG_LOGGING = true; //TURN OFF -- preface all logging with this
-	
+
 	private InputMultiplexer input_multiplexer;
 
 	private static PriorityComparator prio_compare;
@@ -72,6 +78,8 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 
 	private String game_name;
 	private String prefs_name;
+	
+	private AdClient ad_client;
 
 	public KyperBoxGame(String prefs, String game_name, Viewport view) {
 		this.view = view;
@@ -140,12 +148,36 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 		input_multiplexer.addProcessor(game_stage);
 		input_multiplexer.addProcessor(input);
 		Gdx.input.setInputProcessor(input_multiplexer);
-
+		
+		if(ad_client == null)
+			ad_client = new MockAdClient();
 		initiate();
+	}
+	
+	/**
+	 * set the games adclient if one is available. 
+	 * mostly only for mobile- requires a custom implementation for 
+	 * each platform. 
+	 * Mock version will be used to avoid errors.
+	 * @param ad_client
+	 */
+	public void setAdClient(AdClient ad_client) {
+		this.ad_client = ad_client;
+	}
+	
+	/**
+	 * get the adclient available. if none was set will return a mock version to
+	 * maintain cross platform compatibility
+	 * 
+	 * @return ad_client
+	 */
+	public AdClient getAdClient() {
+		return ad_client;
 	}
 
 	/**
-	 * get the prefferences used for this game
+	 * get the preferences used for this game
+	 * 
 	 * @return
 	 */
 	public Preferences getGamePreferences() {
@@ -154,6 +186,7 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 
 	/**
 	 * check if the debug render is on
+	 * 
 	 * @return
 	 */
 	public boolean getDebugEnabled() {
@@ -162,6 +195,7 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 
 	/**
 	 * enable or disable debug rendering
+	 * 
 	 * @param enable
 	 */
 	public void debugEnabled(boolean enable) {
@@ -177,7 +211,8 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	}
 
 	/**
-	 * get the global data for this game. 
+	 * get the global data for this game.
+	 * 
 	 * @return
 	 */
 	public UserData getGlobals() {
@@ -203,8 +238,9 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	}
 
 	/**
-	 * register the package to look for objects when loading the gamestates.
-	 * You may register as many packages as you need
+	 * register the package to look for objects when loading the gamestates. You may
+	 * register as many packages as you need
+	 * 
 	 * @param object_package
 	 */
 	public void registerObjectPackage(String object_package) {
@@ -217,9 +253,14 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 
 	/**
 	 * register a game state
-	 * @param name - name of the game state - this will be used for logging and storing data
-	 * @param tmx - the tmx associated with this state. 
-	 * @param manager - the manager for this gamestate - this handles all the logic
+	 * 
+	 * @param name
+	 *            - name of the game state - this will be used for logging and
+	 *            storing data
+	 * @param tmx
+	 *            - the tmx associated with this state.
+	 * @param manager
+	 *            - the manager for this gamestate - this handles all the logic
 	 */
 	public void registerGameState(String name, String tmx, StateManager manager) {
 		game_states.put(name, new GameState(name, tmx, manager));
@@ -228,8 +269,11 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 
 	/**
 	 * register a gamestate and use its tmx file as its name
-	 * @param tmx - the tmx associated with this state
-	 * @param manager - the manager for this gamestate - this handles the logic
+	 * 
+	 * @param tmx
+	 *            - the tmx associated with this state
+	 * @param manager
+	 *            - the manager for this gamestate - this handles the logic
 	 */
 	public void registerGameState(String tmx, StateManager manager) {
 		registerGameState(tmx, tmx, manager);
@@ -237,7 +281,9 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 
 	/**
 	 * register a gamestate with no name and manager
-	 * @param tmx - the tmx associated with this gamestate
+	 * 
+	 * @param tmx
+	 *            - the tmx associated with this gamestate
 	 */
 	public void registerGameState(String tmx) {
 		game_states.put(tmx, new GameState(tmx));
@@ -245,9 +291,11 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	}
 
 	/**
-	 * clear all other states currently in the state stack and
-	 * set the state to the one given
-	 * @param state_name - the name of the gamestate to set it to
+	 * clear all other states currently in the state stack and set the state to the
+	 * one given
+	 * 
+	 * @param state_name
+	 *            - the name of the gamestate to set it to
 	 */
 	public void setGameState(final String state_name) {
 		Gdx.app.postRunnable(new Runnable() {
@@ -267,10 +315,12 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	}
 
 	/**
-	 * push a gamestate on to the state stack. Gamestates have state specific flags to 
-	 * indicate whether it should halt the update/render of the state directly under it
+	 * push a gamestate on to the state stack. Gamestates have state specific flags
+	 * to indicate whether it should halt the update/render of the state directly
+	 * under it
 	 * 
-	 * @param state - the gamestate to use
+	 * @param state
+	 *            - the gamestate to use
 	 */
 	public void pushGameState(final GameState state) {
 		Gdx.app.postRunnable(new Runnable() {
@@ -289,10 +339,12 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	}
 
 	/**
-	 * * push a gamestate on to the state stack. Gamestates have state specific flags to 
-	 * indicate whether it should halt the update/render of the state directly under it
+	 * * push a gamestate on to the state stack. Gamestates have state specific
+	 * flags to indicate whether it should halt the update/render of the state
+	 * directly under it
 	 * 
-	 * @param state_name - the name of the gamestate to use
+	 * @param state_name
+	 *            - the name of the gamestate to use
 	 */
 	public void pushGameState(String state_name) {
 		pushGameState(game_states.get(state_name));
@@ -300,11 +352,12 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 
 	/**
 	 * pop the topmost state on the statestack
+	 * 
 	 * @return - the popped state in case you would like to refference it
 	 */
 	public GameState popGameState() {
 		final GameState popped_state = current_gamestates.pop();
-		if (current_gamestates.peek() != null)
+		if (current_gamestates.size > 0 && current_gamestates.peek() != null)
 			current_gamestates.peek().disableLayers(false);
 		Gdx.app.postRunnable(new Runnable() {
 			@Override
@@ -319,9 +372,13 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 
 	/**
 	 * transition to another state
-	 * @param state - state to transition to
-	 * @param duration - duration of transition (*2 for in out)
-	 * @param type - type of TransitionManager.Type
+	 * 
+	 * @param state
+	 *            - state to transition to
+	 * @param duration
+	 *            - duration of transition (*2 for in out)
+	 * @param type
+	 *            - type of TransitionManager.Type
 	 */
 	public void transitionTo(String state, float duration, int type) {
 		if (transition_state.getManager() == null || !(transition_state.getManager() instanceof TransitionManager)) {
@@ -339,6 +396,7 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 
 	/**
 	 * get the gamestate by name
+	 * 
 	 * @param name
 	 * @return
 	 */
@@ -351,6 +409,7 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 
 	/**
 	 * get the sound manager
+	 * 
 	 * @return
 	 */
 	public SoundManager getSoundManager() {
@@ -359,6 +418,7 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 
 	/**
 	 * get the assetmanager
+	 * 
 	 * @return
 	 */
 	public AssetManager getAssetManager() {
@@ -370,14 +430,14 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 		clear();
 		input.update();
 		AnimatedTiledMapTile.updateAnimationBaseTime();
-		float delta = Math.min(Gdx.graphics.getDeltaTime(),1f);
+		float delta = Math.min(Gdx.graphics.getDeltaTime(), 1f);
 		if (current_gamestates.size > 0)
 			for (int i = 0; i < current_gamestates.size; i++) {
 				GameState cs = current_gamestates.get(i);
-				if(i+1 < current_gamestates.size) {
-					if(!current_gamestates.get(i+1).haltsUpdate())
+				if (i + 1 < current_gamestates.size) {
+					if (!current_gamestates.get(i + 1).haltsUpdate())
 						cs.act(delta);
-				}else
+				} else
 					cs.act(delta);
 			}
 		game_stage.draw();
@@ -402,7 +462,9 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 
 	/**
 	 * get a shader program from the shaders folder
-	 * @param name - name of the shader
+	 * 
+	 * @param name
+	 *            - name of the shader
 	 * @return
 	 */
 	public ShaderProgram getShader(String name) {
@@ -411,6 +473,7 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 
 	/**
 	 * get a particle effect from the particles folder
+	 * 
 	 * @param name
 	 * @return
 	 */
@@ -420,6 +483,7 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 
 	/**
 	 * get a sound from the sounds folder
+	 * 
 	 * @param name
 	 * @return
 	 */
@@ -429,6 +493,7 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 
 	/**
 	 * get a music file from the music folder
+	 * 
 	 * @param name
 	 * @return
 	 */
@@ -438,6 +503,7 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 
 	/**
 	 * get a texture atlas from the image folder
+	 * 
 	 * @param name
 	 * @return
 	 */
@@ -447,6 +513,7 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 
 	/**
 	 * get a tiledmap from the maps folder
+	 * 
 	 * @param name
 	 * @return
 	 */
@@ -456,6 +523,7 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 
 	/**
 	 * get a bitmap font
+	 * 
 	 * @param name
 	 * @return
 	 */
@@ -508,7 +576,8 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	}
 
 	public static void log(String tag, String message) {
-		Gdx.app.log(TAG + tag, message);
+		if (DEBUG_LOGGING)
+			Gdx.app.log(TAG + tag, message);
 	}
 
 	@Override

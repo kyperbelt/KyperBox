@@ -151,6 +151,11 @@ public abstract class GameObject extends Group {
 	public void setDebugBoundsColor(Color color) {
 		this.debug_bounds = color;
 	}
+	
+	@Override
+	protected void drawChildren(Batch batch, float parentAlpha) {
+		super.drawChildren(batch,parentAlpha);
+	}
 
 	@Override
 	public void drawDebug(ShapeRenderer shapes) {
@@ -190,9 +195,8 @@ public abstract class GameObject extends Group {
 	@Override
 	public void addActor(Actor actor) {
 		if (!(actor instanceof GameObject)) {
-			getState().log("unable to add [" + actor.getName() + "] to [" + getName()
-					+ "]. Only GameObjects can be children of GameObjects");
-			return;
+			getState().log("you should not add [" + actor.getName() + "] to [" + getName()
+					+ "]. Only GameObjects are recommended children of GameObjects");
 		}
 		super.addActor(actor);
 	}
@@ -233,6 +237,7 @@ public abstract class GameObject extends Group {
 		for (int i = 0; i < controllers.size; i++)
 			controllers.get(i).update(this, delta);
 		setPosition(getX() + velocity.x * delta, getY() + velocity.y * delta);
+		
 	}
 
 	public float getAbsoluteX() {
@@ -318,7 +323,7 @@ public abstract class GameObject extends Group {
 			render.setSize(getWidth(), getHeight());
 			render.setScale(getScaleX(), getScaleY());
 			render.setFlip(flip_x, flip_y);
-			render.draw(batch);
+			render.draw(batch,parentAlpha);
 		}
 		super.draw(batch, parentAlpha);
 	}

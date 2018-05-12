@@ -15,10 +15,13 @@ public class GameInput extends InputMultiplexer {
 	private ObjectMap<String, Boolean> inputs_last_pressed;
 	private ObjectMap<String, Array<InputMapping>> mappings;
 	private Array<String> input_check;
-	
+
+	private int pointer;
 	private boolean touch_down = false;
 	private boolean justTouched = false;
-	
+	private int touch_x = 0;
+	private int touch_y = 0;
+
 	private InputAdapter ia;
 
 	public GameInput() {
@@ -28,26 +31,33 @@ public class GameInput extends InputMultiplexer {
 		input_check = new Array<String>();
 
 		InputDefaults.addDefaults(this);
-		
-		
+
 		ia = new InputAdapter() {
 			@Override
 			public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-				justTouched = touch_down == false?true:false;
+
+				GameInput.this.pointer = pointer;
+				justTouched = touch_down == false ? true : false;
 				touch_down = true;
+				touch_x = screenX;
+				touch_y = screenY;
 				return false;
 			}
-			
+
 			@Override
 			public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-				justTouched = false;
-				touch_down = false;
+
+				if (GameInput.this.pointer == pointer) {
+					justTouched = false;
+					touch_down = false;
+					touch_x = 0;
+					touch_y = 0;
+				}
 				return false;
 			}
 		};
 		addProcessor(ia);
-		
-		
+
 	}
 
 	public void addInputMapping(String input, InputMapping mapping) {
@@ -123,11 +133,11 @@ public class GameInput extends InputMultiplexer {
 	}
 
 	public float getX() {
-		return Gdx.input.getX();
+		return Gdx.input.getX(pointer);
 	}
 
 	public float getY() {
-		return Gdx.input.getY();
+		return Gdx.input.getY(pointer);
 	}
 
 	/**
