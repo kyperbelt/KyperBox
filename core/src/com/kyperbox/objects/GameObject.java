@@ -2,7 +2,6 @@ package com.kyperbox.objects;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.math.MathUtils;
@@ -18,6 +17,7 @@ import com.kyperbox.GameState;
 import com.kyperbox.KyperBoxGame;
 import com.kyperbox.controllers.GameObjectController;
 import com.kyperbox.input.GameInput;
+import com.kyperbox.umisc.KyperSprite;
 
 public abstract class GameObject extends Group {
 
@@ -46,9 +46,10 @@ public abstract class GameObject extends Group {
 	private boolean flip_y;
 
 	private boolean change_sprite;
-	private Sprite render;
+	private KyperSprite render;
 
 	public GameObject() {
+		setTransform(false);
 		controllers = new Array<GameObjectController>();
 		sprite = NO_SPRITE;
 		velocity = new Vector2();
@@ -66,6 +67,11 @@ public abstract class GameObject extends Group {
 
 	public Vector2 getPosition() {
 		position.set(getX(), getY());
+		return position;
+	}
+	
+	public Vector2 getTruePosition() {
+		position.set(getTrueX(),getTrueY());
 		return position;
 	}
 
@@ -108,6 +114,44 @@ public abstract class GameObject extends Group {
 	public boolean getFlipY() {
 		return flip_y;
 	}
+	
+	public float getTrueX() {
+		if(getParent()!=null) {
+			if(getParent() instanceof GameObject) {
+				GameObject p = (GameObject) getParent();
+				
+				return p.getTrueX()+getX();
+				
+			}else if(getParent()!=layer){
+				return getParent().getX()+getX();
+			}
+		}
+		return getX();
+	}
+	
+	public float getTrueY() {
+		if(getParent()!=null) {
+			if(getParent() instanceof GameObject) {
+				GameObject p = (GameObject) getParent();
+				return p.getTrueY()+getY();
+			}else if(getParent()!=layer){
+				return getParent().getY()+getY();
+			}
+		}
+		return getY();
+	}
+	
+	public float getTrueRotation() {
+		if(getParent()!=null) {
+			if(getParent() instanceof GameObject) {
+				GameObject p = (GameObject) getParent();
+				return p.getTrueRotation()+getRotation();
+			}else if(getParent()!=layer){
+				return getParent().getRotation()+getRotation();
+			}
+		}
+		return getRotation();
+	}
 
 	public void setFlip(boolean flip_x, boolean flip_y) {
 		this.flip_x = flip_x;
@@ -122,13 +166,17 @@ public abstract class GameObject extends Group {
 	}
 
 	public Rectangle getCollisionBounds() {
-		if (getParent() != null && getParent() != layer)
-			ret_bounds.set(getX() + getParent().getX() + bounds.x, getY() + getParent().getY() + bounds.y, bounds.width,
+		if (getParent() != null) {
+			ret_bounds.setCenter(getOriginX(), getOriginY());
+			ret_bounds.set(getTrueX() + bounds.x, getTrueY() + bounds.y, bounds.width,
 					bounds.height);
-		else if (getCollisionPolygon() != null)
+			//System.out.println("object||"+getName()+"|| bounds - "+bounds+" - retbounds -"+ret_bounds+" truepos["+getTrueX()+","+getTrueY()+"]");
+			return ret_bounds;
+		}else if (getCollisionPolygon() != null) {
 			return getCollisionPolygon().getBoundingRectangle();
-		ret_bounds.setCenter(getOriginX(), getOriginY());
-		return ret_bounds;
+		}
+		
+		return null;
 	}
 
 	public Polygon getCollisionPolygon() {
@@ -142,7 +190,7 @@ public abstract class GameObject extends Group {
 			return null;
 		
 		col_poly.setScale(getScaleX(), getScaleY());
-		col_poly.setPosition(getX() + bounds.getX(), getY() + bounds.getY());
+		col_poly.setPosition(getTrueX() + bounds.getX(), getTrueY() + bounds.getY());
 		col_poly.setRotation(getRotation());
 		ret_poly.setVertices(col_poly.getTransformedVertices());
 		return col_poly;
@@ -161,11 +209,15 @@ public abstract class GameObject extends Group {
 	public void drawDebug(ShapeRenderer shapes) {
 		if (getDebug()) {
 			shapes.setColor(debug_bounds);
+			Color cc = shapes.getColor();
 			Polygon p = getCollisionPolygon();
 			if (bounds != null && p != null) {
 				shapes.polygon(ret_poly.getTransformedVertices());
+				Rectangle r = ret_poly.getBoundingRectangle();
+				shapes.setColor(Color.SKY);
+				shapes.rect(r.x, r.y, r.width, r.height);
 			}
-			;
+			shapes.setColor(cc);
 		}
 		super.drawDebug(shapes);
 	}
@@ -179,16 +231,18 @@ public abstract class GameObject extends Group {
 	}
 
 	public void addChild(GameObject child) {
-		if (getParent() != null && getParent() == layer) {// this is a base object
+		if (getParent() != null) {
 			addActor(child);
-			child.setGameLayer(layer);
-			layer.gameObjectAdded(child, this);
-			child.init(properties);
+			
+			if(layer!=null) {
+				child.setGameLayer(layer);
+				layer.gameObjectAdded(child, this);
+				child.init(properties);
+			}
+			
 		} else if (getParent() == null) {
 			addActor(child);
-		} else {
-			KyperBoxGame.error("GAMEOBJECT [" + getName() + "] ->", "Could not add child to child object.");
-		}
+		} 
 
 	}
 
@@ -219,9 +273,12 @@ public abstract class GameObject extends Group {
 		ret_bounds = new Rectangle(bounds);
 		if (getChildren().size > 0)
 			for (int i = 0; i < getChildren().size; i++) {
+				if(!(getChildren().get(i) instanceof GameObject))
+					continue;
 				GameObject child = (GameObject) getChildren().get(i);
 				child.setGameLayer(layer);
-				init(properties);
+				layer.gameObjectAdded(child, this);
+				child.init(properties);
 			}
 		for (int i = 0; i < controllers.size; i++) {
 			controllers.get(i).init(this);
@@ -238,20 +295,6 @@ public abstract class GameObject extends Group {
 			controllers.get(i).update(this, delta);
 		setPosition(getX() + velocity.x * delta, getY() + velocity.y * delta);
 		
-	}
-
-	public float getAbsoluteX() {
-		if (getParent() != layer && getParent() != null) {
-			return getParent().getX() + getX();
-		}
-		return getX();
-	}
-
-	public float getAbsoluteY() {
-		if (getParent() != layer && getParent() != null) {
-			return getParent().getY() + getY();
-		}
-		return getY();
 	}
 
 	@Override
@@ -275,6 +318,12 @@ public abstract class GameObject extends Group {
 		change_sprite = true;
 		if (sprite == null || sprite.isEmpty())
 			this.sprite = NO_SPRITE;
+	}
+	
+	public void setRawSprite(KyperSprite sprite) {
+		this.sprite = sprite.getName();
+		this.render = sprite;
+		
 	}
 
 	public void addController(GameObjectController controller) {
@@ -306,7 +355,7 @@ public abstract class GameObject extends Group {
 	public void draw(Batch batch, float parentAlpha) {
 
 		if (change_sprite && !sprite.equals(NO_SPRITE) && layer!=null) {
-			render = layer.getGameSprite(sprite);
+			render = (KyperSprite) layer.getGameSprite(sprite);
 			change_sprite = false;
 		} else if (change_sprite && sprite.equals(NO_SPRITE)) {
 			render = null;
@@ -315,8 +364,13 @@ public abstract class GameObject extends Group {
 
 		if (render != null) {
 
-			render.setPosition(MathUtils.round(getX()), MathUtils.round(getY()));
-			render.setRotation(getRotation());
+			if(getParent().isTransform()) {
+				render.setPosition(MathUtils.round(getX()), MathUtils.round(getY()));
+				render.setRotation(getRotation());
+			}else { 
+				render.setPosition(MathUtils.round(getTrueX()), MathUtils.round(getTrueY()));
+				render.setRotation(getTrueRotation());
+			}
 			render.setAlpha(getColor().a * parentAlpha);
 			render.setOrigin(getOriginX(), getOriginY());
 			render.setColor(getColor());
@@ -332,7 +386,7 @@ public abstract class GameObject extends Group {
 	public void setPosition(float x, float y) {
 		if (layer != null && (x != getX() || y != getY()))
 			layer.gameObjectChanged(this, GameObjectChangeType.LOCATION, 1);
-		super.setPosition(MathUtils.floor(x), MathUtils.floor(y));
+		super.setPosition(x, y);
 	}
 
 	/**

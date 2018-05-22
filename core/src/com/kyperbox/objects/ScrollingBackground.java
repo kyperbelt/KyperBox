@@ -1,5 +1,6 @@
 package com.kyperbox.objects;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapProperties;
@@ -139,6 +140,9 @@ public class ScrollingBackground extends GameObject {
 	public void draw(Batch batch, float parentAlpha) {
 		if (background != null) {
 			// draw background
+			Color cc = batch.getColor();
+			
+			batch.setColor(getColor().r,getColor().g,getColor().b,getColor().a *parentAlpha);
 			if (size > 1) {
 				for (int i = 0; i < size; i++) {
 					y = (i % (size / 3)) + yoff;
@@ -150,6 +154,7 @@ public class ScrollingBackground extends GameObject {
 			} else {
 				batch.draw(background, MathUtils.floor(getX() + pos_x), MathUtils.floor(getY() + pos_y), getWidth(), getHeight());
 			}
+			batch.setColor(cc);
 
 		}
 		super.draw(batch, parentAlpha);

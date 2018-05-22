@@ -10,9 +10,7 @@ import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Pool.Poolable;
 import com.kyperbox.KyperBoxGame;
 import com.kyperbox.objects.BasicGameObject;
-import com.kyperbox.objects.GameLayer;
 import com.kyperbox.objects.GameObject;
-import com.kyperbox.objects.GameLayer.LayerCamera;
 import com.kyperbox.objects.GameObject.GameObjectChangeType;
 
 public class QuadTree extends CollisionSystem {
@@ -94,7 +92,8 @@ public class QuadTree extends CollisionSystem {
 
 	@Override
 	public void gameObjectAdded(GameObject object, GameObject parent) {
-
+		if (KyperBoxGame.DEBUG_LOGGING)
+			getLayer().getState().log(String.format("QuadTree: added object[%s] with parent[%s]",object.getName(),parent == null ?KyperBoxGame.NULL_STRING:parent.getName()));
 		objects.add(object);
 
 	}
@@ -106,7 +105,7 @@ public class QuadTree extends CollisionSystem {
 
 		if (!objects.contains(object, true)) {
 			Rectangle o = object.getCollisionBounds();
-			if (root.bounds.overlaps(object.getCollisionBounds())) {
+			if (root.bounds.overlaps(o)) {
 				objects.add(object);
 			}
 		}
@@ -295,7 +294,6 @@ public class QuadTree extends CollisionSystem {
 		}
 
 		public void assessPossibleCollisions(Array<GameObject> possible_collisions, GameObject object) {
-
 			if (quads[0] != null) {
 				for (int i = 0; i < quads.length; i++)
 					if (quads[i].getBounds().overlaps(object.getCollisionBounds()))

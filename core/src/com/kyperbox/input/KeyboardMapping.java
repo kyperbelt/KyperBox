@@ -5,13 +5,14 @@ import com.badlogic.gdx.Gdx;
 public class KeyboardMapping extends InputMapping{
 	
 	private int key;
+	private boolean pressed;
 	
 	public KeyboardMapping(int key) {
 		this.key = key;
 	}
 	@Override
 	public float inputValue() {
-		if(Gdx.input.isKeyPressed(key))
+		if(pressed)
 			return 1f;
 		return GameInput.NOT_USED;
 	}
@@ -24,6 +25,26 @@ public class KeyboardMapping extends InputMapping{
 		
 		}
 		return false;
+	}
+	
+	@Override
+	public boolean keyDown(int keycode) {
+		if(key == keycode)
+			pressed = true;
+		return super.keyDown(keycode);
+	}
+	
+	@Override
+	public boolean keyUp(int keycode) {
+		if(key == keycode)
+			pressed = false;
+		return super.keyUp(keycode);
+	}
+	
+	@Override
+	public void reset() {
+		pressed = false;
+		super.reset();
 	}
 	
 }

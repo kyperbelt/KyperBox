@@ -15,6 +15,7 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.maps.MapProperties;
@@ -27,6 +28,7 @@ import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.kyperbox.ads.AdClient;
 import com.kyperbox.ads.MockAdClient;
+import com.kyperbox.console.DevConsole;
 import com.kyperbox.input.GameInput;
 import com.kyperbox.managers.Priority.PriorityComparator;
 import com.kyperbox.umisc.KyperMapLoader;
@@ -39,6 +41,7 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 
 	public static String TAG = "KyperBox->";
 	public static final String NOT_SUPPORTED = "[NOT SUPPORTED]";
+	public static final String NULL_STRING = "NULL";
 
 	public static final String IMAGE_FOLDER = "image";
 	public static final String MUSIC_FOLDER = "music";
@@ -51,8 +54,18 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 
 	public static final String VERTEX_SUFFIX = ".vert";
 	public static final String FRAGMENT_SUFFIX = ".frag";
+	
+	public static final String SPACE_SEPARATOR = " ";
+	public static final String DASH_SEPARATOR = " - ";
 
 	public static final MapProperties NULL_PROPERTIES = new MapProperties();
+	
+	private static ShaderProgram DEFAULT_SHADER;
+	public static ShaderProgram getDefaultShader() {
+		if(DEFAULT_SHADER == null)
+			DEFAULT_SHADER = SpriteBatch.createDefaultShader();
+		return DEFAULT_SHADER;
+	}
 
 	private static final String GAME_DATA_NAME = "GAME_GLOBALS";
 
@@ -80,6 +93,8 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	private String prefs_name;
 	
 	private AdClient ad_client;
+	
+	private DevConsole console;
 
 	public KyperBoxGame(String prefs, String game_name, Viewport view) {
 		this.view = view;
@@ -118,6 +133,32 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 			prio_compare = new PriorityComparator();
 		return prio_compare;
 	}
+	
+	/**
+	 * set the developer console - recommended to leave null
+	 * for deployment
+	 * @param console
+	 */
+	public void setDevConsole(DevConsole console) {
+		this.console = console;
+	}
+	
+	/**
+	 * check if the dev console is available
+	 * @return
+	 */
+	public boolean isDevConsoleAvailable() {
+		return console!=null;
+	}
+	
+	/**
+	 * return the dev console if there is one. Otherwise return null.
+	 * If you want to check against a boolean instead of null then try isDevConsoleAvailable()
+	 * @return
+	 */
+	public DevConsole getDevConsole() {
+		return console;
+	}
 
 	@Override
 	public void create() {
@@ -126,6 +167,7 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 		game_stage = new Stage(view);
 		game_states = new ObjectMap<String, GameState>();
 		game_stage.setDebugAll(false);
+		game_stage.getBatch().setShader(getDefaultShader());
 
 		current_gamestates = new Array<GameState>();
 		transition_state = new GameState(null);
@@ -137,6 +179,7 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 		assets.setLoader(ShaderProgram.class,
 				new ShaderProgramLoader(assets.getFileHandleResolver(), VERTEX_SUFFIX, FRAGMENT_SUFFIX));
 		sound = new SoundManager(this);
+		ShaderProgram.pedantic = false;
 
 		packages = new Array<String>();
 		packages.add("com.kyperbox.objects");
@@ -144,13 +187,22 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 		global_data = new UserData(GAME_DATA_NAME);
 		input = new GameInput();
 
+		
+		
+		if(ad_client == null)
+			ad_client = new MockAdClient();
+		
+		if(console!=null) {
+			console.create(this);
+		}
+		
 		input_multiplexer = new InputMultiplexer();
+		if(console!=null)
+			console.addToMultiplexer(input_multiplexer);
 		input_multiplexer.addProcessor(game_stage);
 		input_multiplexer.addProcessor(input);
 		Gdx.input.setInputProcessor(input_multiplexer);
 		
-		if(ad_client == null)
-			ad_client = new MockAdClient();
 		initiate();
 	}
 	
@@ -406,6 +458,10 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 		error(TAG, "GameState-> not registerd [" + name + "].");
 		return null;
 	}
+	
+	public Array<GameState> getCurrentStates(){
+		return current_gamestates;
+	}
 
 	/**
 	 * get the sound manager
@@ -431,6 +487,8 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 		input.update();
 		AnimatedTiledMapTile.updateAnimationBaseTime();
 		float delta = Math.min(Gdx.graphics.getDeltaTime(), 1f);
+		if(console!=null)
+			console.consoleUpdate(delta);
 		if (current_gamestates.size > 0)
 			for (int i = 0; i < current_gamestates.size; i++) {
 				GameState cs = current_gamestates.get(i);
@@ -441,6 +499,8 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 					cs.act(delta);
 			}
 		game_stage.draw();
+		if(console!=null)
+			console.consoleDraw();
 
 	}
 
@@ -453,7 +513,8 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	public void dispose() {
 		game_stage.dispose();
 		assets.dispose();
-
+		if(console!=null)
+			console.dispose();
 	}
 
 	//========================================
@@ -583,6 +644,11 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	@Override
 	public void resize(int width, int height) {
 		game_stage.getViewport().update(width, height);
+		for (int i = 0; i < current_gamestates.size; i++) {
+			current_gamestates.get(i).resize(width,height);
+		}
+		if(console!=null)
+			console.updateSize(width, height);
 	}
 
 	public abstract void initiate();

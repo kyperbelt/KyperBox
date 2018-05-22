@@ -67,6 +67,9 @@
  <objecttype name="Shader" color="#55ff00">
   <property name="shader_name" type="string"/>
  </objecttype>
+ <objecttype name="ShaderObject" color="#ff0000">
+  <property name="sprite" type="string"/>
+ </objecttype>
  <objecttype name="Table" color="#ff00ff">
   <property name="background" type="string"/>
   <property name="children" type="string"/>

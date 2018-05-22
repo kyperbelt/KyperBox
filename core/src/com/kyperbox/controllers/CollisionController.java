@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Pool.Poolable;
 import com.kyperbox.managers.Priority;
 import com.kyperbox.objects.GameObject;
+import com.kyperbox.systems.CollisionSystem;
 import com.kyperbox.systems.QuadTree;
 
 /**
@@ -18,11 +19,12 @@ import com.kyperbox.systems.QuadTree;
  */
 public class CollisionController extends GameObjectController {
 
-	private QuadTree tree;
+	private CollisionSystem tree;
 	private Array<CollisionData> collisions;
 	private Rectangle check;
 
-	public CollisionController() {
+	public CollisionController(CollisionSystem collision_system) {
+		this.tree = collision_system;
 		check = new Rectangle();
 		this.collisions = new Array<CollisionController.CollisionData>();
 	}
@@ -35,7 +37,6 @@ public class CollisionController extends GameObjectController {
 	public void init(GameObject object) {
 		if(object.getParent() == null)
 			return;
-		tree = object.getGameLayer().getSystem(QuadTree.class);
 		setPriority(Priority.HIGH);
 		object.getState().log("COLCon init:"+object.getName());
 		collisions.clear();
@@ -54,13 +55,10 @@ public class CollisionController extends GameObjectController {
 			Array<GameObject> possible_collisions = tree.getPossibleCollisions(object);
 			for (int i = 0; i < possible_collisions.size; i++) {
 				GameObject target = possible_collisions.get(i);
-				CollisionController target_controller = target.getController(CollisionController.class);
-				if (target == object || target_controller == null)
-					continue;
-				if (Intersector.overlaps(object.getCollisionBounds(), target.getCollisionBounds())) {
+				if (Intersector.overlapConvexPolygons(object.getCollisionPolygon(), target.getCollisionPolygon())) {
 					CollisionData data = CollisionData.getPool().obtain();
-					Rectangle self_bounds = object.getCollisionBounds();
-					Rectangle target_bounds = target.getCollisionBounds();
+					Rectangle self_bounds = object.getCollisionPolygon().getBoundingRectangle();
+					Rectangle target_bounds = target.getCollisionPolygon().getBoundingRectangle();
 					
 					//create a quad for the collision
 					float x = self_bounds.x > target_bounds.x ? self_bounds.x : target_bounds.x; 						//X
@@ -75,7 +73,7 @@ public class CollisionController extends GameObjectController {
 				}
 			}
 		} else
-			object.getState().log("tree is null.");
+			object.getState().log("no collison sytem found : is null.");
 
 	}
 	
@@ -101,7 +99,7 @@ public class CollisionController extends GameObjectController {
 		return null;
 	}
 	
-	public QuadTree getTree() {
+	public CollisionSystem getCollisionSystem() {
 		return tree;
 	}
 

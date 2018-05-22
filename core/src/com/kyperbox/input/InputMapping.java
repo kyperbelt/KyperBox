@@ -122,4 +122,8 @@ public abstract class InputMapping implements InputProcessor,GestureListener{
 	public boolean scrolled(int amount) {
 		return false;
 	}
+	
+	public void reset() {
+		
+	}
 }

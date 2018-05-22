@@ -1,6 +1,7 @@
 package com.kyperbox.objects;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -8,15 +9,18 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.kyperbox.GameState;
 import com.kyperbox.KyperBoxGame;
 import com.kyperbox.systems.LayerSystem;
+import com.kyperbox.umisc.KyperSprite;
 
 public class GameLayer extends Group{
 	
@@ -37,6 +41,9 @@ public class GameLayer extends Group{
 	
 	public void setLayerShader(ShaderProgram shader) {
 		this.shader = shader;
+		if(!shader.isCompiled()) {
+			getState().error(shader.getLog());
+		}
 	}
 	
 	public ShaderProgram getLayerShader() {
@@ -78,7 +85,7 @@ public class GameLayer extends Group{
 	 * @param animation_name
 	 * @return
 	 */
-	public Animation<String> getAnimation(String animation_name){
+	public Animation<KyperSprite> getAnimation(String animation_name){
 		return state.getAnimation(animation_name);
 	}
 	
@@ -115,7 +122,7 @@ public class GameLayer extends Group{
 			if(system.isActive())
 				system.update(delta*time_scale);
 		}
-		super.act(delta*time_scale);
+		super.act(delta*time_scale);;
 		cam.update(delta*time_scale);
 	}
 	
@@ -123,27 +130,29 @@ public class GameLayer extends Group{
 	public void draw(Batch batch, float parentAlpha) {
 		
 		ShaderProgram current_shader = batch.getShader();
-		ShaderProgram state_shader = getState().getStateShader();
 		
-		if(current_shader!=shader && shader!=null) {
+		
+
+		if(shader!=null && shader!= current_shader) {
 			batch.setShader(shader);
 		}
-		else if(shader == null && state_shader!=null && current_shader!= state_shader) {
-			batch.setShader(state_shader);
-		}
-			
 		
 		for(int i = 0;i < systems.size;i++) {
 			LayerSystem system = systems.get(i);
 			if(system.isActive())
-				system.preDraw(batch, parentAlpha);
+				system.preDraw(batch, getColor().a * parentAlpha);
 		}
 		super.draw(batch, parentAlpha);
 		
+		
 		for(int i = 0;i < systems.size;i++) {
 			LayerSystem system = systems.get(i);
 			if(system.isActive())
-				system.postDraw(batch, parentAlpha);
+				system.postDraw(batch, getColor().a * parentAlpha);
+		}
+		
+		if(current_shader!=batch.getShader()) {
+			batch.setShader(current_shader);
 		}
 	}
 	
@@ -259,7 +268,7 @@ public class GameLayer extends Group{
 				return type.cast(system);
 		return null;
 	}
-	
+
 	public static class LayerCamera{
 		
 		public static final int UP = 0;
@@ -444,5 +453,34 @@ public class GameLayer extends Group{
 				system.drawDebug(shapes);
 			}
 	}
+	
+	
+	//EXPERIMENTS;
+	
+	
+//	public static class LayerCamera{
+//		
+//		private Viewport view;
+//		private OrthographicCamera cam;
+//		private GameLayer layer;
+//		
+//		public LayerCamera(GameLayer layer) {
+//			this.layer = layer;
+//			view = new StretchViewport(worldWidth, worldHeight)
+//		}
+//		
+//		public void setPosition(float x,float y) {
+//		
+//		}
+//		
+//		public Matrix4 getProjectionMatrix() {
+//			return cam.getP
+//		}
+//		
+//		public void update() {
+//			
+//		}
+//		
+//	}
 	
 }

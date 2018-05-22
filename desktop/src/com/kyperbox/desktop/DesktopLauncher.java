@@ -1,13 +1,17 @@
 package com.kyperbox.desktop;
 
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.kyperbox.KyperBoxGame;
+import com.kyperbox.console.DevConsole;
 import com.kyperbox.ztests.CollisionTest;
+import com.kyperbox.ztests.ObjectParentTest;
 import com.kyperbox.ztests.ParticleTests;
+import com.kyperbox.ztests.ShaderTest;
 
 public class DesktopLauncher {
-	public static boolean DEPLOYMENT = true;
+	public static boolean DEPLOYMENT = false;
 	public static void main (String[] arg) {
 		
 		if(!DEPLOYMENT) {
@@ -16,6 +20,8 @@ public class DesktopLauncher {
 		}
 		//game
 		KyperBoxGame game = new ParticleTests();
+		
+		game.setDevConsole(new DevConsole("console.fnt", "shade1.png",Keys.GRAVE));
 		
 		//config
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();

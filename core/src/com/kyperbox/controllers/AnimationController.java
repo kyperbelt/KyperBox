@@ -3,11 +3,14 @@ package com.kyperbox.controllers;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.kyperbox.objects.GameObject;
+import com.kyperbox.umisc.KyperSprite;
 
 public class AnimationController extends GameObjectController{
 	
-	private Animation<String> current_animation;
+	private Animation<KyperSprite> current_animation;
+	private String animation_name;
 	private float animation_elapsed;
+	private PlayMode mode;
 	private float play_speed;
 	private GameObject daddy; //The gameobject this controller belongs to
 							  //or as i like to call it, its daddy haha
@@ -15,8 +18,15 @@ public class AnimationController extends GameObjectController{
 	@Override
 	public void init(GameObject object) {
 		daddy = object;
-		current_animation =null;
-		play_speed = 1f;
+		if(animation_name!=null ) {
+			loadAnimation();
+		}
+	}
+	
+	private void loadAnimation() {
+		animation_elapsed = 0f;
+		current_animation = daddy.getState().getAnimation(animation_name);
+		current_animation.setPlayMode(mode);
 	}
 	
 	/**
@@ -40,8 +50,11 @@ public class AnimationController extends GameObjectController{
 	 */
 	public void setAnimation(String animation,PlayMode playmode) {
 		animation_elapsed = 0f;
-		current_animation = daddy.getState().getAnimation(animation);
-		current_animation.setPlayMode(playmode);
+		animation_name = animation;
+		mode = playmode;
+		if(daddy!=null) {
+			loadAnimation();
+		}
 	}
 	
 	/**
@@ -52,7 +65,7 @@ public class AnimationController extends GameObjectController{
 		return animation_elapsed;
 	}
 	
-	public Animation<String> getCurrentAniamtion(){
+	public Animation<KyperSprite> getCurrentAnimation(){
 		return current_animation;
 	}
 	
@@ -73,13 +86,14 @@ public class AnimationController extends GameObjectController{
 	public void update(GameObject object, float delta) {
 		animation_elapsed+=delta*play_speed;
 		if(current_animation!=null) {
-			object.setSprite(current_animation.getKeyFrame(animation_elapsed));
+			object.setRawSprite(current_animation.getKeyFrame(animation_elapsed));
 		}
 	}
 
 	@Override
 	public void remove(GameObject object) {
-		
+		current_animation = null;
+		daddy = null;
 	}
 
 }

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" tiledversion="2018.04.18" orientation="orthogonal" renderorder="right-down" width="100" height="30" tilewidth="32" tileheight="32" infinite="0" nextobjectid="53">
+ <properties>
+  <property name="atlas" value="image/game.atlas"/>
+ </properties>
+ <tileset firstgid="1" source="../testset.tsx"/>
+ <objectgroup name="background" locked="1">
+  <object id="43" name="background" type="ScrollingBackground" gid="5" x="-160" y="1024" width="1600" height="936">
+   <properties>
+    <property name="image" value="SunsetTempleBackground"/>
+    <property name="repeat_horizontal" type="bool" value="true"/>
+    <property name="speed_horizontal" type="float" value="80"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="playground">
+  <object id="41" name="object" type="ShaderObject" x="64" y="288" width="512" height="320">
+   <properties>
+    <property name="sprite" value="windowbackground"/>
+   </properties>
+  </object>
+  <object id="44" name="player" type="BasicGameObject" gid="1" x="736" y="768" width="416" height="369">
+   <properties>
+    <property name="sprite" value="rpg_man_down"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <layer name="platformer_tiles" width="100" height="30" locked="1">
+  <data encoding="base64" compression="zlib">
+   eJztwTEBAAAAwqD1T20MH6AAAAAAAAAAAAAAAOBvLuAAAQ==
+  </data>
+ </layer>
+ <objectgroup name="foreground" locked="1"/>
+ <objectgroup name="uiground" locked="1"/>
+ <objectgroup name="preload">
+  <object id="1" name="ScreenSize" type="Viewport" x="0" y="240" width="1280" height="720"/>
+  <object id="46" x="-800" y="64" width="288" height="64">
+   <text fontfamily="MS Shell Dlg 2" pixelsize="48" wrap="1" color="#ffffff">Shader</text>
+  </object>
+  <object id="47" name="invertedShader" type="Shader" x="-768" y="192" width="64" height="64">
+   <properties>
+    <property name="shader_name" value="inverted"/>
+   </properties>
+  </object>
+  <object id="49" name="grayscaleShader" type="Shader" x="-768" y="288" width="64" height="64">
+   <properties>
+    <property name="shader_name" value="grayscale"/>
+   </properties>
+  </object>
+  <object id="52" name="flashbackShader" type="Shader" x="-768" y="384" width="64" height="64">
+   <properties>
+    <property name="shader_name" value="flashback"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>

@@ -19,8 +19,6 @@ public class GameInput extends InputMultiplexer {
 	private int pointer;
 	private boolean touch_down = false;
 	private boolean justTouched = false;
-	private int touch_x = 0;
-	private int touch_y = 0;
 
 	private InputAdapter ia;
 
@@ -39,8 +37,6 @@ public class GameInput extends InputMultiplexer {
 				GameInput.this.pointer = pointer;
 				justTouched = touch_down == false ? true : false;
 				touch_down = true;
-				touch_x = screenX;
-				touch_y = screenY;
 				return false;
 			}
 
@@ -50,8 +46,6 @@ public class GameInput extends InputMultiplexer {
 				if (GameInput.this.pointer == pointer) {
 					justTouched = false;
 					touch_down = false;
-					touch_x = 0;
-					touch_y = 0;
 				}
 				return false;
 			}
@@ -162,6 +156,18 @@ public class GameInput extends InputMultiplexer {
 		boolean jt = justTouched;
 		justTouched = false;
 		return jt;
+	}
+
+	/**
+	 * if the input mapping allows - reset to default state of each mapping -
+	 * probably false
+	 */
+	public void resetAllInputs() {
+		for (String input : input_check) {
+			for (InputMapping mapping : mappings.get(input)) {
+				mapping.reset();
+			}
+		}
 	}
 
 	public void update() {

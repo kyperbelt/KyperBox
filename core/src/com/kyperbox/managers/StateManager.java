@@ -38,4 +38,11 @@ public abstract class StateManager {
 	 * @param game
 	 */
 	public abstract void dispose(GameState state);
+	
+	/**
+	 * called whent he game is resized -- should be overriden manually
+	 * @param width
+	 * @param height
+	 */
+	public void resize(int width,int height) {}
 }

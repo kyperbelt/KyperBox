@@ -2,6 +2,7 @@ package com.kyperbox.systems;
 
 import java.util.Comparator;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
@@ -23,6 +24,7 @@ public class ParticleSystem extends LayerSystem {
 	private Array<PooledEffect> pre_draws;
 	private Array<PooledEffect> post_draws;
 	private ParticleComparator pcomp;
+	private Color pc;
 	private boolean enabled;
 	
 	public ParticleSystem() {
@@ -35,6 +37,7 @@ public class ParticleSystem extends LayerSystem {
 		pre_draws = new Array<ParticleEffectPool.PooledEffect>();
 		post_draws = new Array<ParticleEffectPool.PooledEffect>();
 		pcomp = new ParticleComparator();
+		pc = new Color(1f, 1f, 1f, 1f);
 	}
 
 	@Override
@@ -85,6 +88,8 @@ public class ParticleSystem extends LayerSystem {
 			return;
 //		boolean last_additive = pre_draws.size > 0?containsAdditive(pre_draws.first()):false;
 		
+		Color cc = batch.getColor();
+		batch.setColor(pc.r, pc.g, pc.b, pc.a * parentAlpha);
 		for (int i = 0; i < pre_draws.size; i++) {
 			PooledEffect pe = pre_draws.get(i);
 			
@@ -98,6 +103,8 @@ public class ParticleSystem extends LayerSystem {
 			pe.draw(batch);
 
 		}
+		
+		batch.setColor(cc);
 		
 		batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 	}
@@ -114,6 +121,9 @@ public class ParticleSystem extends LayerSystem {
 	public void postDraw(Batch batch, float parentAlpha) {
 		if(!enabled)
 			return;
+		Color cc = batch.getColor();
+		batch.setColor(pc.r, pc.g, pc.b, pc.a * parentAlpha);
+		
 //		boolean last_additive = post_draws.size > 0?containsAdditive(post_draws.first()):false;
 		for (int i = 0; i < post_draws.size; i++) {
 			PooledEffect pe = post_draws.get(i);
@@ -124,6 +134,7 @@ public class ParticleSystem extends LayerSystem {
 //			last_additive = contains_additive;
 			pe.draw(batch);
 		}
+		batch.setColor(cc);
 		
 		batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 		

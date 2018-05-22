@@ -16,6 +16,7 @@ import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool.PooledEffect;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -47,6 +48,7 @@ import com.kyperbox.objects.GameLayer;
 import com.kyperbox.objects.GameObject;
 import com.kyperbox.umisc.ImageButton;
 import com.kyperbox.umisc.KyperProgressBar;
+import com.kyperbox.umisc.KyperSprite;
 import com.kyperbox.umisc.SaveUtils;
 import com.kyperbox.umisc.UserData;
 
@@ -74,8 +76,8 @@ public class GameState extends Group {
 	private ObjectMap<String, BitmapFont> fonts;
 	private ObjectMap<String, ParticleEffectPool> particle_effects;
 	/* delete ref */ private Array<String> pvalues;
-	private ObjectMap<String, Sprite> sprites;
-	private ObjectMap<String, Animation<String>> animations;
+	private ObjectMap<String, KyperSprite> sprites;
+	private ObjectMap<String, Animation<KyperSprite>> animations;
 	private ObjectMap<String, ShaderProgram> shaders;
 	/* delete ref */ private Array<String> svalues;
 	private ObjectMap<String, String> musics;
@@ -114,8 +116,8 @@ public class GameState extends Group {
 			this.name = name;
 		else
 			this.name = "";
-		sprites = new ObjectMap<String, Sprite>();
-		animations = new ObjectMap<String, Animation<String>>();
+		sprites = new ObjectMap<String, KyperSprite>();
+		animations = new ObjectMap<String, Animation<KyperSprite>>();
 		fonts = new ObjectMap<String, BitmapFont>(); //TODO: test load to avoid repeats
 		particle_effects = new ObjectMap<String, ParticleEffectPool>();
 		pvalues = new Array<String>();
@@ -459,8 +461,15 @@ public class GameState extends Group {
 	}
 
 	public Sprite getGameSprite(String name, String atlas) {
-		if (!sprites.containsKey(name))
-			sprites.put(name, game.getAtlas(atlas).createSprite(name));
+		if (!sprites.containsKey(name)) {
+			TextureRegion region = game.getAtlas(atlas).findRegion(name);
+			KyperSprite sprite = null;
+			if(region!=null) {
+				sprite = new KyperSprite(region);
+				sprite.setName(name);
+			}
+			sprites.put(name,sprite);
+		}
 		return sprites.get(name);
 	}
 
@@ -470,29 +479,41 @@ public class GameState extends Group {
 	 * @param animation_name
 	 * @param animation
 	 */
-	public void storeAnimation(String animation_name, Animation<String> animation) {
+	public void storeAnimation(String animation_name, Animation<KyperSprite> animation) {
 		if (animations.containsKey(animation_name) && KyperBoxGame.DEBUG_LOGGING)
 			log("Animations->animation [" + animation_name + "] already exists and has been overriden!");
 		animations.put(animation_name, animation);
 	}
 
 	/**
-	 * create a game animation with the base name and the number of frames. This
-	 * method uses indexes (ex.calling (animation,3) =
-	 * Animation0,Animation1,Animation2 - )
+	 * Create an animation with the given name as a region alias and the number of frames and frame duration.
+	 * The regions must be indext like so "animationalias_index"(spritename_0,spritename_1,spritename_2) ect.
 	 * 
-	 * @param frames
-	 * @param frame_duration
-	 * @return
+	 * @param name = the alias of the regions
+	 * @param atlas = which atlas to use to find the sprites
+	 * @param frames = the amount of frames to retrieve
+	 * @param frame_duration = the amount of time between frames
 	 */
-	public Animation<String> createGameAnimation(String name, int frames, float frame_duration) {
-		String[] f = new String[frames];
-		for (int i = 0; i < f.length; i++) {
-			f[i] = name + "_" + i;
+	public Animation<KyperSprite> createGameAnimation(String name,String atlas, int frames, float frame_duration) {
+		KyperSprite[] sprites = new KyperSprite[frames];
+		String sep = "_";
+		for (int i = 0; i < sprites.length; i++) {
+			sprites[i] = (KyperSprite) getGameSprite(name+sep+i,atlas);
 		}
-		Animation<String> animations = new Animation<String>(frame_duration, f);
+ 		
+		return createGameAnimation(sprites,frame_duration);
+	}
+	
+	public Animation<KyperSprite> createGameAnimation(String name,int frames,float frame_duration){
+		return createGameAnimation(name,KyperBoxGame.GAME_ATLAS,frames,frame_duration);
+	}
+	
+	public Animation<KyperSprite> createGameAnimation(KyperSprite[] frames,float frame_duration){
+		Animation<KyperSprite> animations = new Animation<KyperSprite>(frame_duration, frames);
 		return animations;
 	}
+	
+	
 
 	/**
 	 * returns a stored animation to avoid garbage collection. Animations may use
@@ -501,7 +522,7 @@ public class GameState extends Group {
 	 * @param name
 	 * @return
 	 */
-	public Animation<String> getAnimation(String name) {
+	public Animation<KyperSprite> getAnimation(String name) {
 		if (animations.containsKey(name)) {
 			return animations.get(name);
 		} else {
@@ -585,6 +606,7 @@ public class GameState extends Group {
 	public KyperBoxGame getGame() {
 		return game;
 	}
+	
 
 	public GameLayer getUiLayer() {
 		return uiground;
@@ -619,12 +641,21 @@ public class GameState extends Group {
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
 		ShaderProgram ps = batch.getShader();
-		if (shader != null && ps != shader) {
+		SpriteBatch sb = (SpriteBatch) batch;
+		
+		if (ps != shader) {
+			if(shader==null)
+				setStateShader(KyperBoxGame.getDefaultShader());
 			batch.setShader(shader);
+			
+			super.draw(batch, parentAlpha);
+			if(ps!=KyperBoxGame.getDefaultShader() && shader!=KyperBoxGame.getDefaultShader()) {
+				batch.setShader(ps);
+			}
+		}else {
+			super.draw(batch, parentAlpha);
 		}
-		super.draw(batch, parentAlpha);
-		if (batch.getShader() != ps || shader != null)
-			batch.setShader(ps);
+		
 	}
 
 	/**
@@ -673,6 +704,15 @@ public class GameState extends Group {
 			getGame().getAssetManager().unload(KyperBoxGame.TMX_FOLDER + KyperBoxGame.FILE_SEPARATOR + tmx);
 			
 		}
+	}
+	
+	/**
+	 * handle a resize
+	 * @param width
+	 * @param height
+	 */
+	public void resize(int width,int height) {
+		getManager().resize(width,height);
 	}
 
 	public GameInput getInput() {

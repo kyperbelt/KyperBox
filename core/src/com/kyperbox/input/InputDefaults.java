@@ -27,6 +27,8 @@ public class InputDefaults {
 	public static final String Y = 					"yY";
 	public static final String Z = 					"zZ";
 	
+	public static final String DEV_CONSOLE = 		"dev_console";
+	
 	/**
 	 * if you for some reason want to delete all default mappings
 	 * @param input - your GameInput instance
@@ -57,6 +59,8 @@ public class InputDefaults {
 		input.removeInput(X);
 		input.removeInput(Y);
 		input.removeInput(Z);
+		
+		input.removeInput(DEV_CONSOLE);
 	}
 	
 	public static void addDefaults(GameInput input) {
@@ -85,6 +89,8 @@ public class InputDefaults {
 		input.registerInput(X);
 		input.registerInput(Y);
 		input.registerInput(Z);
+		
+		input.registerInput(DEV_CONSOLE);
 	}
 
 }
