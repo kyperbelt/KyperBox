@@ -108,57 +108,49 @@ public class KyperMapLoader extends BaseTmxMapLoader<AtlasTmxMapLoader.AtlasTile
 	public Array<AssetDescriptor> getDependencies(String fileName, FileHandle tmxFile,
 			com.badlogic.gdx.maps.tiled.AtlasTmxMapLoader.AtlasTiledMapLoaderParameters parameter) {
 		Array<AssetDescriptor> dependencies = new Array<AssetDescriptor>();
-		try {
-			root = xml.parse(tmxFile);
+		root = xml.parse(tmxFile);
 
-			Element properties = root.getChildByName("properties");
-			if (properties != null) {
-				for (Element property : properties.getChildrenByName("property")) {
-					String name = property.getAttribute("name");
-					String value = property.getAttribute("value");
-					if (name.startsWith("atlas")) {
-						FileHandle atlasHandle = Gdx.files.internal(value);
-						dependencies.add(new AssetDescriptor(atlasHandle, TextureAtlas.class));
-					}
+		Element properties = root.getChildByName("properties");
+		if (properties != null) {
+			for (Element property : properties.getChildrenByName("property")) {
+				String name = property.getAttribute("name");
+				String value = property.getAttribute("value");
+				if (name.startsWith("atlas")) {
+					FileHandle atlasHandle = Gdx.files.internal(value);
+					dependencies.add(new AssetDescriptor(atlasHandle, TextureAtlas.class));
 				}
 			}
-		} catch (IOException e) {
-			throw new GdxRuntimeException("Unable to parse .tmx file.");
 		}
 		return dependencies;
 	}
 
-	public TiledMap load(String fileName, AtlasTiledMapLoaderParameters parameter) {
+	public TiledMap load(String fileName, AtlasTiledMapLoaderParameters parameter){
 
-		try {
-			if (parameter != null) {
-				convertObjectToTileSpace = parameter.convertObjectToTileSpace;
-				flipY = parameter.flipY;
-			} else {
-				convertObjectToTileSpace = false;
-				flipY = true;
-			}
-
-			FileHandle tmxFile = resolve(fileName);
-			root = xml.parse(tmxFile);
-			ObjectMap<String, TextureAtlas> atlases = new ObjectMap<String, TextureAtlas>();
-			FileHandle atlasFile = Gdx.files
-					.internal(KyperBoxGame.IMAGE_FOLDER + KyperBoxGame.FILE_SEPARATOR + KyperBoxGame.GAME_ATLAS);
-			if (atlasFile == null) {
-				throw new GdxRuntimeException("Couldn't load atlas");
-			}
-
-			TextureAtlas atlas = new TextureAtlas(atlasFile);
-			atlases.put(atlasFile.path(), atlas);
-
-			AtlasResolver.DirectAtlasResolver atlasResolver = new AtlasResolver.DirectAtlasResolver(atlases);
-			TiledMap map = loadMap(root, tmxFile, atlasResolver);
-			map.setOwnedResources(atlases.values().toArray());
-			setTextureFilters(parameter.textureMinFilter, parameter.textureMagFilter);
-			return map;
-		} catch (IOException e) {
-			throw new GdxRuntimeException("Couldn't load tilemap '" + fileName + "'", e);
+		if (parameter != null) {
+			convertObjectToTileSpace = parameter.convertObjectToTileSpace;
+			flipY = parameter.flipY;
+		} else {
+			convertObjectToTileSpace = false;
+			flipY = true;
 		}
+
+		FileHandle tmxFile = resolve(fileName);
+		root = xml.parse(tmxFile);
+		ObjectMap<String, TextureAtlas> atlases = new ObjectMap<String, TextureAtlas>();
+		FileHandle atlasFile = Gdx.files
+				.internal(KyperBoxGame.IMAGE_FOLDER + KyperBoxGame.FILE_SEPARATOR + KyperBoxGame.GAME_ATLAS);
+		if (atlasFile == null) {
+			throw new GdxRuntimeException("Couldn't load atlas");
+		}
+
+		TextureAtlas atlas = new TextureAtlas(atlasFile);
+		atlases.put(atlasFile.path(), atlas);
+
+		AtlasResolver.DirectAtlasResolver atlasResolver = new AtlasResolver.DirectAtlasResolver(atlases);
+		TiledMap map = loadMap(root, tmxFile, atlasResolver);
+		map.setOwnedResources(atlases.values().toArray());
+		setTextureFilters(parameter.textureMinFilter, parameter.textureMagFilter);
+		return map;
 	}
 
 	/** May return null. */
@@ -298,28 +290,24 @@ public class KyperMapLoader extends BaseTmxMapLoader<AtlasTmxMapLoader.AtlasTile
 			FileHandle image = null;
 			if (source != null) {
 				FileHandle tsx = getRelativeFileHandle(tmxFile, source);
-				try {
-					element = xml.parse(tsx);
-					name = element.get("name", null);
-					tilewidth = element.getIntAttribute("tilewidth", 0);
-					tileheight = element.getIntAttribute("tileheight", 0);
-					spacing = element.getIntAttribute("spacing", 0);
-					margin = element.getIntAttribute("margin", 0);
-					Element offset = element.getChildByName("tileoffset");
-					if (offset != null) {
-						offsetX = offset.getIntAttribute("x", 0);
-						offsetY = offset.getIntAttribute("y", 0);
-					}
-					Element imageElement = element.getChildByName("image");
-					if (imageElement != null) {
-						imageSource = imageElement.getAttribute("source");
-						imageSource.replace("../../input_assets", "");
-						imageWidth = imageElement.getIntAttribute("width", 0);
-						imageHeight = imageElement.getIntAttribute("height", 0);
-						image = getRelativeFileHandle(tsx, imageSource);
-					}
-				} catch (IOException e) {
-					throw new GdxRuntimeException("Error parsing external tileset.");
+				element = xml.parse(tsx);
+				name = element.get("name", null);
+				tilewidth = element.getIntAttribute("tilewidth", 0);
+				tileheight = element.getIntAttribute("tileheight", 0);
+				spacing = element.getIntAttribute("spacing", 0);
+				margin = element.getIntAttribute("margin", 0);
+				Element offset = element.getChildByName("tileoffset");
+				if (offset != null) {
+					offsetX = offset.getIntAttribute("x", 0);
+					offsetY = offset.getIntAttribute("y", 0);
+				}
+				Element imageElement = element.getChildByName("image");
+				if (imageElement != null) {
+					imageSource = imageElement.getAttribute("source");
+					imageSource.replace("../../input_assets", "");
+					imageWidth = imageElement.getIntAttribute("width", 0);
+					imageHeight = imageElement.getIntAttribute("height", 0);
+					image = getRelativeFileHandle(tsx, imageSource);
 				}
 			} else {
 				Element offset = element.getChildByName("tileoffset");

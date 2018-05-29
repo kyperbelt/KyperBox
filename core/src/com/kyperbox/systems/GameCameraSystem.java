@@ -11,7 +11,7 @@ import com.kyperbox.objects.GameObject;
 import com.kyperbox.objects.GameObject.GameObjectChangeType;
 
 public class GameCameraSystem extends LayerSystem {
-	
+
 	//TODO: create a distance equation so that instead of 10% of distance you reach 
 	//		Math.max(.01f,1f-( distance/threshold )) * distance_to_move;
 
@@ -50,7 +50,7 @@ public class GameCameraSystem extends LayerSystem {
 	private float shake_duration;
 	private float shake_elapsed;
 	private Vector2 prev_pos;
-	
+
 	//if axis locked it will not follow in that axis
 	private boolean lock_y;
 	private boolean lock_x;
@@ -65,7 +65,7 @@ public class GameCameraSystem extends LayerSystem {
 		this.feather_elapsed = 0f;
 		this.feathering = false;
 		this.highest_weight = 0;
-		
+
 		lock_x = false;
 		lock_y = false;
 
@@ -83,27 +83,27 @@ public class GameCameraSystem extends LayerSystem {
 		obj_check = new Vector2();
 		poi_midpoint = new Vector2();
 	}
-	
+
 	public void lockX() {
 		this.lock_x = true;
 	}
-	
+
 	public void lockY() {
 		this.lock_y = true;
 	}
-	
+
 	public boolean isXLocked() {
 		return lock_x;
 	}
-	
+
 	public boolean isYLocked() {
 		return lock_y;
-	} 
-	
+	}
+
 	public void unlockX() {
 		this.lock_x = false;
 	}
-	
+
 	public void unlockY() {
 		this.lock_y = false;
 	}
@@ -115,21 +115,21 @@ public class GameCameraSystem extends LayerSystem {
 		Vector2 pos = getCam().getPosition();
 		this.prev_pos.set(pos.x, pos.y);
 	}
-	
+
 	public void stopShake() {
 		this.shake_duration = 0;
 		this.shake_duration = 0;
 		this.shake_strength = 0;
 		this.prev_pos.set(getCam().getPosition());
 	}
-	
-	public void addShake(float strength,float duration) {
-		
-		this.shake_duration+=duration;
-		this.shake_strength+=strength;
-		if(Float.isNaN(prev_pos.x)) {
+
+	public void addShake(float strength, float duration) {
+
+		this.shake_duration += duration;
+		this.shake_strength += strength;
+		if (Float.isNaN(prev_pos.x)) {
 			Vector2 pos = getCam().getPosition();
-			this.prev_pos.set(pos.x,pos.y);
+			this.prev_pos.set(pos.x, pos.y);
 		}
 	}
 
@@ -149,6 +149,7 @@ public class GameCameraSystem extends LayerSystem {
 		this.feather_duration = feather_duration;
 	}
 
+	public void setFeathering(boolean feathering) {this.feathering = feathering;}
 	/**
 	 * add an object of focus. The camera will try to adjust to keep all objects of
 	 * focus centered.
@@ -220,7 +221,7 @@ public class GameCameraSystem extends LayerSystem {
 
 	@Override
 	public void gameObjectChanged(GameObject object, int type, float value) {
-		if (type == GameObjectChangeType.MANAGER) {
+		if (type == GameObjectChangeType.CONTROLLER) {
 			if (value > 0) {// manager added
 				PoiController poic = object.getController(PoiController.class);
 				if (poic != null && !poi_objects.contains(object, true)) {
@@ -254,7 +255,7 @@ public class GameCameraSystem extends LayerSystem {
 	protected LayerCamera getCam() {
 		return getLayer().getCamera();
 	}
-	
+
 	public boolean isShaking() {
 		return shake_duration > 0;
 	}
@@ -264,39 +265,42 @@ public class GameCameraSystem extends LayerSystem {
 		Vector2 cam_pos = getCam().getPosition();
 		cam_pos.x = MathUtils.floor(cam_pos.x);
 		cam_pos.y = MathUtils.floor(cam_pos.y);
-		
+
 		Rectangle view = getCam().getViewBounds();
 
 		// adjust bounds to point of focus.
-		updateFocus(cam_pos,view);
+		updateFocus(cam_pos, view);
 
 		// adjust midpoint to include prominent point of interest
 		if (updatePois(getCam())) {
-			focus_midpoint.lerp(poi_midpoint, Math.max(.1f, highest_weight*.5f));
+			focus_midpoint.lerp(poi_midpoint, Math.max(.1f, highest_weight * .5f));
 		}
 
 		//interpolate to cam position
-		float newxspeed = /*x_speed*delta;*/Math.min(x_speed*delta,1f);
-		float newyspeed = Math.min(y_speed*delta,1f);
-		obj_check.set(cam_pos.x + (focus_midpoint.x - cam_pos.x) * newxspeed,
-				cam_pos.y + (focus_midpoint.y - cam_pos.y) * newyspeed).scl(getCam().getZoom());
-		
+		if (!feathering) {
+			float newxspeed = /* x_speed*delta; */Math.min(x_speed * delta, 1f);
+			float newyspeed = Math.min(y_speed * delta, 1f);
+			obj_check.set(cam_pos.x + (focus_midpoint.x - cam_pos.x) * newxspeed,
+					cam_pos.y + (focus_midpoint.y - cam_pos.y) * newyspeed).scl(getCam().getZoom());
+		} else {
+			obj_check.set(cam_pos.x, cam_pos.y);
+			obj_check.lerp(focus_midpoint, .1f);
+		}
 
 		if (!calculateShake(delta)) {
-			if (feathering) { //TODO: feathering is not used.. remove or find use
-				feather_elapsed += delta;
-				getCam().setPosition(cam_pos.x + (((focus_midpoint.x - cam_pos.x) * (x_speed * .5f)) * delta),
-						cam_pos.y + ((focus_midpoint.y - cam_pos.y) * (y_speed * .5f)) * delta);
-				if (feather_elapsed >= feather_duration) {
-					feather_elapsed = 0f;
-					feathering = false;
-				}
-			} else {
-				getCam().setPosition(MathUtils.floor(obj_check.x),MathUtils.floor(obj_check.y));
-				
-			}
+			//			if (feathering) { //TODO: feathering is not used.. remove or find use
+			//				feather_elapsed += delta;
+			//				getCam().setPosition(cam_pos.x + (((focus_midpoint.x - cam_pos.x) * (x_speed * .5f)) * delta),
+			//						cam_pos.y + ((focus_midpoint.y - cam_pos.y) * (y_speed * .5f)) * delta);
+			//				if (feather_elapsed >= feather_duration) {
+			//					feather_elapsed = 0f;
+			//					feathering = false;
+			//				}
+			//			} else {
+			getCam().setPosition(MathUtils.round(obj_check.x), MathUtils.round(obj_check.y));
+
+			//			}
 		}
-		
 
 	}
 
@@ -308,7 +312,7 @@ public class GameCameraSystem extends LayerSystem {
 			float x = (MathUtils.random() - .5f) * 2 * current_strength;
 			float y = (MathUtils.random() - .5f) * 2 * current_strength;
 
-			cam.setPosition(obj_check.x-x,obj_check.y-y);
+			cam.setPosition(obj_check.x - x, obj_check.y - y);
 			if (shake_elapsed >= shake_duration) {
 				shake_duration = 0;
 				shake_strength = 0;
@@ -316,7 +320,7 @@ public class GameCameraSystem extends LayerSystem {
 				obj_check.set(prev_pos.x, prev_pos.y);
 				prev_pos.set(Float.NaN, Float.NaN);
 			}
-			
+
 			shake_elapsed += delta;
 			return true;
 		}
@@ -339,8 +343,8 @@ public class GameCameraSystem extends LayerSystem {
 
 			for (int i = 0; i < points_of_focus.size; i++) {
 				GameObject focus = points_of_focus.get(i);
-				float focus_top = focus.getY()+focus.getHeight();
-				float focus_right = focus.getX()+focus.getWidth();
+				float focus_top = focus.getY() + focus.getHeight();
+				float focus_right = focus.getX() + focus.getWidth();
 				float focus_left = focus.getX();
 				float focus_bot = focus.getY();
 
@@ -359,7 +363,8 @@ public class GameCameraSystem extends LayerSystem {
 			if (right > left + view.width)
 				right = left + view.width;
 
-			focus_midpoint.set(isXLocked()?focus_midpoint.x:left + (right - left) * .5f, isYLocked()?focus_midpoint.y:bot + (top - bot) * .5f);
+			focus_midpoint.set(isXLocked() ? focus_midpoint.x : left + (right - left) * .5f,
+					isYLocked() ? focus_midpoint.y : bot + (top - bot) * .5f);
 			focus_midpoint.x = MathUtils.floor(focus_midpoint.x);
 			focus_midpoint.y = MathUtils.floor(focus_midpoint.y);
 		}

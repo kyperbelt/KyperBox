@@ -144,7 +144,7 @@ public class MessageSystem extends LayerSystem {
 
 	@Override
 	public void gameObjectChanged(GameObject object, int type, float value) {
-		if (type == GameObjectChangeType.MANAGER) {
+		if (type == GameObjectChangeType.CONTROLLER) {
 			MessageController mc = object.getController(MessageController.class);
 			if (mc != null && !message_controllers.containsKey(object)) {
 				message_controllers.put(object, mc);

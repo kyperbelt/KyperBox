@@ -1,6 +1,4 @@
 package com.kyperbox.umisc;
-import java.io.IOException;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
@@ -25,11 +23,7 @@ public class TiledTemplates {
 	public void addTemplate(String template) {
 		XmlReader xml = types.getXmlReader();
 		Element root = null;
-		try {
-			root = xml.parse(Gdx.files.internal(template_folder+template));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		root = xml.parse(Gdx.files.internal(template_folder+template));
 		if(root == null) {
 			throw new GdxRuntimeException("Unable to parse template ["+template+"]. Make sure it exists or that you have the correct template folder set.");
 		}

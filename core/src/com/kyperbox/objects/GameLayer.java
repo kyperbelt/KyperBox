@@ -1,7 +1,6 @@
 package com.kyperbox.objects;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -9,13 +8,11 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.kyperbox.GameState;
 import com.kyperbox.KyperBoxGame;
@@ -235,7 +232,7 @@ public class GameLayer extends Group{
 	 */
 	public void addLayerSystem(LayerSystem system) {
 		for(LayerSystem m: systems)
-			if(m.getClass().isInstance(system)) {
+			if(m.getClass().getName().equals(system.getClass().getName())) {
 				getState().error("manager ["+m.getClass().getName()+"] already exists in layer "+getName()+".");
 			}
 		system.setLayer(this);
@@ -262,10 +259,16 @@ public class GameLayer extends Group{
 		return cam;
 	}
 	
-	public <t>t getSystem(Class<t> type) {
-		for(LayerSystem system:systems)
-			if(type.isInstance(system))
-				return type.cast(system);
+	@SuppressWarnings("unchecked")
+	public <t extends LayerSystem>t getSystem(Class<t> type) {
+		
+		for(LayerSystem system:systems) {
+			if(system.getClass().getName().equals(type.getName())||system.getClass().getSuperclass().getName().equals(type.getName())) {
+//				System.out.println("sysclass_name="+system.getClass().getSuperclass().getName());
+//				System.out.println("type_passed_name="+type.getName());
+				return (t) system;
+			}
+		}
 		return null;
 	}
 

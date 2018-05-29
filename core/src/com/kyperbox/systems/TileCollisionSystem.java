@@ -80,7 +80,7 @@ public class TileCollisionSystem extends LayerSystem{
 	
 	@Override
 	public void gameObjectChanged(GameObject object, int type, float value) {
-			if(type == GameObjectChangeType.MANAGER) {
+			if(type == GameObjectChangeType.CONTROLLER) {
 				if(value == -1) { //removed 
 					if(object.getController(TileCollisionController.class) == null)
 						tilemap_objects.removeValue(object, true);

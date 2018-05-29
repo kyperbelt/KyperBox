@@ -16,28 +16,6 @@ public class KyperController implements ICWrapper,ControllerListener{
 	
 	private Controller controller;
 	
-	//buttons
-	private boolean a_justPressed;
-	private boolean b_justPressed;
-	private boolean x_justPressed;
-	private boolean y_justPressed;
-	
-	//select-start
-	private boolean start_justPressed;
-	private boolean select_justPressed;
-	
-	//triggers
-	private boolean left_oneJustPressed;
-	private boolean right_oneJustPressed;
-	private boolean left_threeJustPressed;
-	private boolean right_threeJustPressed;
-
-	//directions
-	private boolean left_justPressed;
-	private boolean right_justPressed;
-	private boolean up_justPressed;
-	private boolean down_justPressed;
-	
 	private KyperControllerMaps maps;
 	
 	public KyperController(Controller controller) {

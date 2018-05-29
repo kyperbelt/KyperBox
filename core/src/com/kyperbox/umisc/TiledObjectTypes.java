@@ -1,6 +1,4 @@
 package com.kyperbox.umisc;
-import java.io.IOException;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
@@ -16,15 +14,11 @@ public class TiledObjectTypes {
 	
 	public TiledObjectTypes(String file) {
 		xml_reader = new XmlReader();
-		try {
-			root = xml_reader.parse(Gdx.files.internal(file));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		root = xml_reader.parse(Gdx.files.internal(file));
 		types = new ObjectMap<String, TiledObjectTypes.TiledObjectType>();
 		
 		if(root == null)
-			throw new GdxRuntimeException(String.format("Unable to parse file %s. make sure it is the correct path.", file));
+			throw new GdxRuntimeException(StringUtils.format("Unable to parse file %s. make sure it is the correct path.", file));
 		Array<Element> types = root.getChildrenByName("objecttype");
 		for (Element element : types) {
 			TiledObjectType tot = new TiledObjectType(element.get("name"));
@@ -53,10 +47,10 @@ public class TiledObjectTypes {
 	
 	@Override
 	public String toString() {
-		String ret = "TiledObjectTypes:========"+System.lineSeparator();
+		String ret = "TiledObjectTypes:========"+"\n";
 		Array<TiledObjectType> t = types.values().toArray();
 		for (int i = 0; i < t.size; i++) {
-			ret+=t.get(i).toString()+System.lineSeparator();
+			ret+=t.get(i).toString()+"\n";
 		}
 		ret+=" ================= END ================";
 		return ret;
@@ -124,10 +118,10 @@ public class TiledObjectTypes {
 		
 		@Override
 		public String toString() {
-			String ret = "Object Type:"+name+"======="+System.lineSeparator();
+			String ret = "Object Type:"+name+"======="+"\n";
 			Array<String> property_names = properties.keys().toArray();
 			for (int i = 0; i < property_names.size; i++) {
-				ret+="---"+properties.get(property_names.get(i)).toString()+System.lineSeparator();
+				ret+="---"+properties.get(property_names.get(i)).toString()+"\n";
 			}
 			return ret;
 		}

@@ -75,13 +75,14 @@ public class UserData {
 	
 	public Object get(String name) {
 		if (variables.containsKey(name))
-			return (Boolean) (variables.get(name));
+			return variables.get(name);
 		return null;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public <t> t get(String name,Class<t> clazz){
 		if (variables.containsKey(name))
-			return clazz.cast(variables.get(name));
+			return (t)variables.get(name);
 		return null;
 	}
 	

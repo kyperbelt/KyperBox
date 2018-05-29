@@ -27,8 +27,9 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kyperbox.GameState;
 import com.kyperbox.KyperBoxGame;
 import com.kyperbox.objects.GameLayer;
+import com.kyperbox.umisc.StringUtils;
 
-public class DevConsole {
+public class DevConsole implements IDevConsole{
 
 	public static float APPEAR_DURATION = .3f;
 
@@ -181,20 +182,20 @@ public class DevConsole {
 			@Override
 			public boolean executeCommand(DevConsole console, String... args) {
 				if (args.length == 0) {
-					log(String.format(help_format2, help, help_info));
+					log(StringUtils.format(help_format2, help, help_info));
 					log(lcommands);
 					for (int i = 0; i < console_commands.size; i++) {
 						ConsoleCommand cc = console_commands.get(i);
 						if (cc.getCommand().equals(help))
 							continue;
-						log(String.format(help_format3, cc.getCommand()));
+						log(StringUtils.format(help_format3, cc.getCommand()));
 					}
 				} else {
 					ConsoleCommand cc = getCommand(args[0]);
 					if (cc != null) {
-						log(String.format(help_format, cc.getCommand(), cc.getInfo(), cc.getParamCount()));
+						log(StringUtils.format(help_format, cc.getCommand(), cc.getInfo(), cc.getParamCount()));
 					} else {
-						log(String.format(help_notfound, help) + String.format(NO_COMMAND_FOUND, args[0]));
+						log(StringUtils.format(help_notfound, help) + StringUtils.format(NO_COMMAND_FOUND, args[0]));
 					}
 				}
 				return true;
@@ -202,7 +203,7 @@ public class DevConsole {
 		}));
 
 		addCommand(new ConsoleCommand("exit", 0,
-				"disposes([GREEN]game.dispose() is called[]) all the game before exiting completely.",
+				"disposes([GREEN]game.dispose()[] is called) all the game before exiting completely.",
 				new CommandRunnable() {
 
 					@Override
@@ -276,12 +277,12 @@ public class DevConsole {
 							gamelayer = current_state.getBackgroundLayer();
 						}
 						if (gamelayer == null) {
-							error(String.format(lalpha_format1, layer));
+							error(StringUtils.format(lalpha_format1, layer));
 							return false;
 						}
 
 						gamelayer.getColor().a = value;
-						log(String.format(lalpha_format2, layer,value));
+						log(StringUtils.format(lalpha_format2, layer,value));
 
 						return true;
 					}
@@ -308,11 +309,30 @@ public class DevConsole {
 						
 						clearConsole();
 						
-						log(String.format(scale_string, value,min,max));
+						log(StringUtils.format(scale_string, value,min,max));
 						
 						scroll.layout();
 						scroll.setScrollPercentY(100f);
 
+						return true;
+					}
+				}));
+		
+		final String dr_format1 = "Debug render has been set to [GREEN]%s[]";
+		addCommand(new ConsoleCommand("debugrender", 1,
+				"Enable or Disable debug render. Takes in a binary param ([GREEN]true[] or [GREEN]false[] - [sky]1[] or [sky]0[])",
+				new CommandRunnable() {
+					@Override
+					public boolean executeCommand(DevConsole console, String... args) {
+						boolean value = false;
+						try {
+							value = Boolean.parseBoolean(args[0]);
+						} catch (Exception e) {
+							console.error(e.getMessage());
+							return false;
+						}
+						console.log(StringUtils.format(dr_format1,value));
+						getGame().debugEnabled(value);
 						return true;
 					}
 				}));
@@ -350,7 +370,7 @@ public class DevConsole {
 		l.setColor(Color.WHITE);
 		l.setFontScale(fontscale);
 		l.getStyle().font.getData().markupEnabled = true;
-		l.setText(String.format(ERROR_FORMAT, message));
+		l.setText(StringUtils.format(ERROR_FORMAT, message));
 		l.setWrap(true);
 		label_table.add(l).growX().row();
 
@@ -418,13 +438,13 @@ public class DevConsole {
 		console_commands.removeValue(getCommand(command), false);
 	}
 
-	private void executeCommand(String command) {
+	public void executeCommand(String command) {
 		if (command.isEmpty() || command.trim().isEmpty())
 			return;
 		String[] commandstruct = command.trim().split(" ");
 		ConsoleCommand cc = getCommand(commandstruct[0]);
 		if (cc == null) {
-			error(String.format(NO_COMMAND_FOUND, commandstruct[0]));
+			error(StringUtils.format(NO_COMMAND_FOUND, commandstruct[0]));
 			return;
 		}
 		int num_of_empty = 0;
@@ -438,7 +458,7 @@ public class DevConsole {
 
 		int param_count = cc.getParamCount();
 		if (commandstruct.length - 1 - num_of_empty < param_count) {
-			error(String.format(WRONG_PARAMETER_COUNT, commandstruct[0], commandstruct.length - 1, param_count));
+			error(StringUtils.format(WRONG_PARAMETER_COUNT, commandstruct[0], commandstruct.length - 1, param_count));
 			return;
 		}
 
@@ -447,11 +467,11 @@ public class DevConsole {
 			params[i] = commandstruct[i + 1];
 		}
 		if (!cc.execute(this, params)) {
-			error(String.format(FAILED_COMMAND, cc.getCommand()));
+			error(StringUtils.format(FAILED_COMMAND, cc.getCommand()));
 		}
 	}
 
-	protected ConsoleCommand getCommand(String command) {
+	public ConsoleCommand getCommand(String command) {
 		for (int i = 0; i < console_commands.size; i++) {
 			if (console_commands.get(i).getCommand().equals(command))
 				return console_commands.get(i);

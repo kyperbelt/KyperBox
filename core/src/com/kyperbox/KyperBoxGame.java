@@ -28,9 +28,13 @@ import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.kyperbox.ads.AdClient;
 import com.kyperbox.ads.MockAdClient;
-import com.kyperbox.console.DevConsole;
+import com.kyperbox.console.IDevConsole;
+import com.kyperbox.console.MockDevConsole;
 import com.kyperbox.input.GameInput;
 import com.kyperbox.managers.Priority.PriorityComparator;
+import com.kyperbox.umisc.BaseGameObjectFactory;
+import com.kyperbox.umisc.IGameObjectFactory;
+import com.kyperbox.umisc.IGameObjectGetter;
 import com.kyperbox.umisc.KyperMapLoader;
 import com.kyperbox.umisc.SaveUtils;
 import com.kyperbox.umisc.UserData;
@@ -76,7 +80,7 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	private GameState transition_state;
 	private ObjectMap<String, GameState> game_states;
 	private Array<GameState> current_gamestates;
-	private Array<String> packages;
+	private IGameObjectFactory object_factory;
 	private Preferences game_prefs;
 
 	public static boolean DEBUG_LOGGING = true; //TURN OFF -- preface all logging with this
@@ -94,7 +98,7 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	
 	private AdClient ad_client;
 	
-	private DevConsole console;
+	private IDevConsole console;
 
 	public KyperBoxGame(String prefs, String game_name, Viewport view) {
 		this.view = view;
@@ -139,16 +143,16 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	 * for deployment
 	 * @param console
 	 */
-	public void setDevConsole(DevConsole console) {
+	public void setDevConsole(IDevConsole console) {
 		this.console = console;
 	}
 	
 	/**
 	 * check if the dev console is available
-	 * @return
+	 * @return false if null or is instance of mock console
 	 */
 	public boolean isDevConsoleAvailable() {
-		return console!=null;
+		return console!=null || !(console instanceof MockDevConsole);
 	}
 	
 	/**
@@ -156,7 +160,7 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	 * If you want to check against a boolean instead of null then try isDevConsoleAvailable()
 	 * @return
 	 */
-	public DevConsole getDevConsole() {
+	public IDevConsole getDevConsole() {
 		return console;
 	}
 
@@ -181,8 +185,7 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 		sound = new SoundManager(this);
 		ShaderProgram.pedantic = false;
 
-		packages = new Array<String>();
-		packages.add("com.kyperbox.objects");
+		object_factory = new BaseGameObjectFactory();
 
 		global_data = new UserData(GAME_DATA_NAME);
 		input = new GameInput();
@@ -192,9 +195,10 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 		if(ad_client == null)
 			ad_client = new MockAdClient();
 		
-		if(console!=null) {
-			console.create(this);
+		if(console==null) {
+			console = new MockDevConsole();
 		}
+		console.create(this);
 		
 		input_multiplexer = new InputMultiplexer();
 		if(console!=null)
@@ -288,19 +292,13 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	public GameInput getInput() {
 		return input;
 	}
-
-	/**
-	 * register the package to look for objects when loading the gamestates. You may
-	 * register as many packages as you need
-	 * 
-	 * @param object_package
-	 */
-	public void registerObjectPackage(String object_package) {
-		packages.add(object_package);
+	
+	public void registerGameObject(String objectname,IGameObjectGetter getter) {
+		this.object_factory.registerGameObject(objectname, getter);
 	}
-
-	protected Array<String> getObjectPackages() {
-		return packages;
+	
+	protected IGameObjectFactory getObjectFactory() {
+		return object_factory;
 	}
 
 	/**

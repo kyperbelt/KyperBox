@@ -18,6 +18,7 @@ import com.kyperbox.KyperBoxGame;
 import com.kyperbox.controllers.GameObjectController;
 import com.kyperbox.input.GameInput;
 import com.kyperbox.umisc.KyperSprite;
+import com.kyperbox.umisc.StringUtils;
 
 public abstract class GameObject extends Group {
 
@@ -40,6 +41,8 @@ public abstract class GameObject extends Group {
 	private MapProperties properties;
 	private Vector2 velocity;
 	private Vector2 position;
+	private float depth; //this is the z depth component;
+	private float thickness; //this is the pseudo 3 dimensional height
 
 	private Color debug_bounds;
 	private boolean flip_x;
@@ -62,6 +65,8 @@ public abstract class GameObject extends Group {
 		filter = -1;
 		change_sprite = true;
 		render = null;
+		depth = 0;
+		thickness = 0;
 		position = new Vector2();
 	}
 
@@ -73,6 +78,68 @@ public abstract class GameObject extends Group {
 	public Vector2 getTruePosition() {
 		position.set(getTrueX(),getTrueY());
 		return position;
+	}
+	
+	/**
+	 * get the depth component of the gameobject
+	 * default is 0 and unless you are using a 3rd dimension in a top down game 
+	 * it should be ignored because it will effect rendering
+	 * @return
+	 */
+	public float getDepth() {
+		return depth;
+	}
+	
+	/**
+	 * get the depth top of this object 
+	 * @return trueY+trueDepth+thickness
+	 */
+	public float getDepthTop() {
+		return getTrueY()+getTrueDepth()+getThickness();
+	}
+	
+	/**
+	 * get the depth bottom of this objecct
+	 * @return trueY+trueDepth
+	 */
+	public float getDepthBottom() {
+		return getTrueY()+getTrueDepth();
+	}
+	
+	/**
+	 * set the depth of this object - this affects the rendering but not the rendering order
+	 * @param depth
+	 */
+	public void setDepth(float depth) {
+		this.depth = depth;
+	}
+	
+	/**
+	 * get the depth of this child all the way up to its parent
+	 * @return
+	 */
+	public float getTrueDepth() {
+		if(getParent()!=null) {
+			if(getParent() instanceof GameObject) {
+				GameObject p = (GameObject) getParent();
+				return p.getTrueDepth()+getDepth();
+			}
+		}
+		return getDepth();
+	}
+	
+	/**
+	 * get the 3d thickness/height of this object. 
+	 * default is 0 and should be ignored unless using the 3rd dimension.
+	 * DOES NOT EFFECT RENDERING
+	 * @return
+	 */
+	public float getThickness() {
+		return thickness;
+	}
+	
+	public void setThickness(float thickness) {
+		this.thickness = thickness;
 	}
 
 	public void setGroup(int group) {
@@ -255,10 +322,16 @@ public abstract class GameObject extends Group {
 		super.addActor(actor);
 	}
 
+	@SuppressWarnings("unchecked")
 	public <t> t getController(Class<t> type) {
 		for (GameObjectController manager : controllers)
-			if (type.isInstance(manager))
-				return type.cast(manager);
+			if(manager.getClass().getName().equals(type.getName())||manager.getClass().getSuperclass().getName().equals(type.getName())) {
+//				System.out.println("sysclass_name="+system.getClass().getSuperclass().getName());
+//				System.out.println("type_passed_name="+type.getName());
+				return (t) manager;
+			}
+//			if (type.isInstance(manager))
+//				return type.cast(manager);
 		return null;
 	}
 
@@ -294,7 +367,6 @@ public abstract class GameObject extends Group {
 		for (int i = 0; i < controllers.size; i++)
 			controllers.get(i).update(this, delta);
 		setPosition(getX() + velocity.x * delta, getY() + velocity.y * delta);
-		
 	}
 
 	@Override
@@ -304,9 +376,9 @@ public abstract class GameObject extends Group {
 	}
 
 	public void onRemove() {
-		for (int i = 0; i < controllers.size; i++) {
-			controllers.get(i).remove(this);
-		}
+//		for (int i = 0; i < controllers.size; i++) {
+//			controllers.get(i).remove(this);
+//		}
 	}
 
 	protected void setGameLayer(GameLayer layer) {
@@ -338,7 +410,7 @@ public abstract class GameObject extends Group {
 		controllers.sort(KyperBoxGame.getPriorityComperator());
 		controller.init(this);
 		if (layer != null) {
-			layer.gameObjectChanged(this, GameObjectChangeType.MANAGER, 1);
+			layer.gameObjectChanged(this, GameObjectChangeType.CONTROLLER, 1);
 		}
 	}
 
@@ -346,7 +418,7 @@ public abstract class GameObject extends Group {
 		if (controllers.removeValue(controller, true)) {
 			controller.remove(this);
 			if (layer != null) {
-				layer.gameObjectChanged(this, GameObjectChangeType.MANAGER, -1);
+				layer.gameObjectChanged(this, GameObjectChangeType.CONTROLLER, -1);
 			}
 		}
 	}
@@ -365,10 +437,10 @@ public abstract class GameObject extends Group {
 		if (render != null) {
 
 			if(getParent().isTransform()) {
-				render.setPosition(MathUtils.round(getX()), MathUtils.round(getY()));
+				render.setPosition(MathUtils.round(getX()), MathUtils.round(getY()+getDepth()));
 				render.setRotation(getRotation());
 			}else { 
-				render.setPosition(MathUtils.round(getTrueX()), MathUtils.round(getTrueY()));
+				render.setPosition(MathUtils.round(getTrueX()), MathUtils.round(getTrueY()+getTrueDepth()));
 				render.setRotation(getTrueRotation());
 			}
 			render.setAlpha(getColor().a * parentAlpha);
@@ -435,7 +507,7 @@ public abstract class GameObject extends Group {
 		for (int i = 0; i < strings.length; i++) {
 			if (!isNumeric(strings[i]))
 				throw new GdxRuntimeException(
-						String.format("GameObject [%s] could not create Int Array. %s is not a valid number.",
+						StringUtils.format("GameObject [%s] could not create Int Array. %s is not a valid number.",
 								getName(), strings[i]));
 			ints[i] = Integer.parseInt(strings[i]);
 		}
@@ -474,7 +546,7 @@ public abstract class GameObject extends Group {
 		for (int i = 0; i < strings.length; i++) {
 			if (!isNumeric(strings[i]))
 				throw new GdxRuntimeException(
-						String.format("GameObject [%s] could not create FloatArray. %s is not a valid float.",
+						StringUtils.format("GameObject [%s] could not create FloatArray. %s is not a valid float.",
 								getName(), strings[i]));
 			floats[i] = Float.parseFloat(strings[i]);
 		}
@@ -502,7 +574,7 @@ public abstract class GameObject extends Group {
 	}
 
 	public static class GameObjectChangeType {
-		public static final int MANAGER = 0; //value -1 means removed  1 = added
+		public static final int CONTROLLER = 0; //value -1 means removed  1 = added
 		public static final int LOCATION = 1;
 		public static final int NAME = 2;
 		public static final int FOLLOW_BOUNDS_REACHED = 3;

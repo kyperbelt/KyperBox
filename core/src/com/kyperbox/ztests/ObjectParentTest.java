@@ -1,14 +1,12 @@
 package com.kyperbox.ztests;
 
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.kyperbox.GameState;
 import com.kyperbox.KyperBoxGame;
 import com.kyperbox.controllers.CollisionController;
-import com.kyperbox.controllers.PlatformerController;
 import com.kyperbox.controllers.CollisionController.CollisionData;
 import com.kyperbox.input.InputDefaults;
 import com.kyperbox.input.KeyboardMapping;
@@ -16,7 +14,6 @@ import com.kyperbox.managers.StateManager;
 import com.kyperbox.objects.BasicGameObject;
 import com.kyperbox.objects.GameObject;
 import com.kyperbox.systems.QuadTree;
-import com.kyperbox.umisc.KyperBoxLocation;
 
 public class ObjectParentTest extends KyperBoxGame{
 

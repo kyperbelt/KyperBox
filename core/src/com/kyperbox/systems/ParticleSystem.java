@@ -51,7 +51,7 @@ public class ParticleSystem extends LayerSystem {
 	@Override
 	public void gameObjectChanged(GameObject object, int type, float value) {
 
-		if (type != GameObjectChangeType.MANAGER)
+		if (type != GameObjectChangeType.CONTROLLER)
 			return;
 
 		ParticleController pc = object.getController(ParticleController.class);

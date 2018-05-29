@@ -11,7 +11,7 @@ public class AnimationController extends GameObjectController{
 	private String animation_name;
 	private float animation_elapsed;
 	private PlayMode mode;
-	private float play_speed;
+	private float play_speed = 1f;;
 	private GameObject daddy; //The gameobject this controller belongs to
 							  //or as i like to call it, its daddy haha
 	
@@ -86,13 +86,13 @@ public class AnimationController extends GameObjectController{
 	public void update(GameObject object, float delta) {
 		animation_elapsed+=delta*play_speed;
 		if(current_animation!=null) {
-			object.setRawSprite(current_animation.getKeyFrame(animation_elapsed));
+			KyperSprite rawsprite = current_animation.getKeyFrame(animation_elapsed);
+			object.setRawSprite(rawsprite);
 		}
 	}
 
 	@Override
 	public void remove(GameObject object) {
-		current_animation = null;
 		daddy = null;
 	}
 

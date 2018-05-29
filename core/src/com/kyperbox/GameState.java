@@ -16,7 +16,6 @@ import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool.PooledEffect;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -46,10 +45,12 @@ import com.kyperbox.input.GameInput;
 import com.kyperbox.managers.StateManager;
 import com.kyperbox.objects.GameLayer;
 import com.kyperbox.objects.GameObject;
+import com.kyperbox.umisc.IGameObjectFactory;
 import com.kyperbox.umisc.ImageButton;
 import com.kyperbox.umisc.KyperProgressBar;
 import com.kyperbox.umisc.KyperSprite;
 import com.kyperbox.umisc.SaveUtils;
+import com.kyperbox.umisc.StringUtils;
 import com.kyperbox.umisc.UserData;
 
 public class GameState extends Group {
@@ -283,7 +284,7 @@ public class GameState extends Group {
 	 */
 	public Music playMusic(int tag, String music, boolean looping) {
 		if (!musics.containsKey(music))
-			throw new IllegalArgumentException(String.format(
+			throw new IllegalArgumentException(StringUtils.format(
 					"Music[%1$s] not loaded to state[%2$s]- try calling playMusic from the soundmanager directly if you wish to play music loaded on to memory from a different state.",
 					music, name));
 		return getSoundManager().playMusic(tag, musics.get(music), looping);
@@ -315,7 +316,7 @@ public class GameState extends Group {
 	 */
 	public long playSound(int tag, String sound,boolean loop) {
 		if (!sounds.containsKey(sound)) {
-			error(String.format(
+			error(StringUtils.format(
 					"Sound[%1$s] not loaded to state[%2$s] - try calling playSound from the soundmanager directly to play sounds loaded on to memory from a different state[you must use the filename]",
 					sound, name));
 			return -1L;
@@ -641,7 +642,6 @@ public class GameState extends Group {
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
 		ShaderProgram ps = batch.getShader();
-		SpriteBatch sb = (SpriteBatch) batch;
 		
 		if (ps != shader) {
 			if(shader==null)
@@ -1254,29 +1254,32 @@ public class GameState extends Group {
 			float h = object_properties.get("height", Float.class);
 			float r = object_properties.get("rotation", new Float(0), Float.class);
 
-			for (String package_name : game.getObjectPackages()) {
-				boolean failed = false;
-				;
-				try {
-					game_object = (GameObject) Class.forName(package_name + "." + type).newInstance();
-				} catch (InstantiationException e) {
-					failed = true;
-				} catch (IllegalAccessException e) {
-					failed = true;
-				} catch (ClassNotFoundException e) {
-					failed = true;
-				}
-
-				if (failed) {
-					if (KyperBoxGame.DEBUG_LOGGING)
-						error(package_name + " did not contain [" + type + ".class].");
-				}
-
-				if (game_object != null) {
-					break;
-				}
-
-			}
+			IGameObjectFactory factory = game.getObjectFactory();
+			game_object = factory.getGameObject(type);
+			
+//			for (String package_name : game.getObjectPackages()) {
+//				boolean failed = false;
+//				;
+//				try {
+//					game_object = (GameObject) Class.forName(package_name + "." + type).newInstance();
+//				} catch (InstantiationException e) {
+//					failed = true;
+//				} catch (IllegalAccessException e) {
+//					failed = true;
+//				} catch (ClassNotFoundException e) {
+//					failed = true;
+//				}
+//
+//				if (failed) {
+//					if (KyperBoxGame.DEBUG_LOGGING)
+//						error(package_name + " did not contain [" + type + ".class].");
+//				}
+//
+//				if (game_object != null) {
+//					break;
+//				}
+//
+//			}
 			if (game_object != null) {
 				game_object.setName(name);
 				game_object.setPosition(x, y);
