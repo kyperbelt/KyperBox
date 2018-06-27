@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.Pool;
 import com.kyperbox.objects.GameObject;
+import com.kyperbox.objects.GameObjectController;
 import com.kyperbox.objects.TilemapLayerObject;
 import com.kyperbox.objects.TilemapLayerObject.MapTile;
 

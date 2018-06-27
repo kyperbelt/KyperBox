@@ -468,6 +468,8 @@ public class GameState extends Group {
 			if(region!=null) {
 				sprite = new KyperSprite(region);
 				sprite.setName(name);
+			}else {
+				throw new NullPointerException(StringUtils.format("Sprite[%s] not found! This could happen when creating animations with not enough frames or in tiled you set the sprite wrong.", name));
 			}
 			sprites.put(name,sprite);
 		}
@@ -696,6 +698,7 @@ public class GameState extends Group {
 		state_data.clear();
 		animations.clear();
 		sprites.clear();
+		
 		if (manager != null) {
 			manager.dispose(this);
 		}

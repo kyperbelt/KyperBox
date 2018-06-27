@@ -123,9 +123,35 @@ public class TilemapLayerObject extends GameObject {
 
 		return array;
 	}
+	
+	public float getTileWidth() {
+		return tiles.getTileWidth();
+	}
+	
+	public float getTileHeight() {
+		return tiles.getTileHeight();
+	}
 
+	/**
+	 * getst the cell at the position without
+	 * taking the layers x and y into account
+	 * @param x
+	 * @param y
+	 * @return
+	 */
 	public Cell getCellAt(float x, float y) {
-		return tiles.getCell((int)x,(int)y);
+		return tiles.getCell((int)(x),(int)(y));
+	}
+	
+	/**
+	 * gets the cell at the location but takes the position of the tile layer
+	 * into account
+	 * @param x
+	 * @param y
+	 * @return
+	 */
+	public Cell getCellAt2(float x, float y) {
+		return getCellAt(x - getX(),y - getY());
 	}
 
 	private Array<MapTile> getCellArray() {

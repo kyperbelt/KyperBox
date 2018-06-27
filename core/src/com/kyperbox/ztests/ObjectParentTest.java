@@ -58,9 +58,9 @@ public class ObjectParentTest extends KyperBoxGame{
 				}
 				
 				CollisionController cc = rpgman.getController(CollisionController.class);
-				if(cc.getCollisions().size > 0) {
-					for (int i = 0; i < cc.getCollisions().size; i++) {
-						CollisionData cd = cc.getCollisions().get(i);
+				if(cc.getCollisions(delta).size > 0) {
+					for (int i = 0; i < cc.getCollisions(delta).size; i++) {
+						CollisionData cd = cc.getCollisions(delta).get(i);
 						System.out.println("collided with "+cd.getTarget().getName());
 					}
 				}

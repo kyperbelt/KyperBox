@@ -2,6 +2,7 @@ package com.kyperbox.controllers;
 
 import com.badlogic.gdx.graphics.Color;
 import com.kyperbox.objects.GameObject;
+import com.kyperbox.objects.GameObjectController;
 import com.kyperbox.systems.Box2dPhysicsSystem;
 
 import box2dLight.ConeLight;

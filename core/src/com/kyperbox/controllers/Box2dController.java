@@ -8,6 +8,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.kyperbox.objects.GameObject;
+import com.kyperbox.objects.GameObjectController;
 import com.kyperbox.systems.Box2dPhysicsSystem;
 
 /**

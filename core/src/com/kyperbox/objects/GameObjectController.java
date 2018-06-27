@@ -1,12 +1,28 @@
-package com.kyperbox.controllers;
+package com.kyperbox.objects;
 
 import com.badlogic.gdx.utils.Pool.Poolable;
 import com.kyperbox.managers.Priority;
-import com.kyperbox.objects.GameObject;
 
 public abstract class GameObjectController implements Poolable,Priority{
 	
-	private int priority;
+	private int priority = Priority.MEDIUM;
+	private boolean removed = false;
+	
+	/**
+	 * set removed
+	 * @param removed
+	 */
+	protected void setRemoved(boolean removed) {
+		this.removed = removed;
+	}
+	
+	/**
+	 * check if this object has been removed
+	 * @return
+	 */
+	public boolean isRemoved() {
+		return removed;
+	}
 	
 	/**
 	 * called when the object is initiated

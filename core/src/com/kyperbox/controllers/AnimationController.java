@@ -2,7 +2,9 @@ package com.kyperbox.controllers;
 
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.kyperbox.objects.GameObject;
+import com.kyperbox.objects.GameObjectController;
 import com.kyperbox.umisc.KyperSprite;
 
 public class AnimationController extends GameObjectController{
@@ -42,6 +44,14 @@ public class AnimationController extends GameObjectController{
 		setAnimation(animation,PlayMode.LOOP);
 	}
 	
+	public void setPlayMode(PlayMode mode) {
+		if(current_animation!=null) {
+			current_animation.setPlayMode(mode);
+		}else {
+			this.mode = mode;
+		}
+	}
+	
 	/**
 	 * set the animation currently played by this animation controller. 
 	 * Animations are retrieved from the animation store in KyperBoxGame.java
@@ -76,7 +86,6 @@ public class AnimationController extends GameObjectController{
 	 */
 	public boolean isAnimationFinished() {
 		if(current_animation == null) {
-			daddy.getState().error("No animation found, finished not possible.");
 			return false;
 		}
 		return current_animation.getAnimationDuration() <= animation_elapsed;

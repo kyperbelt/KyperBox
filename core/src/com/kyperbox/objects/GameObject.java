@@ -15,7 +15,6 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.kyperbox.GameState;
 import com.kyperbox.KyperBoxGame;
-import com.kyperbox.controllers.GameObjectController;
 import com.kyperbox.input.GameInput;
 import com.kyperbox.umisc.KyperSprite;
 import com.kyperbox.umisc.StringUtils;
@@ -43,10 +42,12 @@ public abstract class GameObject extends Group {
 	private Vector2 position;
 	private float depth; //this is the z depth component;
 	private float thickness; //this is the pseudo 3 dimensional height
+	private float depth_velocity;
 
 	private Color debug_bounds;
 	private boolean flip_x;
 	private boolean flip_y;
+	private boolean apply_velocity = true; //whether or not this object applies its own velocity
 
 	private boolean change_sprite;
 	private KyperSprite render;
@@ -66,8 +67,16 @@ public abstract class GameObject extends Group {
 		change_sprite = true;
 		render = null;
 		depth = 0;
-		thickness = 0;
+		thickness = 1;
 		position = new Vector2();
+	}
+	
+	public float getDepthVelocity() {
+		return depth_velocity;
+	}
+	
+	public void setDepthVelocity(float depth_velocity) {
+		this.depth_velocity = depth_velocity;
 	}
 
 	public Vector2 getPosition() {
@@ -112,6 +121,22 @@ public abstract class GameObject extends Group {
 	 */
 	public void setDepth(float depth) {
 		this.depth = depth;
+	}
+	
+	/**
+	 * get whether or not this object applies its own velocity after all controller updates
+	 * @return
+	 */
+	public boolean getApplyVelocity() {
+		return apply_velocity;
+	}
+	
+	/**
+	 * set whether this object applies its own velocity after all controller updates
+	 * @param apply_velocity
+	 */
+	public void setApplyVelocity(boolean apply_velocity) {
+		this.apply_velocity = apply_velocity;
 	}
 	
 	/**
@@ -227,7 +252,7 @@ public abstract class GameObject extends Group {
 
 	public void setCollisionBounds(float x, float y, float w, float h) {
 		if (bounds == null)
-			return;
+			bounds = new Rectangle();
 		bounds.set(x, y, w, h);
 		col_poly = null;
 	}
@@ -275,13 +300,13 @@ public abstract class GameObject extends Group {
 	@Override
 	public void drawDebug(ShapeRenderer shapes) {
 		if (getDebug()) {
-			shapes.setColor(debug_bounds);
+			shapes.setColor(ignoresCollision()?Color.PINK:debug_bounds);
 			Color cc = shapes.getColor();
 			Polygon p = getCollisionPolygon();
 			if (bounds != null && p != null) {
 				shapes.polygon(ret_poly.getTransformedVertices());
 				Rectangle r = ret_poly.getBoundingRectangle();
-				shapes.setColor(Color.SKY);
+				//shapes.setColor(Color.SKY);
 				shapes.rect(r.x, r.y, r.width, r.height);
 			}
 			shapes.setColor(cc);
@@ -342,7 +367,8 @@ public abstract class GameObject extends Group {
 	public void init(MapProperties properties) {
 		setOrigin(Align.center);
 		this.properties = properties;
-		bounds = new Rectangle(0, 0, getWidth(), getHeight());
+		if(bounds==null)
+			bounds = new Rectangle(0, 0, getWidth(), getHeight());
 		ret_bounds = new Rectangle(bounds);
 		if (getChildren().size > 0)
 			for (int i = 0; i < getChildren().size; i++) {
@@ -362,11 +388,41 @@ public abstract class GameObject extends Group {
 	public Array<GameObjectController> getControllers() {
 		return controllers;
 	}
+	
+	/**
+	 * get the raw bounds untrasnformed
+	 * @return
+	 */
+	public Rectangle getBoundsRaw() {
+		if(bounds == null)
+			bounds = new Rectangle();
+		return bounds;
+	}
+	
+	/**
+	 * get the world y of the bounds 
+	 * @return
+	 */
+	public float getBoundsY() {
+		return getY()+(bounds!=null?bounds.getY():0);
+	}
+	
+	/**
+	 * get the world x of the bounds
+	 * @return
+	 */
+	public float getBoundsX() {
+		return getX()+(bounds!=null?bounds.getX():0);
+	}
+	
 
 	public void update(float delta) {
+		controllers.sort(KyperBoxGame.getPriorityComperator());
 		for (int i = 0; i < controllers.size; i++)
 			controllers.get(i).update(this, delta);
-		setPosition(getX() + velocity.x * delta, getY() + velocity.y * delta);
+		
+		if(apply_velocity)
+			setPosition(getX() + velocity.x * delta, getY() + velocity.y * delta);
 	}
 
 	@Override
@@ -407,9 +463,11 @@ public abstract class GameObject extends Group {
 		}
 
 		controllers.add(controller);
+		controller.setRemoved(false);
 		controllers.sort(KyperBoxGame.getPriorityComperator());
-		controller.init(this);
+		
 		if (layer != null) {
+			controller.init(this);
 			layer.gameObjectChanged(this, GameObjectChangeType.CONTROLLER, 1);
 		}
 	}
@@ -417,6 +475,7 @@ public abstract class GameObject extends Group {
 	public void removeController(GameObjectController controller) {
 		if (controllers.removeValue(controller, true)) {
 			controller.remove(this);
+			controller.setRemoved(true);
 			if (layer != null) {
 				layer.gameObjectChanged(this, GameObjectChangeType.CONTROLLER, -1);
 			}

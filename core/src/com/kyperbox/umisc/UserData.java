@@ -13,7 +13,7 @@ import com.kyperbox.KyperBoxGame;
  */
 public class UserData {
 
-	private static final String NAME = "$USERDATA_NAME";
+	public static final String NAME = "$USERDATA_NAME";
 	private static final String NULL_STRING = "NULL_STRING";
 
 	private ObjectMap<String, Object> variables;

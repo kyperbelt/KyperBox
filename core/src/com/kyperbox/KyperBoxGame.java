@@ -58,15 +58,16 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 
 	public static final String VERTEX_SUFFIX = ".vert";
 	public static final String FRAGMENT_SUFFIX = ".frag";
-	
+
 	public static final String SPACE_SEPARATOR = " ";
 	public static final String DASH_SEPARATOR = " - ";
 
 	public static final MapProperties NULL_PROPERTIES = new MapProperties();
-	
+
 	private static ShaderProgram DEFAULT_SHADER;
+
 	public static ShaderProgram getDefaultShader() {
-		if(DEFAULT_SHADER == null)
+		if (DEFAULT_SHADER == null)
 			DEFAULT_SHADER = SpriteBatch.createDefaultShader();
 		return DEFAULT_SHADER;
 	}
@@ -95,9 +96,9 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 
 	private String game_name;
 	private String prefs_name;
-	
+
 	private AdClient ad_client;
-	
+
 	private IDevConsole console;
 
 	public KyperBoxGame(String prefs, String game_name, Viewport view) {
@@ -137,27 +138,29 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 			prio_compare = new PriorityComparator();
 		return prio_compare;
 	}
-	
+
 	/**
-	 * set the developer console - recommended to leave null
-	 * for deployment
+	 * set the developer console - recommended to leave null for deployment
+	 * 
 	 * @param console
 	 */
 	public void setDevConsole(IDevConsole console) {
 		this.console = console;
 	}
-	
+
 	/**
 	 * check if the dev console is available
+	 * 
 	 * @return false if null or is instance of mock console
 	 */
 	public boolean isDevConsoleAvailable() {
-		return console!=null || !(console instanceof MockDevConsole);
+		return console != null || !(console instanceof MockDevConsole);
 	}
-	
+
 	/**
-	 * return the dev console if there is one. Otherwise return null.
-	 * If you want to check against a boolean instead of null then try isDevConsoleAvailable()
+	 * return the dev console if there is one. Otherwise return null. If you want to
+	 * check against a boolean instead of null then try isDevConsoleAvailable()
+	 * 
 	 * @return
 	 */
 	public IDevConsole getDevConsole() {
@@ -190,37 +193,35 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 		global_data = new UserData(GAME_DATA_NAME);
 		input = new GameInput();
 
-		
-		
-		if(ad_client == null)
+		if (ad_client == null)
 			ad_client = new MockAdClient();
-		
-		if(console==null) {
+
+		if (console == null) {
 			console = new MockDevConsole();
 		}
 		console.create(this);
-		
+
 		input_multiplexer = new InputMultiplexer();
-		if(console!=null)
+		if (console != null)
 			console.addToMultiplexer(input_multiplexer);
 		input_multiplexer.addProcessor(game_stage);
 		input_multiplexer.addProcessor(input);
 		Gdx.input.setInputProcessor(input_multiplexer);
-		
+
 		initiate();
 	}
-	
+
 	/**
-	 * set the games adclient if one is available. 
-	 * mostly only for mobile- requires a custom implementation for 
-	 * each platform. 
-	 * Mock version will be used to avoid errors.
+	 * set the games adclient if one is available. mostly only for mobile- requires
+	 * a custom implementation for each platform. Mock version will be used to avoid
+	 * errors.
+	 * 
 	 * @param ad_client
 	 */
 	public void setAdClient(AdClient ad_client) {
 		this.ad_client = ad_client;
 	}
-	
+
 	/**
 	 * get the adclient available. if none was set will return a mock version to
 	 * maintain cross platform compatibility
@@ -292,11 +293,11 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	public GameInput getInput() {
 		return input;
 	}
-	
-	public void registerGameObject(String objectname,IGameObjectGetter getter) {
+
+	public void registerGameObject(String objectname, IGameObjectGetter getter) {
 		this.object_factory.registerGameObject(objectname, getter);
 	}
-	
+
 	protected IGameObjectFactory getObjectFactory() {
 		return object_factory;
 	}
@@ -456,8 +457,8 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 		error(TAG, "GameState-> not registerd [" + name + "].");
 		return null;
 	}
-	
-	public Array<GameState> getCurrentStates(){
+
+	public Array<GameState> getCurrentStates() {
 		return current_gamestates;
 	}
 
@@ -485,7 +486,7 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 		input.update();
 		AnimatedTiledMapTile.updateAnimationBaseTime();
 		float delta = Math.min(Gdx.graphics.getDeltaTime(), 1f);
-		if(console!=null)
+		if (console != null)
 			console.consoleUpdate(delta);
 		if (current_gamestates.size > 0)
 			for (int i = 0; i < current_gamestates.size; i++) {
@@ -497,7 +498,7 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 					cs.act(delta);
 			}
 		game_stage.draw();
-		if(console!=null)
+		if (console != null)
 			console.consoleDraw();
 
 	}
@@ -511,7 +512,7 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	public void dispose() {
 		game_stage.dispose();
 		assets.dispose();
-		if(console!=null)
+		if (console != null)
 			console.dispose();
 	}
 
@@ -619,7 +620,6 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 
 	public void loadMusic(String name) {
 		assets.load(MUSIC_FOLDER + FILE_SEPARATOR + name, Music.class);
-		;
 	}
 
 	public void loadAtlas(String name) {
@@ -635,19 +635,22 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	}
 
 	public static void log(String tag, String message) {
-		if (DEBUG_LOGGING)
-			Gdx.app.log(TAG + tag, message);
+		Gdx.app.log(TAG + tag, message);
 	}
 
 	@Override
 	public void resize(int width, int height) {
 		game_stage.getViewport().update(width, height);
 		for (int i = 0; i < current_gamestates.size; i++) {
-			current_gamestates.get(i).resize(width,height);
+			current_gamestates.get(i).resize(width, height);
 		}
-		if(console!=null)
+		if (console != null)
 			console.updateSize(width, height);
 	}
-
+	
+	/**
+	 * use this to register your gamestates and set the initial gamestate
+	 * other setup type things can also be done here. 
+	 */
 	public abstract void initiate();
 }

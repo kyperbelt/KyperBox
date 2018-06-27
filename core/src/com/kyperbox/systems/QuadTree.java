@@ -94,7 +94,7 @@ public class QuadTree extends CollisionSystem {
 	@Override
 	public void gameObjectAdded(GameObject object, GameObject parent) {
 		if (KyperBoxGame.DEBUG_LOGGING)
-			getLayer().getState().log(StringUtils.format("QuadTree: added object[%s] with parent[%s]",object.getName(),parent == null ?KyperBoxGame.NULL_STRING:parent.getName()));
+			getLayer().getState().log(StringUtils.format("QuadTree: added object[%s] with parent[%s]",object.getName()==null?KyperBoxGame.NULL_STRING:object.getName(),parent == null ?KyperBoxGame.NULL_STRING:parent.getName()));
 		objects.add(object);
 
 	}

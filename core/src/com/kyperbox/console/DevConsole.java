@@ -320,7 +320,7 @@ public class DevConsole implements IDevConsole{
 		
 		final String dr_format1 = "Debug render has been set to [GREEN]%s[]";
 		addCommand(new ConsoleCommand("debugrender", 1,
-				"Enable or Disable debug render. Takes in a binary param ([GREEN]true[] or [GREEN]false[] - [sky]1[] or [sky]0[])",
+				"Enable or Disable debug render. Takes in a binary param ([GREEN]true[] or [GREEN]false[] - [SKY]1[] or [SKY]0[])",
 				new CommandRunnable() {
 					@Override
 					public boolean executeCommand(DevConsole console, String... args) {

@@ -16,7 +16,7 @@ public abstract class LayerSystem implements Priority {
 	
 	public LayerSystem() {
 		active = true;
-		priority = LOW;
+		priority = MEDIUM;
 	}
 	
 	/**

@@ -14,11 +14,7 @@ public interface Priority {
 	public static class PriorityComparator implements Comparator<Priority>{
 		@Override
 		public int compare(Priority o1, Priority o2) {
-			if(o1.getPriority() < o2.getPriority())
-				return 1;
-			else if(o1.getPriority() > o2.getPriority())
-				return -1;
-			return 0;
+			return Integer.compare(o2.getPriority(), o1.getPriority());
 		}
 		
 	}

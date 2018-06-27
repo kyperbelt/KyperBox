@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.Array;
 import com.kyperbox.controllers.CollisionController.CollisionData;
 import com.kyperbox.managers.Priority;
 import com.kyperbox.objects.GameObject;
+import com.kyperbox.objects.GameObjectController;
 
 public class PlatformerController extends GameObjectController{
 	
@@ -39,8 +40,7 @@ public class PlatformerController extends GameObjectController{
 		setGravity(object.getProperties().get("gravity", -12f,Float.class));
 		setWalkSpeed(object.getProperties().get("walk_speed",300f,Float.class));
 		collision_control = object.getController(CollisionController.class);
-		if(collision_control!=null)
-			collision_control.getCollisions().clear();
+	
 		
 	}
 	
@@ -103,7 +103,7 @@ public class PlatformerController extends GameObjectController{
 			}
 			if(collision_control!=null) {
 				
-				Array<CollisionData> col_data = collision_control.getCollisions();
+				Array<CollisionData> col_data = collision_control.getCollisions(delta);
 				for (int i = 0; i < col_data.size; i++) {
 					CollisionData cd = col_data.get(i);
 					PlatformerController tpc = cd.getTarget().getController(PlatformerController.class);

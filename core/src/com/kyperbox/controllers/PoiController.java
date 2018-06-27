@@ -2,6 +2,7 @@ package com.kyperbox.controllers;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.kyperbox.objects.GameObject;
+import com.kyperbox.objects.GameObjectController;
 
 public class PoiController extends GameObjectController{
 

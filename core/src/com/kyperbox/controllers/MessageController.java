@@ -1,6 +1,7 @@
 package com.kyperbox.controllers;
 
 import com.kyperbox.objects.GameObject;
+import com.kyperbox.objects.GameObjectController;
 
 public class MessageController extends GameObjectController{
 
