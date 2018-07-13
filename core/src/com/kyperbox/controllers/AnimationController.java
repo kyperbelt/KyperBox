@@ -79,6 +79,10 @@ public class AnimationController extends GameObjectController{
 		return current_animation;
 	}
 	
+	public String getAnimationName() {
+		return animation_name;
+	}
+	
 	/**
 	 * check to see if The animation is finished by checking the animation 
 	 * total duration against elapsed time

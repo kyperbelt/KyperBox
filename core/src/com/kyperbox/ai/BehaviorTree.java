@@ -75,6 +75,8 @@ public class BehaviorTree {
 	 */
 	public boolean update(float delta) {
 		if (!finished) {
+			if(root == null)
+				throw new NullPointerException("the root node of this behavior tree is null, Try and using its start method to set it.");
 			NodeState result = root.update(delta);
 			if (result != NodeState.Running) {
 				finished = true;
@@ -135,6 +137,10 @@ public class BehaviorTree {
 
 		protected BehaviorTree tree;
 		protected BehaviorNode parent;
+		
+		public BehaviorNode() {
+			
+		}
 
 		public BehaviorTree getTree() {
 			return tree == null ? getParent().getTree() : tree;
@@ -359,6 +365,7 @@ public class BehaviorTree {
 
 		public void setChild(BehaviorNode child) {
 			this.child = child;
+			child.parent = this;
 		}
 
 		public BehaviorNode getChild() {

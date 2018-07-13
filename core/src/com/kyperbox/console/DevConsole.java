@@ -319,18 +319,12 @@ public class DevConsole implements IDevConsole{
 				}));
 		
 		final String dr_format1 = "Debug render has been set to [GREEN]%s[]";
-		addCommand(new ConsoleCommand("debugrender", 1,
-				"Enable or Disable debug render. Takes in a binary param ([GREEN]true[] or [GREEN]false[] - [SKY]1[] or [SKY]0[])",
+		addCommand(new ConsoleCommand("debugrender", 0,
+				"Enable or Disable debug render. Toggles",
 				new CommandRunnable() {
 					@Override
 					public boolean executeCommand(DevConsole console, String... args) {
-						boolean value = false;
-						try {
-							value = Boolean.parseBoolean(args[0]);
-						} catch (Exception e) {
-							console.error(e.getMessage());
-							return false;
-						}
+						boolean value = !getGame().getDebugEnabled();
 						console.log(StringUtils.format(dr_format1,value));
 						getGame().debugEnabled(value);
 						return true;
@@ -394,6 +388,7 @@ public class DevConsole implements IDevConsole{
 	}
 
 	public void consoleDraw() {
+		stage.getViewport().apply();
 		stage.draw();
 	}
 

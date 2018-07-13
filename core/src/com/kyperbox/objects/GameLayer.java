@@ -1,5 +1,6 @@
 package com.kyperbox.objects;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -120,7 +121,7 @@ public class GameLayer extends Group{
 				system.update(delta*time_scale);
 		}
 		super.act(delta*time_scale);;
-		cam.update(delta*time_scale);
+		
 	}
 	
 	@Override
@@ -151,6 +152,8 @@ public class GameLayer extends Group{
 		if(current_shader!=batch.getShader()) {
 			batch.setShader(current_shader);
 		}
+		
+		cam.update();
 	}
 	
 	/**
@@ -380,7 +383,7 @@ public class GameLayer extends Group{
 			setPosition(p.x+x, p.y+y);
 		}
 		
-		public void update(float delta) {
+		public void update() {
 			
 //		    Vector2 pos = getPosition();
 //			//process screenshake
@@ -438,10 +441,29 @@ public class GameLayer extends Group{
 //					
 //				}
 //			}
+			//xscale 
+			xs =  view.getWorldWidth() / Gdx.graphics.getWidth();
+			//yscale
+			ys = view.getWorldHeight() / Gdx.graphics.getHeight();
 			
+			//xpos rounded
+			float xpr = MathUtils.round(position.x / xs) * xs;
+			float ypr = MathUtils.round(position.y / ys) * ys;
 //			//set the layer position
-			layer.setPosition(MathUtils.floor(position.x), MathUtils.floor(position.y));
+			layer.setPosition(xpr, ypr);
+			layer.setTransform(true);
 		
+		}
+		
+		float xs = 1;
+		float ys = 1;
+		
+		public float getYS() {
+			return ys;
+		}
+		
+		public float getXS() {
+			return xs;
 		}
 
 		

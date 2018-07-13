@@ -496,10 +496,10 @@ public abstract class GameObject extends Group {
 		if (render != null) {
 
 			if(getParent().isTransform()) {
-				render.setPosition(MathUtils.round(getX()), MathUtils.round(getY()+getDepth()));
+				render.setPosition(getX(), getY()+getDepth());
 				render.setRotation(getRotation());
 			}else { 
-				render.setPosition(MathUtils.round(getTrueX()), MathUtils.round(getTrueY()+getTrueDepth()));
+				render.setPosition(getTrueX(), getTrueY()+getTrueDepth());
 				render.setRotation(getTrueRotation());
 			}
 			render.setAlpha(getColor().a * parentAlpha);
