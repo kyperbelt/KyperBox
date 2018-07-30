@@ -117,7 +117,7 @@ public class GameState extends Group {
 		if (name != null)
 			this.name = name;
 		else
-			this.name = "";
+			this.name = tmx;
 		sprites = new ObjectMap<String, KyperSprite>();
 		animations = new ObjectMap<String, Animation<KyperSprite>>();
 		fonts = new ObjectMap<String, BitmapFont>(); //TODO: test load to avoid repeats
@@ -473,7 +473,7 @@ public class GameState extends Group {
 				sprite = new KyperSprite(region);
 				sprite.setName(name);
 			}else {
-				throw new NullPointerException(StringUtils.format("Sprite[%s] not found! This could happen when creating animations with not enough frames or in tiled you set the sprite wrong.", name));
+				throw new NullPointerException(StringUtils.format("Sprite[%s] in Atlas[%s] not found! This could happen when creating animations with not enough frames or in tiled you set the sprite wrong.", name,atlas));
 			}
 			sprites.put(name,sprite);
 		}
