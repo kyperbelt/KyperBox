@@ -1,5 +1,6 @@
 package com.kyperbox.ai;
 
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.kyperbox.umisc.UserData;
@@ -11,7 +12,7 @@ import com.kyperbox.umisc.UserData;
  *
  */
 public class BehaviorTree {
-	
+
 	private static NodeFactory node_factory = new NodeFactory();
 
 	private BehaviorNode root; //base node in the btree
@@ -19,6 +20,7 @@ public class BehaviorTree {
 	private UserData context; //context for this tree
 	private NodeState last_result; // the last result - defaults to failure
 	private boolean finished;
+	private float total_runtime;
 
 	public BehaviorTree() {
 	}
@@ -31,6 +33,7 @@ public class BehaviorTree {
 		root.parent = null;
 		this.root.init();
 		current = root;
+		total_runtime = 0;
 	}
 
 	public void setRoot(BehaviorNode root) {
@@ -47,6 +50,10 @@ public class BehaviorTree {
 
 	protected void setCurrent(BehaviorNode current) {
 		this.current = current;
+	}
+
+	public float getTotalRuntime() {
+		return total_runtime;
 	}
 
 	/**
@@ -67,6 +74,13 @@ public class BehaviorTree {
 		return root;
 	}
 
+	public void debugRender(ShapeRenderer shapes) {
+		if (root == null)
+			throw new NullPointerException(
+					"the root node of this behavior tree is null, Try and using its start method to set it.");
+		root.debugRender(shapes);
+	}
+
 	/**
 	 * update the btree and check if its finished
 	 * 
@@ -75,8 +89,9 @@ public class BehaviorTree {
 	 */
 	public boolean update(float delta) {
 		if (!finished) {
-			if(root == null)
-				throw new NullPointerException("the root node of this behavior tree is null, Try and using its start method to set it.");
+			if (root == null)
+				throw new NullPointerException(
+						"the root node of this behavior tree is null, Try and using its start method to set it.");
 			NodeState result = root.update(delta);
 			if (result != NodeState.Running) {
 				finished = true;
@@ -94,24 +109,22 @@ public class BehaviorTree {
 	public NodeState lastResult() {
 		return last_result == null ? NodeState.Failure : last_result;
 	}
-	
-	
+
 	//static start
-	
-	public static void registerNode(String name,NodeGetter getter) {
+
+	public static void registerNode(String name, NodeGetter getter) {
 		node_factory.registerNode(name, getter);
 	}
-	
+
 	@SuppressWarnings("unused")
 	private static BehaviorNode getNode(String name) {
 		return node_factory.getNode(name);
 	}
-	
+
 	public static BehaviorNode generateRoot(String data) {
 		throw new UnsupportedOperationException("Not Yet Implemented");
 	}
-	
-	
+
 	//static end --
 
 	/**
@@ -137,9 +150,20 @@ public class BehaviorTree {
 
 		protected BehaviorTree tree;
 		protected BehaviorNode parent;
-		
+		private NodeState state;
+		protected float total_runtime;
+
 		public BehaviorNode() {
-			
+			state = NodeState.Running;
+		}
+
+		protected NodeState setState(NodeState state) {
+			this.state = state;
+			return state;
+		}
+
+		public NodeState getState() {
+			return state;
 		}
 
 		public BehaviorTree getTree() {
@@ -150,11 +174,27 @@ public class BehaviorTree {
 			return parent;
 		}
 
+		public float getTotalRuntime() {
+			return total_runtime;
+		}
+
+		public UserData getContext() {
+			return getTree().getContext();
+		}
+
+		public void debugRender(ShapeRenderer render) {
+
+		}
+
 		/**
 		 * this method is used to initiate the node - should house any code used to
 		 * reset the node to a 'fresh' state
 		 */
-		public abstract void init();
+		public void init() {
+			setState(NodeState.Running);
+			getTree().setCurrent(this);
+			total_runtime = 0;
+		}
 
 		/**
 		 * Bread and butter method of all Behavior nodes. If the update should continue
@@ -166,7 +206,10 @@ public class BehaviorTree {
 		 * @param delta
 		 * @return
 		 */
-		public abstract NodeState update(float delta);
+		public NodeState update(float delta) {
+			total_runtime += delta;
+			return NodeState.Running;
+		}
 	}
 
 	//START COMPOSITE NODES 
@@ -201,6 +244,15 @@ public class BehaviorTree {
 			}
 			return nodes;
 		}
+		
+		@Override
+		public void debugRender(ShapeRenderer render) {
+
+			for (int i = 0; i < nodes.size; i++) {
+				nodes.get(i).debugRender(render);
+			}
+		}
+
 	}
 
 	/**
@@ -221,6 +273,7 @@ public class BehaviorTree {
 
 		@Override
 		public void init() {
+			super.init();
 			finished = false;
 			current = 0;
 			last = -1;
@@ -229,11 +282,12 @@ public class BehaviorTree {
 
 		@Override
 		public NodeState update(float delta) {
+			super.update(delta);
 			Array<BehaviorNode> nodes = getNodes();
 
 			//if already finished just return success
 			if (finished)
-				return NodeState.Success;
+				return setState(NodeState.Success);
 
 			if (nodes.size == 0) { //no nodes to fail so default to success
 				finished = true;
@@ -247,7 +301,7 @@ public class BehaviorTree {
 					}
 					NodeState result = cnode.update(delta); //get the result of the current node
 					if (result == NodeState.Failure) //if its a failure then return it as such - this whole sequence fails
-						return result;
+						return setState(result);
 					else if (result == NodeState.Success) { //node ran successfully so go to the next one
 						current++;
 					}
@@ -256,7 +310,7 @@ public class BehaviorTree {
 				}
 
 			}
-			return NodeState.Running;
+			return setState(NodeState.Running);
 		}
 
 	}
@@ -276,6 +330,7 @@ public class BehaviorTree {
 
 		@Override
 		public void init() {
+			super.init();
 			finished = false;
 			current = 0;
 			last = -1;
@@ -284,11 +339,12 @@ public class BehaviorTree {
 
 		@Override
 		public NodeState update(float delta) {
+			super.update(delta);
 			Array<BehaviorNode> nodes = getNodes();
 
 			//if already finished just return failure
 			if (finished)
-				return NodeState.Failure;
+				return setState(NodeState.Failure);
 
 			if (nodes.size == 0) { //no nodes to succeed so default to failure
 				finished = true;
@@ -302,7 +358,7 @@ public class BehaviorTree {
 					}
 					NodeState result = cnode.update(delta); //get the result of the current node
 					if (result == NodeState.Success) //if its a success then return it as such - this whole sequence succeeds
-						return result;
+						return setState(result);
 					else if (result == NodeState.Failure) { //node ran failure so go to the next one
 						current++;
 					}
@@ -311,7 +367,7 @@ public class BehaviorTree {
 				}
 
 			}
-			return NodeState.Running;
+			return setState(NodeState.Running);
 		}
 
 	}
@@ -363,13 +419,19 @@ public class BehaviorTree {
 
 		private BehaviorNode child;
 
-		public void setChild(BehaviorNode child) {
+		public BehaviorNode setChild(BehaviorNode child) {
 			this.child = child;
 			child.parent = this;
+			return this;
 		}
 
 		public BehaviorNode getChild() {
 			return child;
+		}
+
+		@Override
+		public void debugRender(ShapeRenderer render) {
+			getChild().debugRender(render);
 		}
 
 	}
@@ -385,17 +447,19 @@ public class BehaviorTree {
 
 		@Override
 		public void init() {
+			super.init();
 			getChild().init();
 		}
 
 		@Override
 		public NodeState update(float delta) {
+			super.update(delta);
 			NodeState result = getChild().update(delta);
 			if (result == NodeState.Success)
-				return NodeState.Failure;
+				return setState(NodeState.Failure);
 			if (result == NodeState.Failure)
-				return NodeState.Success;
-			return result;
+				return setState(NodeState.Success);
+			return setState(result);
 		}
 
 	}
@@ -411,15 +475,17 @@ public class BehaviorTree {
 
 		@Override
 		public void init() {
+			super.init();
 			getChild().init();
 		}
 
 		@Override
 		public NodeState update(float delta) {
+			super.update(delta);
 			NodeState result = getChild().update(delta);
 			if (result != NodeState.Running)
-				return NodeState.Success;
-			return result;
+				return setState(NodeState.Success);
+			return setState(result);
 		}
 
 	}
@@ -434,24 +500,47 @@ public class BehaviorTree {
 	public static class RepeatNode extends SupplementNode {
 
 		private boolean finished = false;
+		private int amount;
+		private int times_ran;
+
+		public RepeatNode(int amount) {
+			this.amount = amount;
+		}
+
+		public RepeatNode() {
+			this(-1);
+		}
 
 		@Override
 		public void init() {
-			getChild().init();
+			super.init();
+			if (getChild() != null)
+				getChild().init();
+			else {
+				throw new NullPointerException("Supplement Nodes must have a child!");
+			}
 			finished = false;
+			times_ran = 1;
 		}
 
 		@Override
 		public NodeState update(float delta) {
+			super.update(delta);
 			if (finished) {
 				finished = false;
 				getChild().init();
+				times_ran++;
 			}
+
 			NodeState result = getChild().update(delta);
+
+			if (times_ran >= amount && amount != -1)
+				return setState(result);
+
 			if (result != NodeState.Running)
 				finished = true;
 
-			return NodeState.Running;
+			return setState(NodeState.Running);
 		}
 
 	}
@@ -468,12 +557,14 @@ public class BehaviorTree {
 
 		@Override
 		public void init() {
+			super.init();
 			getChild().init();
 			finished = false;
 		}
 
 		@Override
 		public NodeState update(float delta) {
+			super.update(delta);
 			if (finished) {
 				finished = false;
 				getChild().init();
@@ -516,23 +607,25 @@ public class BehaviorTree {
 	 */
 	private static class NodeFactory {
 		ObjectMap<String, NodeGetter> getters;
+
 		private NodeFactory() {
 			getters = new ObjectMap<String, BehaviorTree.NodeGetter>();
 		}
-		
+
 		/**
 		 * register a node and its getter
+		 * 
 		 * @param nodename
 		 * @param getter
 		 */
 		public void registerNode(String nodename, NodeGetter getter) {
 			getters.put(nodename, getter);
 		}
-		
+
 		public BehaviorNode getNode(String node) {
-			if(getters.containsKey(node)) {
+			if (getters.containsKey(node)) {
 				return getters.get(node).getNode();
-			}else {
+			} else {
 				return null;
 			}
 		}

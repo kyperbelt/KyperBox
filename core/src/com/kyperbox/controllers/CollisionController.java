@@ -27,6 +27,8 @@ public class CollisionController extends GameObjectController {
 	private Array<CollisionData> collisions;
 	private Rectangle check;
 	private GameObject object;
+	
+	private boolean collides_with_group = true;
 
 	/**
 	 * a collision controller that takes in a collisiosn system
@@ -39,12 +41,36 @@ public class CollisionController extends GameObjectController {
 		this.collisions = new Array<CollisionController.CollisionData>();
 	}
 	
+	public CollisionController() {
+		this(null);
+	}
+	
+	/**
+	 * get whether this controls' object should consider colliding with members of its own group
+	 * @return
+	 */
+	public boolean getCollidesWithGroup() {
+		return collides_with_group;
+	}
+	
+	/**
+	 * set whether this control's object should consider colliding with members of its own group
+	 * @param collides_with_group
+	 */
+	public void setCollidesWithGroup(boolean collides_with_group) {
+		this.collides_with_group = collides_with_group;
+	}
+	
 	/**
 	 * get the current collisions for the parent of this controller
 	 * @return
 	 */
 	public Array<CollisionData> getCollisions(){
-		return getCollisions(0.0f);
+		return getCollisions(object,0.0f);
+	}
+	
+	public Array<CollisionData> getCollisions(float delta){
+		return getCollisions(object,delta);
 	}
 
 	/**
@@ -52,7 +78,7 @@ public class CollisionController extends GameObjectController {
 	 * @param delta - the amount in the future to test for (usually just the frame elapsed time)
 	 * @return
 	 */
-	public Array<CollisionData> getCollisions(float delta) {
+	public Array<CollisionData> getCollisions(GameObject object,float delta) {
 		if (tree != null) {
 			CollisionData.getPool().freeAll(collisions);
 			collisions.clear();

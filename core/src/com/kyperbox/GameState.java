@@ -17,6 +17,7 @@ import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool.PooledEffect;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.maps.MapLayer;
@@ -202,17 +203,20 @@ public class GameState extends Group {
 			playground.setLayerProperties(map_data.getLayers().get("playground").getProperties());
 			background.setLayerProperties(map_data.getLayers().get("background").getProperties());
 
-			//init manager
-			if (manager != null) {
-				manager.addLayerSystems(this);
-			}
-
+			
 			//do preload
 			loadFonts(map_data, map_data.getProperties().get("atlas", String.class));
 			loadParticleEffects(map_data, map_data.getProperties().get("atlas", String.class));
 			loadShaders(map_data);
 			loadMusic(map_data);
 			loadSound(map_data);
+			
+			//init manager
+			if (manager != null) {
+				manager.addLayerSystems(this);
+			}
+
+			
 
 			//load UI actors
 			loadUi(map_data.getLayers().get("uiground"), game.getAtlas(atlas_name));
@@ -463,7 +467,7 @@ public class GameState extends Group {
 
 	public Sprite getGameSprite(String name, String atlas) {
 		if (!sprites.containsKey(name)) {
-			TextureRegion region = game.getAtlas(atlas).findRegion(name);
+			AtlasRegion region = game.getAtlas(atlas).findRegion(name);
 			KyperSprite sprite = null;
 			if(region!=null) {
 				sprite = new KyperSprite(region);
@@ -482,10 +486,11 @@ public class GameState extends Group {
 	 * @param animation_name
 	 * @param animation
 	 */
-	public void storeAnimation(String animation_name, Animation<KyperSprite> animation) {
+	public Animation<KyperSprite> storeAnimation(String animation_name, Animation<KyperSprite> animation) {
 		if (animations.containsKey(animation_name) && KyperBoxGame.DEBUG_LOGGING)
 			log("Animations->animation [" + animation_name + "] already exists and has been overriden!");
 		animations.put(animation_name, animation);
+		return animation;
 	}
 
 	/**

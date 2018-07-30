@@ -2,7 +2,6 @@ package com.kyperbox.umisc;
 
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.kyperbox.KyperBoxGame;
 
 /**
  * A data table that stores string pairs for later retrieval. global instance in
@@ -35,9 +34,9 @@ public class UserData {
 	}
 
 	public void put(String name, Object object) {
-		if (variables.containsKey(name) && KyperBoxGame.DEBUG_LOGGING) {
-			KyperBoxGame.error(name, "[" + name + "] already exists in " + getName() + ". it was overriden.");
-		}
+//		if (variables.containsKey(name) && KyperBoxGame.DEBUG_LOGGING) {
+//			KyperBoxGame.error(name, "[" + name + "] already exists in " + getName() + ". it was overriden.");
+//		}
 		variables.put(name, object);
 	}
 

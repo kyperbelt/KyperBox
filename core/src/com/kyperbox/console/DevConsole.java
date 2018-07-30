@@ -319,7 +319,7 @@ public class DevConsole implements IDevConsole{
 				}));
 		
 		final String dr_format1 = "Debug render has been set to [GREEN]%s[]";
-		addCommand(new ConsoleCommand("debugrender", 0,
+		addCommand(new ConsoleCommand("debug", 0,
 				"Enable or Disable debug render. Toggles",
 				new CommandRunnable() {
 					@Override

@@ -1,10 +1,9 @@
 package com.kyperbox.objects;
 
-import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Color;		
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapProperties;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -40,6 +39,7 @@ public abstract class GameObject extends Group {
 	private MapProperties properties;
 	private Vector2 velocity;
 	private Vector2 position;
+	private Vector2 collision_center;
 	private float depth; //this is the z depth component;
 	private float thickness; //this is the pseudo 3 dimensional height
 	private float depth_velocity;
@@ -69,6 +69,7 @@ public abstract class GameObject extends Group {
 		depth = 0;
 		thickness = 1;
 		position = new Vector2();
+		collision_center = new Vector2();
 	}
 	
 	public float getDepthVelocity() {
@@ -151,6 +152,16 @@ public abstract class GameObject extends Group {
 			}
 		}
 		return getDepth();
+	}
+	
+	/**
+	 * get the center point of the collision bounds.
+	 * sometimes considered the true center of a game object.
+	 * @return
+	 */
+	public Vector2 getCollisionCenter() {
+		collision_center.set(getBoundsX() + getBoundsRaw().width * .5f,getBoundsY() + getBoundsRaw().height * .5f	);
+		return collision_center;
 	}
 	
 	/**

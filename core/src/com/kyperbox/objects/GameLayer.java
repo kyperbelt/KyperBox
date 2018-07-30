@@ -176,8 +176,9 @@ public class GameLayer extends Group{
 	public void addGameObject(GameObject object,MapProperties properties) {
 		object.setGameLayer(this);
 		addActor(object);
-		object.init(properties);
 		gameObjectAdded(object, null);
+		object.init(properties);
+		
 	}
 	
 	/**

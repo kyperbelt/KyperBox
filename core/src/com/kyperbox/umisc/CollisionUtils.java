@@ -45,7 +45,7 @@ public class CollisionUtils {
 		return boundsCollision(o1, o2) && depthCollision(o1, o2);
 	}
 
-	private GameObject getZTest() {
+	private static GameObject getZTest() {
 		if (ztest == null) {
 			ztest = new BasicGameObject();
 		}
@@ -63,9 +63,11 @@ public class CollisionUtils {
 	 * @param filter
 	 * @return
 	 */
-	public GameObject getTestObject(Rectangle bounds, String name, int group, int filter) {
+	public static GameObject getTestObject(Rectangle bounds, String name, int group, int filter) {
 		GameObject z = getZTest();
-		z.setCollisionBounds(bounds.x, bounds.y, bounds.width, bounds.height);
+		z.setPosition(bounds.x, bounds.y);
+		z.setSize(bounds.width, bounds.height);
+		z.setCollisionBounds(0, 0, bounds.width, bounds.height);
 		z.setName(name);
 		z.setGroup(group);
 		z.setFilter(filter);
