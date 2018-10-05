@@ -414,8 +414,9 @@ public class KyperMapLoader extends BaseTmxMapLoader<AtlasTmxMapLoader.AtlasTile
 						regionName = regionName.substring(regionName.lastIndexOf("/") + 1, regionName.length());
 						regionName = regionName.substring(0, regionName.lastIndexOf('.'));
 						AtlasRegion region = atlas.findRegion(regionName);
-						if (region == null)
-							throw new GdxRuntimeException("Tileset region not found: " + regionName);
+						if (region == null) {
+							//throw new GdxRuntimeException("Tileset region not found: " + regionName);
+						}
 						tile = new StaticTiledMapTile(region);
 						tile.setId(tileid);
 						tile.setOffsetX(offsetX);

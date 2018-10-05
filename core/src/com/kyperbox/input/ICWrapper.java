@@ -11,6 +11,10 @@ import com.badlogic.gdx.controllers.Controller;
 public interface ICWrapper {
 	
 	
+	public boolean hasTOriggerAxis();
+	
+	public void update();
+	
 	public Controller getController();
 
 	/**
@@ -99,13 +103,13 @@ public interface ICWrapper {
 	
 	public boolean downPressed();
 
-	public boolean triggerLeftOnePressed();
+	public boolean L1Pressed();
 
-	public boolean triggerRightOnePressed();
+	public boolean R1Pressed();
 
-	public boolean triggerLeftThreePressed();
+	public boolean L3Pressed();
 
-	public boolean triggerRightThreePressed();
+	public boolean R3Pressed();
 	
 	public boolean selectPressed();
 	
@@ -149,13 +153,13 @@ public interface ICWrapper {
 	
 	public boolean downJustPressed();
 
-	public boolean triggerLeftOneJustPressed();
+	public boolean L1JustPressed();
 
-	public boolean triggerRightOneJustPressed();
+	public boolean R1JustPressed();
 
-	public boolean triggerLeftThreeJustPressed();
+	public boolean L3JustPressed();
 
-	public boolean triggerRightThreeJustPressed();
+	public boolean R3JustPressed();
 	
 	public boolean selectJustPressed();
 	

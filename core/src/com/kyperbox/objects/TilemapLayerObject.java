@@ -5,6 +5,7 @@ import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Pool.Poolable;
@@ -35,6 +36,7 @@ public class TilemapLayerObject extends GameObject {
 				return new MapTile();
 			}
 		};
+		setTouchable(Touchable.disabled);
 		tiles = (TiledMapTileLayer) getState().getMapData().getLayers().get(properties.get("tile_layer", String.class));
 		setSize(tiles.getWidth() * tiles.getTileWidth(), tiles.getHeight() * tiles.getTileHeight());
 		render = new TileLayerRenderer(this);

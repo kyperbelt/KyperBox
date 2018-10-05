@@ -18,6 +18,7 @@ import com.badlogic.gdx.graphics.g2d.ParticleEffectPool.PooledEffect;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasSprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.maps.MapLayer;
@@ -37,6 +38,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
+import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
@@ -203,20 +205,19 @@ public class GameState extends Group {
 			playground.setLayerProperties(map_data.getLayers().get("playground").getProperties());
 			background.setLayerProperties(map_data.getLayers().get("background").getProperties());
 
-			
 			//do preload
+
+			loadAtlas(map_data);
 			loadFonts(map_data, map_data.getProperties().get("atlas", String.class));
 			loadParticleEffects(map_data, map_data.getProperties().get("atlas", String.class));
 			loadShaders(map_data);
 			loadMusic(map_data);
 			loadSound(map_data);
-			
+
 			//init manager
 			if (manager != null) {
 				manager.addLayerSystems(this);
 			}
-
-			
 
 			//load UI actors
 			loadUi(map_data.getLayers().get("uiground"), game.getAtlas(atlas_name));
@@ -318,21 +319,21 @@ public class GameState extends Group {
 	 * 
 	 * @return soundid
 	 */
-	public long playSound(int tag, String sound,boolean loop) {
+	public long playSound(int tag, String sound, boolean loop) {
 		if (!sounds.containsKey(sound)) {
 			error(StringUtils.format(
 					"Sound[%1$s] not loaded to state[%2$s] - try calling playSound from the soundmanager directly to play sounds loaded on to memory from a different state[you must use the filename]",
 					sound, name));
 			return -1L;
-			
+
 		}
-		long id =  getSoundManager().playSound(tag, sounds.get(sound));
+		long id = getSoundManager().playSound(tag, sounds.get(sound));
 		getSoundManager().loopSound(sound, id, loop);
 		return id;
 	}
-	
-	public long playSound(int tag,String sound) {
-		return playSound(tag,sound,false);
+
+	public long playSound(int tag, String sound) {
+		return playSound(tag, sound, false);
 	}
 
 	/**
@@ -344,9 +345,9 @@ public class GameState extends Group {
 	public long playSound(String sound) {
 		return playSound(SoundManager.SFX, sound);
 	}
-	
-	public long playSound(String sound,boolean loop) {
-		return playSound(SoundManager.SFX, sound,loop);
+
+	public long playSound(String sound, boolean loop) {
+		return playSound(SoundManager.SFX, sound, loop);
 	}
 
 	/**
@@ -469,13 +470,16 @@ public class GameState extends Group {
 		if (!sprites.containsKey(name)) {
 			AtlasRegion region = game.getAtlas(atlas).findRegion(name);
 			KyperSprite sprite = null;
-			if(region!=null) {
+			if (region != null) {
 				sprite = new KyperSprite(region);
 				sprite.setName(name);
-			}else {
-				throw new NullPointerException(StringUtils.format("Sprite[%s] in Atlas[%s] not found! This could happen when creating animations with not enough frames or in tiled you set the sprite wrong.", name,atlas));
+			} else {
+				KyperBoxGame.error(KyperBoxGame.TAG, StringUtils.format(
+						"Sprite[%s] in Atlas[%s] not found! This could happen when creating animations with not enough frames or in tiled you set the sprite wrong.",
+						name, atlas));
+				return null;
 			}
-			sprites.put(name,sprite);
+			sprites.put(name, sprite);
 		}
 		return sprites.get(name);
 	}
@@ -494,34 +498,76 @@ public class GameState extends Group {
 	}
 
 	/**
-	 * Create an animation with the given name as a region alias and the number of frames and frame duration.
-	 * The regions must be indext like so "animationalias_index"(spritename_0,spritename_1,spritename_2) ect.
+	 * Create an animation with the given name as a region alias and the number of
+	 * frames and frame duration. The regions must be indext like so
+	 * "animationalias_index"(spritename_0,spritename_1,spritename_2) ect.
 	 * 
-	 * @param name = the alias of the regions
-	 * @param atlas = which atlas to use to find the sprites
-	 * @param frames = the amount of frames to retrieve
-	 * @param frame_duration = the amount of time between frames
+	 * @param name
+	 *            = the alias of the regions
+	 * @param atlas
+	 *            = which atlas to use to find the sprites
+	 * @param frames
+	 *            = the amount of frames to retrieve
+	 * @param frame_duration
+	 *            = the amount of time between frames
 	 */
-	public Animation<KyperSprite> createGameAnimation(String name,String atlas, int frames, float frame_duration) {
+	public Animation<KyperSprite> createGameAnimation(String name, String atlas, int frames, float frame_duration) {
 		KyperSprite[] sprites = new KyperSprite[frames];
 		String sep = "_";
 		for (int i = 0; i < sprites.length; i++) {
-			sprites[i] = (KyperSprite) getGameSprite(name+sep+i,atlas);
+			sprites[i] = (KyperSprite) getGameSprite(name + sep + i, atlas);
 		}
- 		
-		return createGameAnimation(sprites,frame_duration);
+
+		return createGameAnimation(sprites, frame_duration);
 	}
-	
-	public Animation<KyperSprite> createGameAnimation(String name,int frames,float frame_duration){
-		return createGameAnimation(name,KyperBoxGame.GAME_ATLAS,frames,frame_duration);
+
+	public Animation<KyperSprite> createGameAnimation(String name, int frames, float frame_duration) {
+		return createGameAnimation(name, KyperBoxGame.GAME_ATLAS, frames, frame_duration);
 	}
-	
-	public Animation<KyperSprite> createGameAnimation(KyperSprite[] frames,float frame_duration){
+
+	/**
+	 * attempt to create an animation by retrieving as many possible matching frames
+	 * with ascending index
+	 * 
+	 * @param name
+	 * @param frame_duration
+	 * @return
+	 */
+	public Animation<KyperSprite> createGameAnimation(String name, float frame_duration) {
+		return createGameAnimation(name, KyperBoxGame.GAME_ATLAS, frame_duration);
+	}
+
+	/**
+	 * create an animation by retrieving as many possible matching frames with
+	 * increasing index.
+	 * 
+	 * @param name
+	 * @param atlas
+	 *            - the atlas to use.
+	 * @param frame_duration
+	 * @return
+	 */
+	public Animation<KyperSprite> createGameAnimation(String name, String atlas, float frame_duration) {
+		int frame_count = 0;
+		KyperSprite sprite = null;
+		String sep = "_";
+
+		do {
+			sprite = (KyperSprite) getGameSprite(name + sep + frame_count, atlas);
+			if (sprite != null)
+				frame_count++;
+		} while (sprite != null);
+		if (sprite == null && frame_count == 0)
+			throw new NullPointerException(
+					StringUtils.format("Animation:[%s] was not found in Atlas:[%s]", name, atlas));
+
+		return createGameAnimation(name, atlas, frame_count, frame_duration);
+	}
+
+	public Animation<KyperSprite> createGameAnimation(KyperSprite[] frames, float frame_duration) {
 		Animation<KyperSprite> animations = new Animation<KyperSprite>(frame_duration, frames);
 		return animations;
 	}
-	
-	
 
 	/**
 	 * returns a stored animation to avoid garbage collection. Animations may use
@@ -556,11 +602,12 @@ public class GameState extends Group {
 			error("Shader -> not found [" + name + "].");
 		return null;
 	}
-	
+
 	public BitmapFont getFont(String name) {
-		if(fonts.containsKey(name)) return fonts.get(name);
-		else if(KyperBoxGame.DEBUG_LOGGING)
-			error("Font -> not found ["+name+"].");
+		if (fonts.containsKey(name))
+			return fonts.get(name);
+		else if (KyperBoxGame.DEBUG_LOGGING)
+			error("Font -> not found [" + name + "].");
 		return null;
 	}
 
@@ -614,7 +661,6 @@ public class GameState extends Group {
 	public KyperBoxGame getGame() {
 		return game;
 	}
-	
 
 	public GameLayer getUiLayer() {
 		return uiground;
@@ -649,20 +695,20 @@ public class GameState extends Group {
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
 		ShaderProgram ps = batch.getShader();
-		
+
 		if (ps != shader) {
-			if(shader==null)
+			if (shader == null)
 				setStateShader(KyperBoxGame.getDefaultShader());
 			batch.setShader(shader);
-			
+
 			super.draw(batch, parentAlpha);
-			if(ps!=KyperBoxGame.getDefaultShader() && shader!=KyperBoxGame.getDefaultShader()) {
+			if (ps != KyperBoxGame.getDefaultShader() && shader != KyperBoxGame.getDefaultShader()) {
 				batch.setShader(ps);
 			}
-		}else {
+		} else {
 			super.draw(batch, parentAlpha);
 		}
-		
+
 	}
 
 	/**
@@ -703,24 +749,25 @@ public class GameState extends Group {
 		state_data.clear();
 		animations.clear();
 		sprites.clear();
-		
+
 		if (manager != null) {
 			manager.dispose(this);
 		}
 		if (tmx != null && !tmx.isEmpty()) {
 			map_data = null;
 			getGame().getAssetManager().unload(KyperBoxGame.TMX_FOLDER + KyperBoxGame.FILE_SEPARATOR + tmx);
-			
+
 		}
 	}
-	
+
 	/**
 	 * handle a resize
+	 * 
 	 * @param width
 	 * @param height
 	 */
-	public void resize(int width,int height) {
-		getManager().resize(width,height);
+	public void resize(int width, int height) {
+		getManager().resize(width, height);
 	}
 
 	public GameInput getInput() {
@@ -862,7 +909,12 @@ public class GameState extends Group {
 			String fontfile = properties.get("font_file", String.class);
 			if (fontfile != null && type != null && type.equals(ffcheck)) {
 				boolean markup = properties.get("markup", false, boolean.class);
-				game.loadFont(fontfile, atlasname);
+				String atlas = properties.get("atlas", String.class);
+				if (atlas.equals(KyperBoxGame.NULL_STRING)) {
+					game.loadFont(fontfile, atlasname);
+				} else {
+					game.loadFont(fontfile, KyperBoxGame.IMAGE_FOLDER + KyperBoxGame.FILE_SEPARATOR + atlas);
+				}
 				game.getAssetManager().finishLoading();
 				font = game.getFont(fontfile);
 				fonts.put(name, font);
@@ -913,6 +965,21 @@ public class GameState extends Group {
 						svalues.add(KyperBoxGame.SHADER_FOLDER + KyperBoxGame.FILE_SEPARATOR + file);
 					}
 				}
+			}
+		}
+	}
+
+	private void loadAtlas(TiledMap data) {
+		MapObjects objects = data.getLayers().get("preload").getObjects();
+		String s_check = "Atlas";
+		for (MapObject o : objects) {
+			MapProperties properties = o.getProperties();
+			String type = properties.get("type", KyperBoxGame.NULL_STRING, String.class);
+			if (type.equals(s_check)) {
+				String atlas = properties.get("atlas", String.class);
+				if (!atlas.equals(KyperBoxGame.NULL_STRING))
+					getGame().loadAtlas(atlas);
+
 			}
 		}
 	}
@@ -981,15 +1048,15 @@ public class GameState extends Group {
 		if (type.equals("ImageButton")) { //TODO: implement hover image
 			ImageButtonStyle style = new ImageButtonStyle();
 			String up = properties.get("upImage", "", String.class);
-			String down = properties.get("downImage", String.class);
+			String down = properties.get("downImage", "", String.class);
 			float pressedXOff = properties.get("pressedXOff", new Float(0), Float.class);
 			float pressedYOff = properties.get("pressedYOff", new Float(0), Float.class);
 
 			if (!up.isEmpty()) {
-				style.imageUp = new TextureRegionDrawable(atlas.findRegion(up));
+				style.imageUp = new SpriteDrawable(new AtlasSprite(new AtlasRegion(atlas.findRegion(up))));
 			}
 			if (!down.isEmpty()) {
-				style.imageDown = new TextureRegionDrawable(atlas.findRegion(down));
+				style.imageDown = new SpriteDrawable(new AtlasSprite(new AtlasRegion(atlas.findRegion(down))));
 			}
 			style.pressedOffsetX = pressedXOff;
 			style.pressedOffsetY = pressedYOff;
@@ -1053,7 +1120,6 @@ public class GameState extends Group {
 				a = new Image(texture);
 				a.setRotation(-r);
 			}
-			
 
 		} else if (type.equals("Label")) {
 			LabelStyle ls = new LabelStyle();
@@ -1254,6 +1320,7 @@ public class GameState extends Group {
 			MapProperties object_properties = object.getProperties();
 			GameObject game_object = null;
 			String sprite = object_properties.get("sprite", GameObject.NO_SPRITE, String.class);
+
 			String type = object_properties.get("type", String.class);
 			String name = object.getName();
 			float x = object_properties.get("x", Float.class);
@@ -1264,30 +1331,30 @@ public class GameState extends Group {
 
 			IGameObjectFactory factory = game.getObjectFactory();
 			game_object = factory.getGameObject(type);
-			
-//			for (String package_name : game.getObjectPackages()) {
-//				boolean failed = false;
-//				;
-//				try {
-//					game_object = (GameObject) Class.forName(package_name + "." + type).newInstance();
-//				} catch (InstantiationException e) {
-//					failed = true;
-//				} catch (IllegalAccessException e) {
-//					failed = true;
-//				} catch (ClassNotFoundException e) {
-//					failed = true;
-//				}
-//
-//				if (failed) {
-//					if (KyperBoxGame.DEBUG_LOGGING)
-//						error(package_name + " did not contain [" + type + ".class].");
-//				}
-//
-//				if (game_object != null) {
-//					break;
-//				}
-//
-//			}
+
+			//			for (String package_name : game.getObjectPackages()) {
+			//				boolean failed = false;
+			//				;
+			//				try {
+			//					game_object = (GameObject) Class.forName(package_name + "." + type).newInstance();
+			//				} catch (InstantiationException e) {
+			//					failed = true;
+			//				} catch (IllegalAccessException e) {
+			//					failed = true;
+			//				} catch (ClassNotFoundException e) {
+			//					failed = true;
+			//				}
+			//
+			//				if (failed) {
+			//					if (KyperBoxGame.DEBUG_LOGGING)
+			//						error(package_name + " did not contain [" + type + ".class].");
+			//				}
+			//
+			//				if (game_object != null) {
+			//					break;
+			//				}
+			//
+			//			}
 			if (game_object != null) {
 				game_object.setName(name);
 				game_object.setPosition(x, y);

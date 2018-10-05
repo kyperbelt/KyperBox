@@ -1,6 +1,6 @@
 package com.kyperbox.objects;
 
-import com.badlogic.gdx.graphics.Color;		
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapProperties;
@@ -71,11 +71,11 @@ public abstract class GameObject extends Group {
 		position = new Vector2();
 		collision_center = new Vector2();
 	}
-	
+
 	public float getDepthVelocity() {
 		return depth_velocity;
 	}
-	
+
 	public void setDepthVelocity(float depth_velocity) {
 		this.depth_velocity = depth_velocity;
 	}
@@ -84,96 +84,106 @@ public abstract class GameObject extends Group {
 		position.set(getX(), getY());
 		return position;
 	}
-	
+
 	public Vector2 getTruePosition() {
-		position.set(getTrueX(),getTrueY());
+		position.set(getTrueX(), getTrueY());
 		return position;
 	}
-	
+
 	/**
-	 * get the depth component of the gameobject
-	 * default is 0 and unless you are using a 3rd dimension in a top down game 
-	 * it should be ignored because it will effect rendering
+	 * get the depth component of the gameobject default is 0 and unless you are
+	 * using a 3rd dimension in a top down game it should be ignored because it will
+	 * effect rendering
+	 * 
 	 * @return
 	 */
 	public float getDepth() {
 		return depth;
 	}
-	
+
 	/**
-	 * get the depth top of this object 
+	 * get the depth top of this object
+	 * 
 	 * @return trueY+trueDepth+thickness
 	 */
 	public float getDepthTop() {
-		return getTrueY()+getTrueDepth()+getThickness();
+		return getTrueY() + getTrueDepth() + getThickness();
 	}
-	
+
 	/**
 	 * get the depth bottom of this objecct
+	 * 
 	 * @return trueY+trueDepth
 	 */
 	public float getDepthBottom() {
-		return getTrueY()+getTrueDepth();
+		return getTrueY() + getTrueDepth();
 	}
-	
+
 	/**
-	 * set the depth of this object - this affects the rendering but not the rendering order
+	 * set the depth of this object - this affects the rendering but not the
+	 * rendering order
+	 * 
 	 * @param depth
 	 */
 	public void setDepth(float depth) {
 		this.depth = depth;
 	}
-	
+
 	/**
-	 * get whether or not this object applies its own velocity after all controller updates
+	 * get whether or not this object applies its own velocity after all controller
+	 * updates
+	 * 
 	 * @return
 	 */
 	public boolean getApplyVelocity() {
 		return apply_velocity;
 	}
-	
+
 	/**
 	 * set whether this object applies its own velocity after all controller updates
+	 * 
 	 * @param apply_velocity
 	 */
 	public void setApplyVelocity(boolean apply_velocity) {
 		this.apply_velocity = apply_velocity;
 	}
-	
+
 	/**
 	 * get the depth of this child all the way up to its parent
+	 * 
 	 * @return
 	 */
 	public float getTrueDepth() {
-		if(getParent()!=null) {
-			if(getParent() instanceof GameObject) {
+		if (getParent() != null) {
+			if (getParent() instanceof GameObject) {
 				GameObject p = (GameObject) getParent();
-				return p.getTrueDepth()+getDepth();
+				return p.getTrueDepth() + getDepth();
 			}
 		}
 		return getDepth();
 	}
-	
+
 	/**
-	 * get the center point of the collision bounds.
-	 * sometimes considered the true center of a game object.
+	 * get the center point of the collision bounds. sometimes considered the true
+	 * center of a game object.
+	 * 
 	 * @return
 	 */
 	public Vector2 getCollisionCenter() {
-		collision_center.set(getBoundsX() + getBoundsRaw().width * .5f,getBoundsY() + getBoundsRaw().height * .5f	);
+		collision_center.set(getBoundsX() + getBoundsRaw().width * .5f, getBoundsY() + getBoundsRaw().height * .5f);
 		return collision_center;
 	}
-	
+
 	/**
-	 * get the 3d thickness/height of this object. 
-	 * default is 0 and should be ignored unless using the 3rd dimension.
-	 * DOES NOT EFFECT RENDERING
+	 * get the 3d thickness/height of this object. default is 0 and should be
+	 * ignored unless using the 3rd dimension. DOES NOT EFFECT RENDERING
+	 * 
 	 * @return
 	 */
 	public float getThickness() {
 		return thickness;
 	}
-	
+
 	public void setThickness(float thickness) {
 		this.thickness = thickness;
 	}
@@ -217,40 +227,40 @@ public abstract class GameObject extends Group {
 	public boolean getFlipY() {
 		return flip_y;
 	}
-	
+
 	public float getTrueX() {
-		if(getParent()!=null) {
-			if(getParent() instanceof GameObject) {
+		if (getParent() != null) {
+			if (getParent() instanceof GameObject) {
 				GameObject p = (GameObject) getParent();
-				
-				return p.getTrueX()+getX();
-				
-			}else if(getParent()!=layer){
-				return getParent().getX()+getX();
+
+				return p.getTrueX() + getX();
+
+			} else if (getParent() != layer) {
+				return getParent().getX() + getX();
 			}
 		}
 		return getX();
 	}
-	
+
 	public float getTrueY() {
-		if(getParent()!=null) {
-			if(getParent() instanceof GameObject) {
+		if (getParent() != null) {
+			if (getParent() instanceof GameObject) {
 				GameObject p = (GameObject) getParent();
-				return p.getTrueY()+getY();
-			}else if(getParent()!=layer){
-				return getParent().getY()+getY();
+				return p.getTrueY() + getY();
+			} else if (getParent() != layer) {
+				return getParent().getY() + getY();
 			}
 		}
 		return getY();
 	}
-	
+
 	public float getTrueRotation() {
-		if(getParent()!=null) {
-			if(getParent() instanceof GameObject) {
+		if (getParent() != null) {
+			if (getParent() instanceof GameObject) {
 				GameObject p = (GameObject) getParent();
-				return p.getTrueRotation()+getRotation();
-			}else if(getParent()!=layer){
-				return getParent().getRotation()+getRotation();
+				return p.getTrueRotation() + getRotation();
+			} else if (getParent() != layer) {
+				return getParent().getRotation() + getRotation();
 			}
 		}
 		return getRotation();
@@ -271,14 +281,13 @@ public abstract class GameObject extends Group {
 	public Rectangle getCollisionBounds() {
 		if (getParent() != null) {
 			ret_bounds.setCenter(getOriginX(), getOriginY());
-			ret_bounds.set(getTrueX() + bounds.x, getTrueY() + bounds.y, bounds.width,
-					bounds.height);
+			ret_bounds.set(getTrueX() + bounds.x, getTrueY() + bounds.y, bounds.width, bounds.height);
 			//System.out.println("object||"+getName()+"|| bounds - "+bounds+" - retbounds -"+ret_bounds+" truepos["+getTrueX()+","+getTrueY()+"]");
 			return ret_bounds;
-		}else if (getCollisionPolygon() != null) {
+		} else if (getCollisionPolygon() != null) {
 			return getCollisionPolygon().getBoundingRectangle();
 		}
-		
+
 		return null;
 	}
 
@@ -287,11 +296,11 @@ public abstract class GameObject extends Group {
 			ret_poly = new Polygon();
 			col_poly = new Polygon(new float[] { 0, 0, 0 + bounds.getWidth(), 0, 0 + bounds.getWidth(),
 					0 + bounds.getHeight(), 0, 0 + bounds.getHeight() });
-			col_poly.setOrigin(bounds.getWidth()*.5f, bounds.getHeight()*.5f);
+			col_poly.setOrigin(bounds.getWidth() * .5f, bounds.getHeight() * .5f);
 		}
 		if (col_poly == null)
 			return null;
-		
+
 		col_poly.setScale(getScaleX(), getScaleY());
 		col_poly.setPosition(getTrueX() + bounds.getX(), getTrueY() + bounds.getY());
 		col_poly.setRotation(getRotation());
@@ -302,16 +311,16 @@ public abstract class GameObject extends Group {
 	public void setDebugBoundsColor(Color color) {
 		this.debug_bounds = color;
 	}
-	
+
 	@Override
 	protected void drawChildren(Batch batch, float parentAlpha) {
-		super.drawChildren(batch,parentAlpha);
+		super.drawChildren(batch, parentAlpha);
 	}
 
 	@Override
 	public void drawDebug(ShapeRenderer shapes) {
 		if (getDebug()) {
-			shapes.setColor(ignoresCollision()?Color.PINK:debug_bounds);
+			shapes.setColor(ignoresCollision() ? Color.PINK : debug_bounds);
 			Color cc = shapes.getColor();
 			Polygon p = getCollisionPolygon();
 			if (bounds != null && p != null) {
@@ -336,16 +345,16 @@ public abstract class GameObject extends Group {
 	public void addChild(GameObject child) {
 		if (getParent() != null) {
 			addActor(child);
-			
-			if(layer!=null) {
+
+			if (layer != null) {
 				child.setGameLayer(layer);
 				layer.gameObjectAdded(child, this);
 				child.init(properties);
 			}
-			
+
 		} else if (getParent() == null) {
 			addActor(child);
-		} 
+		}
 
 	}
 
@@ -361,13 +370,14 @@ public abstract class GameObject extends Group {
 	@SuppressWarnings("unchecked")
 	public <t> t getController(Class<t> type) {
 		for (GameObjectController manager : controllers)
-			if(manager.getClass().getName().equals(type.getName())||manager.getClass().getSuperclass().getName().equals(type.getName())) {
-//				System.out.println("sysclass_name="+system.getClass().getSuperclass().getName());
-//				System.out.println("type_passed_name="+type.getName());
+			if (manager.getClass().getName().equals(type.getName())
+					|| manager.getClass().getSuperclass().getName().equals(type.getName())) {
+				//				System.out.println("sysclass_name="+system.getClass().getSuperclass().getName());
+				//				System.out.println("type_passed_name="+type.getName());
 				return (t) manager;
 			}
-//			if (type.isInstance(manager))
-//				return type.cast(manager);
+		//			if (type.isInstance(manager))
+		//				return type.cast(manager);
 		return null;
 	}
 
@@ -378,12 +388,12 @@ public abstract class GameObject extends Group {
 	public void init(MapProperties properties) {
 		setOrigin(Align.center);
 		this.properties = properties;
-		if(bounds==null)
+		if (bounds == null)
 			bounds = new Rectangle(0, 0, getWidth(), getHeight());
 		ret_bounds = new Rectangle(bounds);
 		if (getChildren().size > 0)
 			for (int i = 0; i < getChildren().size; i++) {
-				if(!(getChildren().get(i) instanceof GameObject))
+				if (!(getChildren().get(i) instanceof GameObject))
 					continue;
 				GameObject child = (GameObject) getChildren().get(i);
 				child.setGameLayer(layer);
@@ -399,40 +409,42 @@ public abstract class GameObject extends Group {
 	public Array<GameObjectController> getControllers() {
 		return controllers;
 	}
-	
+
 	/**
 	 * get the raw bounds untrasnformed
+	 * 
 	 * @return
 	 */
 	public Rectangle getBoundsRaw() {
-		if(bounds == null)
+		if (bounds == null)
 			bounds = new Rectangle();
 		return bounds;
 	}
-	
+
 	/**
-	 * get the world y of the bounds 
+	 * get the world y of the bounds
+	 * 
 	 * @return
 	 */
 	public float getBoundsY() {
-		return getY()+(bounds!=null?bounds.getY():0);
+		return getY() + (bounds != null ? bounds.getY() : 0);
 	}
-	
+
 	/**
 	 * get the world x of the bounds
+	 * 
 	 * @return
 	 */
 	public float getBoundsX() {
-		return getX()+(bounds!=null?bounds.getX():0);
+		return getX() + (bounds != null ? bounds.getX() : 0);
 	}
-	
 
 	public void update(float delta) {
 		controllers.sort(KyperBoxGame.getPriorityComperator());
 		for (int i = 0; i < controllers.size; i++)
 			controllers.get(i).update(this, delta);
-		
-		if(apply_velocity)
+
+		if (apply_velocity)
 			setPosition(getX() + velocity.x * delta, getY() + velocity.y * delta);
 	}
 
@@ -443,9 +455,9 @@ public abstract class GameObject extends Group {
 	}
 
 	public void onRemove() {
-//		for (int i = 0; i < controllers.size; i++) {
-//			controllers.get(i).remove(this);
-//		}
+		//		for (int i = 0; i < controllers.size; i++) {
+		//			controllers.get(i).remove(this);
+		//		}
 	}
 
 	protected void setGameLayer(GameLayer layer) {
@@ -458,11 +470,11 @@ public abstract class GameObject extends Group {
 		if (sprite == null || sprite.isEmpty())
 			this.sprite = NO_SPRITE;
 	}
-	
+
 	public void setRawSprite(KyperSprite sprite) {
 		this.sprite = sprite.getName();
 		this.render = sprite;
-		
+
 	}
 
 	public void addController(GameObjectController controller) {
@@ -476,7 +488,7 @@ public abstract class GameObject extends Group {
 		controllers.add(controller);
 		controller.setRemoved(false);
 		controllers.sort(KyperBoxGame.getPriorityComperator());
-		
+
 		if (layer != null) {
 			controller.init(this);
 			layer.gameObjectChanged(this, GameObjectChangeType.CONTROLLER, 1);
@@ -496,8 +508,17 @@ public abstract class GameObject extends Group {
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
 
-		if (change_sprite && !sprite.equals(NO_SPRITE) && layer!=null) {
-			render = (KyperSprite) layer.getGameSprite(sprite);
+		if (change_sprite && !sprite.equals(NO_SPRITE) && layer != null) {
+			String atlas = null;
+			if (sprite.contains(KyperBoxGame.COLON)) {
+				String ss[] = sprite.split(KyperBoxGame.COLON);
+				atlas = ss[0].trim();
+				sprite = ss[1].trim();
+			}
+			if (atlas == null)
+				render = (KyperSprite) layer.getGameSprite(sprite);
+			else
+				render = (KyperSprite) layer.getGameSprite(sprite,atlas);
 			change_sprite = false;
 		} else if (change_sprite && sprite.equals(NO_SPRITE)) {
 			render = null;
@@ -506,11 +527,11 @@ public abstract class GameObject extends Group {
 
 		if (render != null) {
 
-			if(getParent().isTransform()) {
-				render.setPosition(getX(), getY()+getDepth());
+			if (getParent().isTransform()) {
+				render.setPosition(getX(), getY() + getDepth());
 				render.setRotation(getRotation());
-			}else { 
-				render.setPosition(getTrueX(), getTrueY()+getTrueDepth());
+			} else {
+				render.setPosition(getTrueX(), getTrueY() + getTrueDepth());
 				render.setRotation(getTrueRotation());
 			}
 			render.setAlpha(getColor().a * parentAlpha);
@@ -519,7 +540,7 @@ public abstract class GameObject extends Group {
 			render.setSize(getWidth(), getHeight());
 			render.setScale(getScaleX(), getScaleY());
 			render.setFlip(flip_x, flip_y);
-			render.draw(batch,parentAlpha);
+			render.draw(batch, parentAlpha);
 		}
 		super.draw(batch, parentAlpha);
 	}

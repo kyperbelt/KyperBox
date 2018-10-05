@@ -30,22 +30,25 @@ import com.kyperbox.ads.AdClient;
 import com.kyperbox.ads.MockAdClient;
 import com.kyperbox.console.IDevConsole;
 import com.kyperbox.console.MockDevConsole;
+import com.kyperbox.dic.Localizer;
 import com.kyperbox.input.GameInput;
+import com.kyperbox.input.ICWrapper;
 import com.kyperbox.managers.Priority.PriorityComparator;
+import com.kyperbox.managers.StateManager;
+import com.kyperbox.managers.TransitionManager;
 import com.kyperbox.umisc.BaseGameObjectFactory;
 import com.kyperbox.umisc.IGameObjectFactory;
 import com.kyperbox.umisc.IGameObjectGetter;
 import com.kyperbox.umisc.KyperMapLoader;
 import com.kyperbox.umisc.SaveUtils;
 import com.kyperbox.umisc.UserData;
-import com.kyperbox.managers.StateManager;
-import com.kyperbox.managers.TransitionManager;
 
 public abstract class KyperBoxGame extends ApplicationAdapter {
 
 	public static String TAG = "KyperBox->";
 	public static final String NOT_SUPPORTED = "[NOT SUPPORTED]";
 	public static final String NULL_STRING = "NULL";
+	public static final String COLON = ":";
 
 	public static final String IMAGE_FOLDER = "image";
 	public static final String MUSIC_FOLDER = "music";
@@ -63,6 +66,8 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	public static final String DASH_SEPARATOR = " - ";
 
 	public static final MapProperties NULL_PROPERTIES = new MapProperties();
+
+	public static final Array<ICWrapper> controllers = new Array<ICWrapper>();
 
 	private static ShaderProgram DEFAULT_SHADER;
 
@@ -84,7 +89,7 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	private IGameObjectFactory object_factory;
 	private Preferences game_prefs;
 
-	public static boolean DEBUG_LOGGING = true; //TURN OFF -- preface all logging with this
+	public static boolean DEBUG_LOGGING = true; // TURN OFF -- preface all logging with this
 
 	private InputMultiplexer input_multiplexer;
 
@@ -96,6 +101,8 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 
 	private String game_name;
 	private String prefs_name;
+
+	private Localizer localizer;
 
 	private AdClient ad_client;
 
@@ -110,8 +117,8 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 			this.game_name = game_name;
 		if (prefs_name == null)
 			prefs_name = this.game_name + "_data";
-		//WARNING    ===========
-	}//DO NOT USE ===========
+		// WARNING ===========
+	}// DO NOT USE ===========
 
 	public KyperBoxGame(String game_name, Viewport view) {
 		this(null, game_name, view);
@@ -165,6 +172,22 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	 */
 	public IDevConsole getDevConsole() {
 		return console;
+	}
+
+	/**
+	 * get the localization localizer object to help wtih localization. This must be
+	 * set usign setLocalizer or it will return a useless empty one
+	 * 
+	 * @return
+	 */
+	public Localizer getLocalizer() {
+		if (localizer == null)
+			localizer = new Localizer();
+		return localizer;
+	}
+
+	public void setLocalizer(Localizer localizer) {
+		this.localizer = localizer;
 	}
 
 	@Override
@@ -487,17 +510,20 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 
 		game_stage.getViewport().apply();
 		game_stage.draw();
-		
+
 		if (console != null) {
 			console.consoleDraw();
 		}
-		
+
+		for (int i = 0; i < controllers.size; i++) {
+			if (controllers.get(i).isConnected())
+				controllers.get(i).update();
+		}
 		input.update();
-		
+
 		float delta = Math.min(Gdx.graphics.getDeltaTime(), 1f);
 		if (console != null)
 			console.consoleUpdate(delta);
-		
 
 		if (current_gamestates.size > 0)
 			for (int i = 0; i < current_gamestates.size; i++) {
@@ -508,7 +534,6 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 				} else
 					cs.act(delta);
 			}
-		
 
 	}
 
@@ -525,9 +550,9 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 			console.dispose();
 	}
 
-	//========================================
-	//ASSET METHODS
-	//========================================
+	// ========================================
+	// ASSET METHODS
+	// ========================================
 
 	/**
 	 * get a shader program from the shaders folder
@@ -656,10 +681,10 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 		if (console != null)
 			console.updateSize(width, height);
 	}
-	
+
 	/**
-	 * use this to register your gamestates and set the initial gamestate
-	 * other setup type things can also be done here. 
+	 * use this to register your gamestates and set the initial gamestate other
+	 * setup type things can also be done here.
 	 */
 	public abstract void initiate();
 }

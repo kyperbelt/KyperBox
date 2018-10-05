@@ -71,8 +71,12 @@ public class TileLayerRenderer {
 //				(pos.y+ cam.getYOffset()/cam.getZoom() - layer.getTileHeight()),
 //				(view.getWorldWidth() + (layer.getTileWidth() * 2))/cam.getZoom(),
 //				(view.getWorldHeight() + (layer.getTileHeight() * 2))/cam.getZoom());
-		view_bounds = cam.getViewBounds();
-
+		view_bounds = view_bounds.set(cam.getViewBounds());
+		view_bounds.x -= layer.getTileWidth();
+		view_bounds.width+=layer.getTileWidth()*2;
+		view_bounds.y-=layer.getTileHeight();
+		view_bounds.height+=layer.getTileHeight()*2;
+		
 		unit_scale = (object.getScaleX() + object.getScaleY()) * .5f;
 		final Color batchColor = batch.getColor();
 		final float color = Color.toFloatBits(batchColor.r, batchColor.g, batchColor.b,

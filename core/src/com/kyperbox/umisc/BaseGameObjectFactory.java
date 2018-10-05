@@ -47,7 +47,7 @@ public class BaseGameObjectFactory implements IGameObjectFactory{
 	}
 	
 	public GameObject getGameObject(String name) {
-		if(object_getters.containsKey(name)) {
+		if(name != null && object_getters.containsKey(name)) {
 			return object_getters.get(name).getGameObject();
 		}
 		return null;

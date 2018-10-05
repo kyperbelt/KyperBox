@@ -92,6 +92,15 @@ public class GameLayer extends Group{
 			if(c.getName().equals(name))
 				return c;
 		}
+		for(Actor c: getChildren()) {
+			if(c instanceof Group) {
+				Group g = (Group) c;
+				for(Actor b:g.getChildren()) {
+					if(b.getName().equals(name))
+						return b;
+				}
+			}
+		}
 		return null;
 	}
 	

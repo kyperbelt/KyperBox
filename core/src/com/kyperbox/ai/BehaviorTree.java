@@ -21,8 +21,17 @@ public class BehaviorTree {
 	private NodeState last_result; // the last result - defaults to failure
 	private boolean finished;
 	private float total_runtime;
+	private boolean debug = false;;
 
 	public BehaviorTree() {
+	}
+	
+	public void setDebug(boolean debug) {
+		this.debug = debug;
+	}
+	
+	public boolean getDebug() {
+		return debug;
 	}
 
 	public void start(UserData context, BehaviorNode root) {
