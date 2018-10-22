@@ -13,6 +13,15 @@ public abstract class InputMapping implements InputProcessor,GestureListener{
 
 	private GameInput gameinput;
 	private GestureDetector gd; //gesture detector
+	private String current_input;
+	
+	protected void setCurrentInput(String current_input) {
+		this.current_input = current_input;
+	}
+	
+	public String getCurrentInput() {
+		return this.current_input;
+	}
 
 	/**
 	 * get the gameinput object this mapping is a part of - will return null if it
@@ -34,8 +43,16 @@ public abstract class InputMapping implements InputProcessor,GestureListener{
 	public void removed() {
 		this.gameinput.removeProcessor(this);
 		this.gameinput.removeProcessor(gd);
+		this.current_input = null;
 		this.gameinput = null;
 		
+	}
+	
+	public boolean removeMapping() {
+		if(this.gameinput!=null && this.current_input != null) {
+			return this.gameinput.removeMapping(current_input, this);
+		}
+		return false;
 	}
 
 	@Override

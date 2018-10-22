@@ -66,6 +66,7 @@ public class GameInput extends InputMultiplexer {
 				return;
 			}
 		mapping.setGameInput(this);
+		mapping.setCurrentInput(input);
 		mappings.get(input).add(mapping);
 	}
 
@@ -113,6 +114,16 @@ public class GameInput extends InputMultiplexer {
 			im.get(i).removed();
 		}
 	}
+	
+	public boolean removeMapping(String input,InputMapping mapping) {
+		Array<InputMapping> maps = mappings.get(input);
+		if(maps.contains(mapping, true)) {
+			maps.removeValue(mapping, true);
+			mapping.removed();
+			return true;
+		}
+		return false;
+	}
 
 	public float inputValue(String input) {
 		return inputs_pressed.get(input);
@@ -123,7 +134,7 @@ public class GameInput extends InputMultiplexer {
 	}
 
 	public boolean inputJustPressed(String input) {
-		return inputs_last_pressed.get(input) && !inputPressed(input);
+		return inputs_last_pressed.get(input);
 	}
 
 	public float getX() {
@@ -182,8 +193,10 @@ public class GameInput extends InputMultiplexer {
 			boolean last_pressed = inputs_last_pressed.get(input);
 			if (value != NOT_USED && inputs_pressed.get(input) == NOT_USED && !last_pressed) {
 				inputs_last_pressed.put(input, !last_pressed);
+				inputs_pressed.put(input, value);
 			} else if (value != NOT_USED) {
 				inputs_pressed.put(input, value);
+				inputs_last_pressed.put(input, false);
 			} else {
 				inputs_last_pressed.put(input, false);
 				inputs_pressed.put(input, NOT_USED);
