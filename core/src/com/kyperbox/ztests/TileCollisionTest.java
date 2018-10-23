@@ -95,14 +95,15 @@ public class TileCollisionTest extends KyperBoxGame {
 				}
 
 				if (getInput().inputJustPressed(InputDefaults.EXIT)) {
-					if (state.getStateShader() == null) {
+					state.getGame();
+					if (state.getStateShader() == KyperBoxGame.getDefaultShader()) {
 						state.setStateShader(getShader("grayscale"));
-						if(playground.getLayerShader() == null)
+						if(playground.getLayerShader() == null ||playground.getLayerShader() == KyperBoxGame.getDefaultShader())
 							playground.setLayerShader(default_shader);
 						else
 							playground.setLayerShader(null);
 					}else {
-						state.setStateShader(null);
+						state.setStateShader(KyperBoxGame.getDefaultShader());
 					}
 				
 				}

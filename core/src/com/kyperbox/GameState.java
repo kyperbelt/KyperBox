@@ -909,7 +909,7 @@ public class GameState extends Group {
 			String fontfile = properties.get("font_file", String.class);
 			if (fontfile != null && type != null && type.equals(ffcheck)) {
 				boolean markup = properties.get("markup", false, boolean.class);
-				String atlas = properties.get("atlas", String.class);
+				String atlas = properties.get("atlas",KyperBoxGame.NULL_STRING ,String.class);
 				if (atlas.equals(KyperBoxGame.NULL_STRING)) {
 					game.loadFont(fontfile, atlasname);
 				} else {

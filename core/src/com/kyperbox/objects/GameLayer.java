@@ -39,7 +39,7 @@ public class GameLayer extends Group{
 	
 	public void setLayerShader(ShaderProgram shader) {
 		this.shader = shader;
-		if(!shader.isCompiled()) {
+		if(shader!=null&&!shader.isCompiled()) {
 			getState().error(shader.getLog());
 		}
 	}

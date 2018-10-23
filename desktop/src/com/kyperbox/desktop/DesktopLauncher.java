@@ -7,6 +7,8 @@ import com.kyperbox.KyperBoxGame;
 import com.kyperbox.console.DevConsole;
 import com.kyperbox.ztests.ControllerTest;
 import com.kyperbox.ztests.LightingTest;
+import com.kyperbox.ztests.ParticleTests;
+import com.kyperbox.ztests.TileCollisionTest;
 
 public class DesktopLauncher {
 	public static boolean DEPLOYMENT = false;
@@ -17,7 +19,7 @@ public class DesktopLauncher {
 			AutoPacking.pack("game", "image", "game");
 		}
 		//game
-		KyperBoxGame game = new ControllerTest();
+		KyperBoxGame game = new TileCollisionTest();
 		
 		game.setDevConsole(new DevConsole("console.fnt", "shade1.png",Keys.GRAVE));
 		
