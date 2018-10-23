@@ -15,6 +15,8 @@ public interface ICWrapper {
 	
 	public void update();
 	
+	public void remove();
+	
 	public Controller getController();
 
 	/**

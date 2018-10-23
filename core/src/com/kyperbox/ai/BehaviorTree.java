@@ -1,8 +1,13 @@
 package com.kyperbox.ai;
 
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.JsonReader;
+import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.kyperbox.KyperBoxGame;
+import com.kyperbox.umisc.StringUtils;
 import com.kyperbox.umisc.UserData;
 
 /**
@@ -15,9 +20,9 @@ public class BehaviorTree {
 
 	private static NodeFactory node_factory = new NodeFactory();
 
-	private BehaviorNode root; //base node in the btree
-	private BehaviorNode current; //currently running node
-	private UserData context; //context for this tree
+	private BehaviorNode root; // base node in the btree
+	private BehaviorNode current; // currently running node
+	private UserData context; // context for this tree
 	private NodeState last_result; // the last result - defaults to failure
 	private boolean finished;
 	private float total_runtime;
@@ -25,11 +30,11 @@ public class BehaviorTree {
 
 	public BehaviorTree() {
 	}
-	
+
 	public void setDebug(boolean debug) {
 		this.debug = debug;
 	}
-	
+
 	public boolean getDebug() {
 		return debug;
 	}
@@ -38,7 +43,7 @@ public class BehaviorTree {
 		finished = false;
 		this.context = context;
 		this.root = root;
-		root.tree = this; //set this as the tree
+		root.tree = this; // set this as the tree
 		root.parent = null;
 		this.root.init();
 		current = root;
@@ -119,22 +124,43 @@ public class BehaviorTree {
 		return last_result == null ? NodeState.Failure : last_result;
 	}
 
-	//static start
+	// static starta
 
 	public static void registerNode(String name, NodeGetter getter) {
 		node_factory.registerNode(name, getter);
 	}
 
-	@SuppressWarnings("unused")
-	private static BehaviorNode getNode(String name) {
-		return node_factory.getNode(name);
+	private static BehaviorNode getNode(String name, JsonValue json) {
+		BehaviorNode node = node_factory.getNode(name, json.get("properties"));
+		JsonValue children = json.get("children");
+
+		if (children != null) {
+			for (int i = 0; i < children.size; i++) {
+				BehaviorNode child = getNode(children.get(i).name, children.get(i));
+				if (child != null) {
+					if(node instanceof CompositeNode) {
+						((CompositeNode)node).add(child);
+					}else if(node instanceof SupplementNode) {
+						((SupplementNode)node).setChild(child);
+					}
+				}
+			}
+		}
+		return node;
 	}
 
-	public static BehaviorNode generateRoot(String data) {
-		throw new UnsupportedOperationException("Not Yet Implemented");
+	public static BehaviorNode generateRoot(String json_data) {
+		JsonValue json = new JsonReader().parse(json_data);
+		int last = json.size -1;
+		JsonValue root = json.get(last);
+		return getNode(root.name, root);
 	}
 
-	//static end --
+	public static BehaviorNode generateRoot(FileHandle file) {
+		return generateRoot(file.readString());
+	}
+
+	// static end --
 
 	/**
 	 * one of the states a nodes update function can return. If failure or success
@@ -144,9 +170,9 @@ public class BehaviorTree {
 	 *
 	 */
 	public static enum NodeState {
-		Failure, //node failed
-		Success, //node finished running successfully
-		Running //node is currently running
+		Failure, // node failed
+		Success, // node finished running successfully
+		Running // node is currently running
 	}
 
 	/**
@@ -221,8 +247,8 @@ public class BehaviorTree {
 		}
 	}
 
-	//START COMPOSITE NODES 
-	//-- These nodes are a composite of several different nodes
+	// START COMPOSITE NODES
+	// -- These nodes are a composite of several different nodes
 
 	/**
 	 * composite node base - contains multiple node children initiation and updating
@@ -253,7 +279,7 @@ public class BehaviorTree {
 			}
 			return nodes;
 		}
-		
+
 		@Override
 		public void debugRender(ShapeRenderer render) {
 
@@ -276,9 +302,9 @@ public class BehaviorTree {
 	 */
 	public static class SequenceNode extends CompositeNode {
 
-		private boolean finished = false; //used to check if all nodes finished successfully
-		private int current; //currently running index;
-		private int last; //last index
+		private boolean finished = false; // used to check if all nodes finished successfully
+		private int current; // currently running index;
+		private int last; // last index
 
 		@Override
 		public void init() {
@@ -294,24 +320,25 @@ public class BehaviorTree {
 			super.update(delta);
 			Array<BehaviorNode> nodes = getNodes();
 
-			//if already finished just return success
+			// if already finished just return success
 			if (finished)
 				return setState(NodeState.Success);
 
-			if (nodes.size == 0) { //no nodes to fail so default to success
+			if (nodes.size == 0) { // no nodes to fail so default to success
 				finished = true;
 			} else {
 
-				if (current < nodes.size) { //current index is possible 
+				if (current < nodes.size) { // current index is possible
 					BehaviorNode cnode = nodes.get(current);
-					if (current != last) { //if this is the first time running this node initiate it
+					if (current != last) { // if this is the first time running this node initiate it
 						cnode.init();
 						last = current;
 					}
-					NodeState result = cnode.update(delta); //get the result of the current node
-					if (result == NodeState.Failure) //if its a failure then return it as such - this whole sequence fails
+					NodeState result = cnode.update(delta); // get the result of the current node
+					if (result == NodeState.Failure) // if its a failure then return it as such - this whole sequence
+														// fails
 						return setState(result);
-					else if (result == NodeState.Success) { //node ran successfully so go to the next one
+					else if (result == NodeState.Success) { // node ran successfully so go to the next one
 						current++;
 					}
 				} else {
@@ -333,9 +360,9 @@ public class BehaviorTree {
 	 */
 	public static class SelectorNode extends CompositeNode {
 
-		private boolean finished = false; //used to check if all nodes finished successfully
-		private int current; //currently running index;
-		private int last; //last index
+		private boolean finished = false; // used to check if all nodes finished successfully
+		private int current; // currently running index;
+		private int last; // last index
 
 		@Override
 		public void init() {
@@ -351,24 +378,25 @@ public class BehaviorTree {
 			super.update(delta);
 			Array<BehaviorNode> nodes = getNodes();
 
-			//if already finished just return failure
+			// if already finished just return failure
 			if (finished)
 				return setState(NodeState.Failure);
 
-			if (nodes.size == 0) { //no nodes to succeed so default to failure
+			if (nodes.size == 0) { // no nodes to succeed so default to failure
 				finished = true;
 			} else {
 
-				if (current < nodes.size) { //current index is possible 
+				if (current < nodes.size) { // current index is possible
 					BehaviorNode cnode = nodes.get(current);
-					if (current != last) { //if this is the first time running this node initiate it
+					if (current != last) { // if this is the first time running this node initiate it
 						cnode.init();
 						last = current;
 					}
-					NodeState result = cnode.update(delta); //get the result of the current node
-					if (result == NodeState.Success) //if its a success then return it as such - this whole sequence succeeds
+					NodeState result = cnode.update(delta); // get the result of the current node
+					if (result == NodeState.Success) // if its a success then return it as such - this whole sequence
+														// succeeds
 						return setState(result);
-					else if (result == NodeState.Failure) { //node ran failure so go to the next one
+					else if (result == NodeState.Failure) { // node ran failure so go to the next one
 						current++;
 					}
 				} else {
@@ -412,10 +440,11 @@ public class BehaviorTree {
 		}
 	}
 
-	//END COMPOSITE NODES
+	// END COMPOSITE NODES
 
-	//START SUPPLEMENTARY NODES
-	//-- These nodes are used to supplement a single child node in some way/shape or form
+	// START SUPPLEMENTARY NODES
+	// -- These nodes are used to supplement a single child node in some way/shape
+	// or form
 
 	/**
 	 * base supplementary node that can parent one child
@@ -590,7 +619,7 @@ public class BehaviorTree {
 
 	}
 
-	//END SUPPLEMENTARY NODEs
+	// END SUPPLEMENTARY NODEs
 
 	/**
 	 * 
@@ -605,7 +634,7 @@ public class BehaviorTree {
 		 * 
 		 * @return
 		 */
-		public BehaviorNode getNode();
+		public BehaviorNode getNode(JsonValue properties);
 	}
 
 	/**
@@ -631,10 +660,12 @@ public class BehaviorTree {
 			getters.put(nodename, getter);
 		}
 
-		public BehaviorNode getNode(String node) {
+		public BehaviorNode getNode(String node, JsonValue json) {
 			if (getters.containsKey(node)) {
-				return getters.get(node).getNode();
+
+				return getters.get(node).getNode(json);
 			} else {
+				KyperBoxGame.error("BehaviorTree",StringUtils.format("Node[%s] not found in node factory.", node));
 				return null;
 			}
 		}

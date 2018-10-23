@@ -348,4 +348,10 @@ public class KyperController implements ICWrapper, ControllerListener {
 		return false;
 	}
 
+	@Override
+	public void remove() {
+		KyperBoxGame.controllers.removeValue(this, true);
+		
+	}
+
 }
