@@ -1,47 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" tiledversion="2017.12.07" orientation="orthogonal" renderorder="right-down" width="100" height="30" tilewidth="32" tileheight="32" infinite="0" nextobjectid="78">
+<map version="1.0" tiledversion="2018.07.13" orientation="orthogonal" renderorder="right-down" width="100" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="7" nextobjectid="78">
  <properties>
   <property name="atlas" value="image/game.atlas"/>
  </properties>
  <tileset firstgid="1" name="TempleTIles" tilewidth="32" tileheight="32" tilecount="221" columns="17">
   <image source="../../../input_assets/game/TempleTIles.png" width="544" height="416"/>
   <tile id="76">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="solid" type="bool" value="true"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="solid" type="bool" value="true"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="77">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="solid" type="bool" value="true"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="solid" type="bool" value="true"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="78">
    <objectgroup draworder="index"/>
   </tile>
   <tile id="79">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="solid" type="bool" value="true"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="solid" type="bool" value="true"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="80">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="solid" type="bool" value="true"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="solid" type="bool" value="true"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="81">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="solid" type="bool" value="true"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="solid" type="bool" value="true"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="82">
    <objectgroup draworder="index"/>
@@ -55,74 +50,64 @@
    </animation>
   </tile>
   <tile id="94">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="type" type="int" value="0"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="type" type="int" value="0"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="95">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="type" type="int" value="0"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="type" type="int" value="0"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="96">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="type" type="int" value="0"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="type" type="int" value="0"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="97">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="type" type="int" value="0"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="type" type="int" value="0"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="102" type="1">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="type" type="int" value="0"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="type" type="int" value="0"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="103">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="type" type="int" value="0"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="type" type="int" value="0"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="104" type="1">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="type" type="int" value="0"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="type" type="int" value="0"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="105">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="type" type="int" value="0"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="type" type="int" value="0"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="106">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="type" type="int" value="0"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="type" type="int" value="0"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="107">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="type" type="int" value="0"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="type" type="int" value="0"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="110">
    <objectgroup draworder="index"/>
@@ -143,46 +128,40 @@
    <objectgroup draworder="index"/>
   </tile>
   <tile id="119">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="type" type="int" value="0"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="type" type="int" value="0"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="120">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="type" type="int" value="0"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="type" type="int" value="0"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="121">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="type" type="int" value="0"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="type" type="int" value="0"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="122">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="type" type="int" value="0"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="type" type="int" value="0"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="123">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="type" type="int" value="0"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="type" type="int" value="0"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="124">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="type" type="int" value="0"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="type" type="int" value="0"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="127">
    <objectgroup draworder="index"/>
@@ -203,172 +182,148 @@
    <objectgroup draworder="index"/>
   </tile>
   <tile id="136">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="type" type="int" value="0"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="type" type="int" value="0"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="137">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="type" type="int" value="0"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="type" type="int" value="0"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="138">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="type" type="int" value="0"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="type" type="int" value="0"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="139">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="type" type="int" value="0"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="type" type="int" value="0"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="140">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="type" type="int" value="0"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="type" type="int" value="0"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="141">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="type" type="int" value="0"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="type" type="int" value="0"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="153">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="type" type="int" value="0"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="type" type="int" value="0"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="154">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="type" type="int" value="0"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="type" type="int" value="0"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="155">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="type" type="int" value="0"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="type" type="int" value="0"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="156">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="type" type="int" value="0"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="type" type="int" value="0"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="157">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="type" type="int" value="0"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="type" type="int" value="0"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="158">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="type" type="int" value="0"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="type" type="int" value="0"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="170">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="type" type="int" value="0"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="type" type="int" value="0"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="171">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="type" type="int" value="0"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="type" type="int" value="0"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="172">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="type" type="int" value="0"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="type" type="int" value="0"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="173">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="type" type="int" value="0"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="type" type="int" value="0"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="174">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="type" type="int" value="0"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="type" type="int" value="0"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="175">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="type" type="int" value="0"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="type" type="int" value="0"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="187">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="type" type="int" value="0"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="type" type="int" value="0"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="188">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="type" type="int" value="0"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="type" type="int" value="0"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="189">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="type" type="int" value="0"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="type" type="int" value="0"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="190">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="type" type="int" value="0"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="type" type="int" value="0"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="191">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="type" type="int" value="0"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="type" type="int" value="0"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
   <tile id="192">
-   <objectgroup draworder="index">
-    <properties>
-     <property name="type" type="int" value="0"/>
-    </properties>
-   </objectgroup>
+   <properties>
+    <property name="type" type="int" value="0"/>
+   </properties>
+   <objectgroup draworder="index"/>
   </tile>
  </tileset>
  <tileset firstgid="222" name="Backgrounds" tilewidth="544" tileheight="160" tilecount="5" columns="0">
@@ -401,7 +356,7 @@
    <image width="32" height="32" source="../../../input_assets/game/player_walking_0.png"/>
   </tile>
  </tileset>
- <objectgroup name="background">
+ <objectgroup id="1" name="background">
   <object id="65" name="parallax_back" type="ScrollingBackground" gid="223" x="0" y="960" width="1280" height="736">
    <properties>
     <property name="image" value="parallax-mountain-bg"/>
@@ -426,7 +381,7 @@
    </properties>
   </object>
  </objectgroup>
- <objectgroup name="playground">
+ <objectgroup id="2" name="playground">
   <object id="69" name="platformer_tiles" type="TilemapLayerObject" x="0" y="928" width="32" height="32">
    <properties>
     <property name="tile_layer" value="platformer_tiles"/>
@@ -453,14 +408,14 @@
    </properties>
   </object>
  </objectgroup>
- <layer name="platformer_tiles" width="100" height="30">
+ <layer id="3" name="platformer_tiles" width="100" height="30">
   <data encoding="base64" compression="zlib">
    eJztmUkOgkAQRfuCjhdw2BiP4HAChws4ncDhiv6KIa4AG1qsyHvJW5CwqOpPUSSEAAAAAAAAAAAAZcwjhbTUOWMySw/n5Qvy8EVeHrx7fkNRHp/eC+kom4+8a/gORWfMu6p56p5zJ0kVkMFz7wvy8IWnPNhXvvq2WhZyHXzV1SSe+rZarvIR2jsjXno+hNdsLOUqtHdGYnq2b9uu7Mm+HMhhojosj43cyp3cR9b2L8T2PJJjOZHThHVYHkd5kmd5qVDbP+ApD9sdN3kP7x3SJrKdOSsw9n8hVtN4Ao1sWTw=
   </data>
  </layer>
- <objectgroup name="foreground"/>
- <objectgroup name="uiground"/>
- <objectgroup name="preload">
+ <objectgroup id="4" name="foreground"/>
+ <objectgroup id="5" name="uiground"/>
+ <objectgroup id="6" name="preload" locked="1">
   <object id="1" name="ScreenSize" type="Viewport" x="0" y="240" width="1280" height="720"/>
   <object id="60" name="game_font" type="Font" x="0" y="32">
    <properties>

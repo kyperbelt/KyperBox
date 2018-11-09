@@ -19,8 +19,8 @@ public class AnimationController extends GameObjectController {
 	private float animation_elapsed;
 	private PlayMode mode;
 	private float play_speed = 1f;;
-	private GameObject daddy; //The gameobject this controller belongs to
-								//or as i like to call it, its daddy haha
+	private GameObject daddy; // The gameobject this controller belongs to
+								// or as i like to call it, its daddy haha
 
 	public AnimationController() {
 		animations = new ObjectMap<String, String>();
@@ -44,9 +44,10 @@ public class AnimationController extends GameObjectController {
 
 	private void loadAnimation() {
 		animation_elapsed = 0f;
-		Animation<KyperSprite> a =  daddy.getState().getAnimation(animation_name);
+		Animation<KyperSprite> a = daddy.getState().getAnimation(animation_name);
 		current_animation = a;
-		current_animation.setPlayMode(mode);
+		if (current_animation != null)
+			current_animation.setPlayMode(mode);
 	}
 
 	/**
@@ -156,7 +157,7 @@ public class AnimationController extends GameObjectController {
 			int pp = (int) (animation_elapsed / current_animation.getAnimationDuration());
 			if (isAnimationFinished() && listener != null && pp > playtimes) {
 				playtimes = pp;
-				listener.finished(getCurrent(),playtimes);
+				listener.finished(getCurrent(), playtimes);
 			}
 
 		}
@@ -174,7 +175,7 @@ public class AnimationController extends GameObjectController {
 		 * @param times
 		 *            - how many times it has finished
 		 */
-		public void finished(String animation,int times);
+		public void finished(String animation, int times);
 	}
 
 }
