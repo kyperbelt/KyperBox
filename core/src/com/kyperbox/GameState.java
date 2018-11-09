@@ -131,6 +131,8 @@ public class GameState extends Group {
 		halt_update = true;
 		sounds = new ObjectMap<String, String>();
 		musics = new ObjectMap<String, String>();
+
+		state_data = new UserData(name + "(data)");
 	}
 
 	public GameState(String tmx, StateManager manager) {
@@ -180,7 +182,7 @@ public class GameState extends Group {
 			game.loadTiledMap(tmx);
 			game.getAssetManager().finishLoading();
 			map_data = game.getTiledMap(tmx);
-			state_data = new UserData(name + "(data)");
+			state_data.setName(name+("data"));
 
 			time_scale = 1f;
 
@@ -801,6 +803,11 @@ public class GameState extends Group {
 	//	  \______/ |__/  \__/|________/ \______/ |__/  |__/|_______/ 
 	//	  =======================================================
 
+	
+	public void clearStateData() {
+		state_data.clear();
+	}
+	
 	public void unloadFonts() {
 		Array<BitmapFont> fvalues = fonts.values().toArray();
 		AssetManager am = game.getAssetManager();

@@ -328,13 +328,10 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	/**
 	 * register a game state
 	 * 
-	 * @param name
-	 *            - name of the game state - this will be used for logging and
-	 *            storing data
-	 * @param tmx
-	 *            - the tmx associated with this state.
-	 * @param manager
-	 *            - the manager for this gamestate - this handles all the logic
+	 * @param name    - name of the game state - this will be used for logging and
+	 *                storing data
+	 * @param tmx     - the tmx associated with this state.
+	 * @param manager - the manager for this gamestate - this handles all the logic
 	 */
 	public void registerGameState(String name, String tmx, StateManager manager) {
 		game_states.put(name, new GameState(name, tmx, manager));
@@ -344,10 +341,8 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	/**
 	 * register a gamestate and use its tmx file as its name
 	 * 
-	 * @param tmx
-	 *            - the tmx associated with this state
-	 * @param manager
-	 *            - the manager for this gamestate - this handles the logic
+	 * @param tmx     - the tmx associated with this state
+	 * @param manager - the manager for this gamestate - this handles the logic
 	 */
 	public void registerGameState(String tmx, StateManager manager) {
 		registerGameState(tmx, tmx, manager);
@@ -356,8 +351,7 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	/**
 	 * register a gamestate with no name and manager
 	 * 
-	 * @param tmx
-	 *            - the tmx associated with this gamestate
+	 * @param tmx - the tmx associated with this gamestate
 	 */
 	public void registerGameState(String tmx) {
 		game_states.put(tmx, new GameState(tmx));
@@ -368,8 +362,7 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	 * clear all other states currently in the state stack and set the state to the
 	 * one given
 	 * 
-	 * @param state_name
-	 *            - the name of the gamestate to set it to
+	 * @param state_name - the name of the gamestate to set it to
 	 */
 	public void setGameState(final String state_name) {
 		Gdx.app.postRunnable(new Runnable() {
@@ -379,8 +372,10 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 					gs.remove();
 				GameState state = game_states.get(state_name);
 				state.init();
-				for (GameState gs : current_gamestates)
-					gs.dispose();
+				for (GameState gs : current_gamestates) {
+					if (state != gs)
+						gs.dispose();
+				}
 				current_gamestates.clear();
 				current_gamestates.add(state);
 				game_stage.addActor(state);
@@ -393,8 +388,7 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	 * to indicate whether it should halt the update/render of the state directly
 	 * under it
 	 * 
-	 * @param state
-	 *            - the gamestate to use
+	 * @param state - the gamestate to use
 	 */
 	public void pushGameState(final GameState state) {
 		Gdx.app.postRunnable(new Runnable() {
@@ -417,8 +411,7 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	 * flags to indicate whether it should halt the update/render of the state
 	 * directly under it
 	 * 
-	 * @param state_name
-	 *            - the name of the gamestate to use
+	 * @param state_name - the name of the gamestate to use
 	 */
 	public void pushGameState(String state_name) {
 		pushGameState(game_states.get(state_name));
@@ -447,12 +440,9 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	/**
 	 * transition to another state
 	 * 
-	 * @param state
-	 *            - state to transition to
-	 * @param duration
-	 *            - duration of transition (*2 for in out)
-	 * @param type
-	 *            - type of TransitionManager.Type
+	 * @param state    - state to transition to
+	 * @param duration - duration of transition (*2 for in out)
+	 * @param type     - type of TransitionManager.Type
 	 */
 	public void transitionTo(String state, float duration, int type) {
 		if (transition_state.getManager() == null || !(transition_state.getManager() instanceof TransitionManager)) {
@@ -557,8 +547,7 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	/**
 	 * get a shader program from the shaders folder
 	 * 
-	 * @param name
-	 *            - name of the shader
+	 * @param name - name of the shader
 	 * @return
 	 */
 	public ShaderProgram getShader(String name) {
