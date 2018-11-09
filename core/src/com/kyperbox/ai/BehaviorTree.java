@@ -130,9 +130,11 @@ public class BehaviorTree {
 		BehaviorNode node = node_factory.getNode(name, json.get("properties"));
 		JsonValue children = json.get("children");
 
-		if (children != null) {
-			for (int i = 0; i < children.size; i++) {
-				BehaviorNode child = getNode(children.get(i).name, children.get(i));
+		if (children != null && children.child!=null) {
+			System.out.println("child of -"+name+" count="+children.size);
+			
+			for (int i = 0; i < children.child.size; i++) {
+				BehaviorNode child = getNode(children.child.get(i).name, children.child.get(i));
 				if (child != null) {
 					if(node instanceof CompositeNode) {
 						((CompositeNode)node).add(child);
