@@ -171,7 +171,7 @@ public class CollisionController extends GameObjectController {
 
 	@Override
 	public void remove(GameObject object) {
-
+		tree = null;
 	}
 
 	@Override
