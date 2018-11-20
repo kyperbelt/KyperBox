@@ -102,7 +102,7 @@ public class BehaviorTree {
 			if (root == null)
 				throw new NullPointerException(
 						"the root node of this behavior tree is null, Try and using its start method to set it.");
-			NodeState result = root.update(delta);
+			NodeState result = root.internalUpdate(delta);
 			if (result != NodeState.Running) {
 				finished = true;
 				last_result = result;

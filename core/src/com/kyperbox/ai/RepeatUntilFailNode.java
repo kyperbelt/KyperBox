@@ -25,7 +25,7 @@ public class RepeatUntilFailNode extends SupplementNode {
 			getChild().init();
 		}
 
-		NodeState result = getChild().update(delta);
+		NodeState result = getChild().internalUpdate(delta);
 		if (result != NodeState.Running && result != NodeState.Failure)
 			finished = true;
 		else

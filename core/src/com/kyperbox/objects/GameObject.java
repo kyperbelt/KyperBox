@@ -40,17 +40,19 @@ public abstract class GameObject extends Group {
 	private Vector2 velocity;
 	private Vector2 position;
 	private Vector2 collision_center;
-	private float depth; //this is the z depth component;
-	private float thickness; //this is the pseudo 3 dimensional height
+	private float depth; // this is the z depth component;
+	private float thickness; // this is the pseudo 3 dimensional height
 	private float depth_velocity;
 
 	private Color debug_bounds;
 	private boolean flip_x;
 	private boolean flip_y;
-	private boolean apply_velocity = true; //whether or not this object applies its own velocity
+	private boolean apply_velocity = true; // whether or not this object applies its own velocity
 
 	private boolean change_sprite;
 	private KyperSprite render;
+
+	private boolean pre_draw_children = false;
 
 	public GameObject() {
 		setTransform(false);
@@ -282,7 +284,8 @@ public abstract class GameObject extends Group {
 		if (getParent() != null) {
 			ret_bounds.setCenter(getOriginX(), getOriginY());
 			ret_bounds.set(getTrueX() + bounds.x, getTrueY() + bounds.y, bounds.width, bounds.height);
-			//System.out.println("object||"+getName()+"|| bounds - "+bounds+" - retbounds -"+ret_bounds+" truepos["+getTrueX()+","+getTrueY()+"]");
+			// System.out.println("object||"+getName()+"|| bounds - "+bounds+" - retbounds
+			// -"+ret_bounds+" truepos["+getTrueX()+","+getTrueY()+"]");
 			return ret_bounds;
 		} else if (getCollisionPolygon() != null) {
 			return getCollisionPolygon().getBoundingRectangle();
@@ -326,7 +329,7 @@ public abstract class GameObject extends Group {
 			if (bounds != null && p != null) {
 				shapes.polygon(ret_poly.getTransformedVertices());
 				Rectangle r = ret_poly.getBoundingRectangle();
-				//shapes.setColor(Color.SKY);
+				// shapes.setColor(Color.SKY);
 				shapes.rect(r.x, r.y, r.width, r.height);
 			}
 			shapes.setColor(cc);
@@ -372,12 +375,12 @@ public abstract class GameObject extends Group {
 		for (GameObjectController manager : controllers)
 			if (manager.getClass().getName().equals(type.getName())
 					|| manager.getClass().getSuperclass().getName().equals(type.getName())) {
-				//				System.out.println("sysclass_name="+system.getClass().getSuperclass().getName());
-				//				System.out.println("type_passed_name="+type.getName());
+				// System.out.println("sysclass_name="+system.getClass().getSuperclass().getName());
+				// System.out.println("type_passed_name="+type.getName());
 				return (t) manager;
 			}
-		//			if (type.isInstance(manager))
-		//				return type.cast(manager);
+		// if (type.isInstance(manager))
+		// return type.cast(manager);
 		return null;
 	}
 
@@ -455,9 +458,9 @@ public abstract class GameObject extends Group {
 	}
 
 	public void onRemove() {
-		//		for (int i = 0; i < controllers.size; i++) {
-		//			controllers.get(i).remove(this);
-		//		}
+		// for (int i = 0; i < controllers.size; i++) {
+		// controllers.get(i).remove(this);
+		// }
 	}
 
 	protected void setGameLayer(GameLayer layer) {
@@ -508,6 +511,10 @@ public abstract class GameObject extends Group {
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
 
+		if (pre_draw_children) {
+			super.draw(batch, parentAlpha);
+		}
+
 		if (change_sprite && !sprite.equals(NO_SPRITE) && layer != null) {
 			String atlas = null;
 			if (sprite.contains(KyperBoxGame.COLON)) {
@@ -518,7 +525,7 @@ public abstract class GameObject extends Group {
 			if (atlas == null)
 				render = (KyperSprite) layer.getGameSprite(sprite);
 			else
-				render = (KyperSprite) layer.getGameSprite(sprite,atlas);
+				render = (KyperSprite) layer.getGameSprite(sprite, atlas);
 			change_sprite = false;
 		} else if (change_sprite && sprite.equals(NO_SPRITE)) {
 			render = null;
@@ -542,7 +549,17 @@ public abstract class GameObject extends Group {
 			render.setFlip(flip_x, flip_y);
 			render.draw(batch, parentAlpha);
 		}
-		super.draw(batch, parentAlpha);
+
+		if (!pre_draw_children)
+			super.draw(batch, parentAlpha);
+	}
+	
+	public boolean isPreDrawChildren() {
+		return pre_draw_children;
+	}
+	
+	public void setPreDrawChildren(boolean pre_draw_children) {
+		this.pre_draw_children = pre_draw_children;
 	}
 
 	@Override
@@ -588,7 +605,7 @@ public abstract class GameObject extends Group {
 		return l;
 	}
 
-	//map properties utility --------------------------
+	// map properties utility --------------------------
 
 	public int[] getIntArray(String name) {
 		String[] strings = getStringArray(name);
@@ -660,12 +677,12 @@ public abstract class GameObject extends Group {
 	 * @return
 	 */
 	public boolean passGameMessage(int type, Object... args) {
-		//TODO OVERRIDE ---
+		// TODO OVERRIDE ---
 		return false;
 	}
 
 	public static class GameObjectChangeType {
-		public static final int CONTROLLER = 0; //value -1 means removed  1 = added
+		public static final int CONTROLLER = 0; // value -1 means removed 1 = added
 		public static final int LOCATION = 1;
 		public static final int NAME = 2;
 		public static final int FOLLOW_BOUNDS_REACHED = 3;

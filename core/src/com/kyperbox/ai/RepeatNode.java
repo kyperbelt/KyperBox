@@ -42,7 +42,7 @@ public class RepeatNode extends SupplementNode {
 			times_ran++;
 		}
 
-		NodeState result = getChild().update(delta);
+		NodeState result = getChild().internalUpdate(delta);
 
 		if (times_ran >= amount && amount != -1)
 			return setState(result);
