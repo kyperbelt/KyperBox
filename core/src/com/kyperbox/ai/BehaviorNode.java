@@ -1,6 +1,5 @@
 package com.kyperbox.ai;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.kyperbox.umisc.UserData;
 

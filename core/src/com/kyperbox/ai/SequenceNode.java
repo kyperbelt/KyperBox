@@ -47,10 +47,10 @@ public class SequenceNode extends CompositeNode {
 					last = current;
 				}
 				NodeState result = cnode.internalUpdate(delta); // get the result of the current node
-				if (result == NodeState.Failure) // if its a failure then return it as such - this whole sequence
+				if (result == NodeState.Failure) { // if its a failure then return it as such - this whole sequence
 													// fails
 					return setState(result);
-				else if (result == NodeState.Success) { // node ran successfully so go to the next one
+				}else if (result == NodeState.Success) { // node ran successfully so go to the next one
 					current++;
 				}
 			} else {
