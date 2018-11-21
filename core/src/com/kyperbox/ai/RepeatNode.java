@@ -45,12 +45,12 @@ public class RepeatNode extends SupplementNode {
 		NodeState result = getChild().internalUpdate(delta);
 
 		if (times_ran >= amount && amount != -1)
-			return setState(result);
+			return result;
 
 		if (result != NodeState.Running)
 			finished = true;
 
-		return setState(NodeState.Running);
+		return NodeState.Running;
 	}
 
 }

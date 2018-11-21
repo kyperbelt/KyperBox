@@ -20,8 +20,8 @@ public class SuccessNode extends SupplementNode {
 		super.update(delta);
 		NodeState result = getChild().internalUpdate(delta);
 		if (result != NodeState.Running)
-			return setState(NodeState.Success);
-		return setState(result);
+			return NodeState.Success;
+		return result;
 	}
 
 }

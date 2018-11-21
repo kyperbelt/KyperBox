@@ -61,9 +61,10 @@ public abstract class BehaviorNode {
 		start_time = System.nanoTime();
 	}
 	
-	protected NodeState internalUpdate(float delta) {
-		NodeState state = setState(update(delta));
+	public NodeState internalUpdate(float delta) {
+		NodeState state = this.update(delta);
 		total_runtime = (float) ((System.nanoTime() - start_time) / 1000000000.0);
+		setState(state);
 		return state;
 	}
 
