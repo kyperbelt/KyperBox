@@ -4,6 +4,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
+import com.kyperbox.KyperBoxGame;
 import com.kyperbox.umisc.UserData;
 
 /**
@@ -13,7 +14,7 @@ import com.kyperbox.umisc.UserData;
  *
  */
 public class BehaviorTree {
-	
+
 	private static NodeFactory node_factory = new NodeFactory();
 
 	private BehaviorNode root; // base node in the btree
@@ -130,16 +131,18 @@ public class BehaviorTree {
 		BehaviorNode node = node_factory.getNode(name, json.get("properties"));
 		JsonValue children = json.get("children");
 
-		if (children != null && children.child!=null) {
-			System.out.println("Node -"+name+" child count="+children.size+" childchildcount="+children.child.size);
-			
+		if (children != null && children.child != null) {
+			if (KyperBoxGame.DEBUG_LOGGING)
+				System.out.println(
+						"Node -" + name + " child count=" + children.size + " childchildcount=" + children.child.size);
+
 			for (int i = 0; i < children.size; i++) {
 				BehaviorNode child = getNode(children.get(i).child.name, children.get(i).child);
 				if (child != null) {
-					if(node instanceof CompositeNode) {
-						((CompositeNode)node).add(child);
-					}else if(node instanceof SupplementNode) {
-						((SupplementNode)node).setChild(child);
+					if (node instanceof CompositeNode) {
+						((CompositeNode) node).add(child);
+					} else if (node instanceof SupplementNode) {
+						((SupplementNode) node).setChild(child);
 					}
 				}
 			}
@@ -149,7 +152,7 @@ public class BehaviorTree {
 
 	public static BehaviorNode generateRoot(String json_data) {
 		JsonValue json = new JsonReader().parse(json_data);
-		int last = json.size -1;
+		int last = json.size - 1;
 		JsonValue root = json.get(last);
 		return getNode(root.name, root);
 	}
@@ -159,9 +162,5 @@ public class BehaviorTree {
 	}
 
 	// static end --
-
-
-
-
 
 }
