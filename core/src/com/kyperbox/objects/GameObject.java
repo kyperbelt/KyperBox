@@ -267,6 +267,14 @@ public abstract class GameObject extends Group {
 		}
 		return getRotation();
 	}
+	
+	public String getSprite() {
+		return sprite;
+	}
+	
+	public KyperSprite getRenderSprite() {
+		return render;
+	}
 
 	public void setFlip(boolean flip_x, boolean flip_y) {
 		this.flip_x = flip_x;
