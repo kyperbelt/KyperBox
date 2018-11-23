@@ -133,12 +133,15 @@ public class BehaviorTree {
 		if (children != null && children.child!=null) {
 			System.out.println("child of -"+name+" count="+children.size);
 			
-			for (int i = 0; i < children.child.size; i++) {
-				BehaviorNode child = getNode(children.child.get(i).name, children.child.get(i));
+			for (int i = 0; i < children.size; i++) {
+				JsonValue cv = children.get(i);
+				BehaviorNode child = getNode(cv.child.name, cv.child);
 				if (child != null) {
 					if(node instanceof CompositeNode) {
 						((CompositeNode)node).add(child);
+						System.out.println("child added -"+cv.child.name+" to "+node.getClass().getSimpleName());
 					}else if(node instanceof SupplementNode) {
+						System.out.println("child added -"+cv.child.name+" to "+node.getClass().getSimpleName());
 						((SupplementNode)node).setChild(child);
 					}
 				}

@@ -29,8 +29,8 @@ public abstract class ControlSpecificSystem extends LayerSystem {
 		if (type == GameObjectChangeType.CONTROLLER) {
 			Object component = object.getController(c);
 			if (component == null) {
-				objects.removeValue(object, true);
-				removed(object);
+				if (objects.removeValue(object, true))
+					removed(object);
 			} else if (!objects.contains(object, true)) {
 				objects.add(object);
 				added(object);
@@ -40,11 +40,9 @@ public abstract class ControlSpecificSystem extends LayerSystem {
 
 	@Override
 	public void gameObjectRemoved(GameObject object, GameObject parent) {
-		Object component = object.getController(c);
-		if (component == null) {
-			objects.removeValue(object, true);
+
+		if (objects.removeValue(object, true))
 			removed(object);
-		}
 	}
 
 	@Override
@@ -56,11 +54,11 @@ public abstract class ControlSpecificSystem extends LayerSystem {
 	public void onRemove() {
 		objects.clear();
 	}
-	
+
 	@Override
 	public void update(float delta) {
-		update(objects,delta);
-	}	
+		update(objects, delta);
+	}
 
 	public abstract void update(Array<GameObject> objects, float delta);
 
