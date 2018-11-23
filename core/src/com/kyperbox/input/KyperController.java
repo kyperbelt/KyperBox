@@ -38,12 +38,16 @@ public class KyperController implements ICWrapper, ControllerListener {
 	private boolean l2;
 	private boolean l3;
 
-	public KyperController(Controller controller) {
+	public KyperController(Controller controller,KyperControllerMapper maps) {
 		this.controller = controller;
 		this.controller.addListener(this);
-		this.maps = KyperControllerMapper.getMapsForController(this.controller);
+		this.maps = maps;
 		KyperBoxGame.controllers.removeValue(this, true);
 		KyperBoxGame.controllers.add(this);
+	}
+	
+	public KyperController(Controller controller) {
+		this(controller,KyperControllerMapper.getMapsForController(controller));
 	}
 
 	@Override
