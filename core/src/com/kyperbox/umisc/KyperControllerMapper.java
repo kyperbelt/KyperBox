@@ -5,29 +5,29 @@ import com.kyperbox.KyperBoxGame;
 
 public class KyperControllerMapper {
 
-	private int button_a;
-	private int button_b;
-	private int button_x;
-	private int button_y;
-	private int dpad;
-	private int left_1;
-	private int right_1;
-	private int select;
-	private int start;
-	private int left_3;
-	private int right_3;
-	private int left2_trigger;
-	private int right2_trigger;
-	private int analog_left_x;
-	private int analog_left_y;
-	private int analog_right_x;
-	private int analog_right_y;
-	private int extra1;
-	private int extra2;
-	private int extra3;
-	private int extra4;
-	private boolean axis_trigger = true;
-	private boolean triggers_same_axis = false;// means that -1
+	public int button_a;
+	public int button_b;
+	public int button_x;
+	public int button_y;
+	public int dpad;
+	public int left_1;
+	public int right_1;
+	public int select;
+	public int start;
+	public int left_3;
+	public int right_3;
+	public int left2_trigger;
+	public int right2_trigger;
+	public int analog_left_x;
+	public int analog_left_y;
+	public int analog_right_x;
+	public int analog_right_y;
+	public int extra1;
+	public int extra2;
+	public int extra3;
+	public int extra4;
+	public boolean axis_trigger = true;
+	public boolean triggers_same_axis = false;// means that -1
 
 	// GETTERS
 
