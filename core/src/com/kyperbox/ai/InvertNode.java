@@ -17,13 +17,12 @@ public class InvertNode extends SupplementNode {
 
 	@Override
 	public NodeState update(float delta) {
-		super.update(delta);
-		NodeState result = getChild().update(delta);
+		NodeState result = getChild().internalUpdate(delta);
 		if (result == NodeState.Success)
-			return setState(NodeState.Failure);
+			return NodeState.Failure;
 		if (result == NodeState.Failure)
-			return setState(NodeState.Success);
-		return setState(result);
+			return NodeState.Success;
+		return result;
 	}
 
 }

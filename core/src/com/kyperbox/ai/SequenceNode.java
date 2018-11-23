@@ -29,12 +29,11 @@ public class SequenceNode extends CompositeNode {
 
 	@Override
 	public NodeState update(float delta) {
-		super.update(delta);
 		Array<BehaviorNode> nodes = getNodes();
 
 		// if already finished just return success
 		if (finished)
-			return setState(NodeState.Success);
+			return NodeState.Success;
 
 		if (nodes.size == 0) { // no nodes to fail so default to success
 			finished = true;
@@ -46,11 +45,11 @@ public class SequenceNode extends CompositeNode {
 					cnode.init();
 					last = current;
 				}
-				NodeState result = cnode.update(delta); // get the result of the current node
-				if (result == NodeState.Failure) // if its a failure then return it as such - this whole sequence
+				NodeState result = cnode.internalUpdate(delta); // get the result of the current node
+				if (result == NodeState.Failure) { // if its a failure then return it as such - this whole sequence
 													// fails
-					return setState(result);
-				else if (result == NodeState.Success) { // node ran successfully so go to the next one
+					return result;
+				}else if (result == NodeState.Success) { // node ran successfully so go to the next one
 					current++;
 				}
 			} else {
@@ -58,7 +57,7 @@ public class SequenceNode extends CompositeNode {
 			}
 
 		}
-		return setState(NodeState.Running);
+		return NodeState.Running;
 	}
 
 }

@@ -15,6 +15,7 @@ public abstract class BehaviorNode {
 	protected BehaviorNode parent;
 	private NodeState state;
 	protected float total_runtime;
+	protected float start_time;
 
 	public BehaviorNode() {
 		state = NodeState.Running;
@@ -57,6 +58,14 @@ public abstract class BehaviorNode {
 		setState(NodeState.Running);
 		getTree().setCurrent(this);
 		total_runtime = 0;
+		start_time = System.nanoTime();
+	}
+	
+	public NodeState internalUpdate(float delta) {
+		NodeState state = this.update(delta);
+		total_runtime = (float) ((System.nanoTime() - start_time) / 1000000000.0);
+		setState(state);
+		return state;
 	}
 
 	/**
@@ -70,7 +79,7 @@ public abstract class BehaviorNode {
 	 * @return
 	 */
 	public NodeState update(float delta) {
-		total_runtime += delta;
+		
 		return NodeState.Running;
 	}
 }

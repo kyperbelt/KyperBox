@@ -31,7 +31,7 @@ public class SelectorNode extends CompositeNode {
 
 		// if already finished just return failure
 		if (finished)
-			return setState(NodeState.Failure);
+			return NodeState.Failure;
 
 		if (nodes.size == 0) { // no nodes to succeed so default to failure
 			finished = true;
@@ -43,10 +43,10 @@ public class SelectorNode extends CompositeNode {
 					cnode.init();
 					last = current;
 				}
-				NodeState result = cnode.update(delta); // get the result of the current node
+				NodeState result = cnode.internalUpdate(delta); // get the result of the current node
 				if (result == NodeState.Success) // if its a success then return it as such - this whole sequence
 													// succeeds
-					return setState(result);
+					return result;
 				else if (result == NodeState.Failure) { // node ran failure so go to the next one
 					current++;
 				}
@@ -55,7 +55,7 @@ public class SelectorNode extends CompositeNode {
 			}
 
 		}
-		return setState(NodeState.Running);
+		return NodeState.Running;
 	}
 
 }

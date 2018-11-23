@@ -122,7 +122,7 @@ public class GameState extends Group {
 			this.name = tmx;
 		sprites = new ObjectMap<String, KyperSprite>();
 		animations = new ObjectMap<String, Animation<KyperSprite>>();
-		fonts = new ObjectMap<String, BitmapFont>(); //TODO: test load to avoid repeats
+		fonts = new ObjectMap<String, BitmapFont>(); // TODO: test load to avoid repeats
 		particle_effects = new ObjectMap<String, ParticleEffectPool>();
 		pvalues = new Array<String>();
 		time_scale = 1f;
@@ -165,7 +165,7 @@ public class GameState extends Group {
 	}
 
 	public void init() {
-		//cleanup
+		// cleanup
 		if (background != null) {
 			background.remove();
 			playground.remove();
@@ -178,11 +178,11 @@ public class GameState extends Group {
 		}
 
 		if (tmx != null) {
-			//load game state
+			// load game state
 			game.loadTiledMap(tmx);
 			game.getAssetManager().finishLoading();
 			map_data = game.getTiledMap(tmx);
-			state_data.setName(name+("data"));
+			state_data.setName(name + ("data"));
 
 			time_scale = 1f;
 
@@ -201,13 +201,13 @@ public class GameState extends Group {
 
 			state_data.setString("map_atlas", atlas_name);
 
-			//set layer properties
+			// set layer properties
 			uiground.setLayerProperties(map_data.getLayers().get("uiground").getProperties());
 			foreground.setLayerProperties(map_data.getLayers().get("foreground").getProperties());
 			playground.setLayerProperties(map_data.getLayers().get("playground").getProperties());
 			background.setLayerProperties(map_data.getLayers().get("background").getProperties());
 
-			//do preload
+			// do preload
 
 			loadAtlas(map_data);
 			loadFonts(map_data, map_data.getProperties().get("atlas", String.class));
@@ -216,29 +216,29 @@ public class GameState extends Group {
 			loadMusic(map_data);
 			loadSound(map_data);
 
-			//init manager
+			// init manager
 			if (manager != null) {
 				manager.addLayerSystems(this);
 			}
 
-			//load UI actors
+			// load UI actors
 			loadUi(map_data.getLayers().get("uiground"), game.getAtlas(atlas_name));
-			//load ui gameobjects
+			// load ui gameobjects
 			loadLayer(uiground, map_data.getLayers().get("uiground"));
-			//load foreground
+			// load foreground
 			loadLayer(foreground, map_data.getLayers().get("foreground"));
-			//load Playground
+			// load Playground
 			loadLayer(playground, map_data.getLayers().get("playground"));
-			//load background
+			// load background
 			loadLayer(background, map_data.getLayers().get("background"));
 
-			//add layers to scene
+			// add layers to scene
 			addActor(background);
 			addActor(playground);
 			addActor(foreground);
 			addActor(uiground);
 
-			//init state manager
+			// init state manager
 			if (manager != null) {
 				manager.init(this);
 			}
@@ -258,18 +258,18 @@ public class GameState extends Group {
 			uiground = new GameLayer(this);
 			uiground.setName("uiground_");
 
-			//init manager
+			// init manager
 			if (manager != null) {
 				manager.addLayerSystems(this);
 			}
 
-			//add layers to scene
+			// add layers to scene
 			addActor(background);
 			addActor(playground);
 			addActor(foreground);
 			addActor(uiground);
 
-			//init state manager
+			// init state manager
 			if (manager != null) {
 				manager.init(this);
 			}
@@ -282,11 +282,9 @@ public class GameState extends Group {
 	/**
 	 * * play the music in the given tag - only one music per tag
 	 * 
-	 * @param tag
-	 *            - the tag to use for this music. tags control volume
-	 * @param music-
-	 *            name of the music loaded to state. (Note: this is the name given
-	 *            to the music object in tiled and not the name of the file)
+	 * @param tag - the tag to use for this music. tags control volume
+	 * @param     music- name of the music loaded to state. (Note: this is the name
+	 *            given to the music object in tiled and not the name of the file)
 	 * @return - the music that was played
 	 */
 	public Music playMusic(int tag, String music, boolean looping) {
@@ -300,12 +298,11 @@ public class GameState extends Group {
 	/**
 	 * plays some music on the default SoundManager.Music tag
 	 * 
-	 * @param music
-	 *            - name of the music loaded to state. (Note: this is the name given
-	 *            to the music object in tiled and not the name of the file)
+	 * @param music   - name of the music loaded to state. (Note: this is the name
+	 *                given to the music object in tiled and not the name of the
+	 *                file)
 	 * 
-	 * @param looping
-	 *            - weather or not the sounds should loop
+	 * @param looping - weather or not the sounds should loop
 	 * @return - the music that was played
 	 */
 	public Music playMusic(String music, boolean looping) {
@@ -366,10 +363,8 @@ public class GameState extends Group {
 	/**
 	 * stop the sound with the given soundid
 	 * 
-	 * @param sound
-	 *            - name of sound
-	 * @param soundid
-	 *            - soundid to stop
+	 * @param sound   - name of sound
+	 * @param soundid - soundid to stop
 	 */
 	public void stopSound(String sound, long soundid) {
 		if (!sounds.containsKey(sound))
@@ -447,16 +442,16 @@ public class GameState extends Group {
 		this.time_scale = Math.max(0f, time_scale);
 	}
 
-	//	 ====================================================================================
-	//	  /$$$$$$   /$$                 /$$                     /$$$$$$$                     
-	//	  /$$__  $$ | $$                | $$                    | $$__  $$                    
-	//	 | $$  \__//$$$$$$    /$$$$$$  /$$$$$$    /$$$$$$       | $$  \ $$  /$$$$$$   /$$$$$$$
-	//	 |  $$$$$$|_  $$_/   |____  $$|_  $$_/   /$$__  $$      | $$$$$$$/ /$$__  $$ /$$_____/
-	//	  \____  $$ | $$      /$$$$$$$  | $$    | $$$$$$$$      | $$__  $$| $$$$$$$$|  $$$$$$ 
-	//	  /$$  \ $$ | $$ /$$ /$$__  $$  | $$ /$$| $$_____/      | $$  \ $$| $$_____/ \____  $$
-	//	 |  $$$$$$/ |  $$$$/|  $$$$$$$  |  $$$$/|  $$$$$$$      | $$  | $$|  $$$$$$$ /$$$$$$$/
-	//	  \______/   \___/   \_______/   \___/   \_______/      |__/  |__/ \_______/|_______/
-	//	  ===================================================================================
+	// ====================================================================================
+	// /$$$$$$ /$$ /$$ /$$$$$$$
+	// /$$__ $$ | $$ | $$ | $$__ $$
+	// | $$ \__//$$$$$$ /$$$$$$ /$$$$$$ /$$$$$$ | $$ \ $$ /$$$$$$ /$$$$$$$
+	// | $$$$$$|_ $$_/ |____ $$|_ $$_/ /$$__ $$ | $$$$$$$/ /$$__ $$ /$$_____/
+	// \____ $$ | $$ /$$$$$$$ | $$ | $$$$$$$$ | $$__ $$| $$$$$$$$| $$$$$$
+	// /$$ \ $$ | $$ /$$ /$$__ $$ | $$ /$$| $$_____/ | $$ \ $$| $$_____/ \____ $$
+	// | $$$$$$/ | $$$$/| $$$$$$$ | $$$$/| $$$$$$$ | $$ | $$| $$$$$$$ /$$$$$$$/
+	// \______/ \___/ \_______/ \___/ \_______/ |__/ |__/ \_______/|_______/
+	// ===================================================================================
 
 	/**
 	 * get a sprite so we dont keep creating new sprites
@@ -476,9 +471,10 @@ public class GameState extends Group {
 				sprite = new KyperSprite(region);
 				sprite.setName(name);
 			} else {
-				KyperBoxGame.error(KyperBoxGame.TAG, StringUtils.format(
-						"Sprite[%s] in Atlas[%s] not found! This could happen when creating animations with not enough frames or in tiled you set the sprite wrong.",
-						name, atlas));
+				if (KyperBoxGame.DEBUG_LOGGING)
+					KyperBoxGame.error(KyperBoxGame.TAG, StringUtils.format(
+							"Sprite[%s] in Atlas[%s] not found! This could happen when creating animations with not enough frames or in tiled you set the sprite wrong.",
+							name, atlas));
 				return null;
 			}
 			sprites.put(name, sprite);
@@ -504,14 +500,10 @@ public class GameState extends Group {
 	 * frames and frame duration. The regions must be indext like so
 	 * "animationalias_index"(spritename_0,spritename_1,spritename_2) ect.
 	 * 
-	 * @param name
-	 *            = the alias of the regions
-	 * @param atlas
-	 *            = which atlas to use to find the sprites
-	 * @param frames
-	 *            = the amount of frames to retrieve
-	 * @param frame_duration
-	 *            = the amount of time between frames
+	 * @param name           = the alias of the regions
+	 * @param atlas          = which atlas to use to find the sprites
+	 * @param frames         = the amount of frames to retrieve
+	 * @param frame_duration = the amount of time between frames
 	 */
 	public Animation<KyperSprite> createGameAnimation(String name, String atlas, int frames, float frame_duration) {
 		KyperSprite[] sprites = new KyperSprite[frames];
@@ -544,8 +536,7 @@ public class GameState extends Group {
 	 * increasing index.
 	 * 
 	 * @param name
-	 * @param atlas
-	 *            - the atlas to use.
+	 * @param atlas          - the atlas to use.
 	 * @param frame_duration
 	 * @return
 	 */
@@ -613,16 +604,18 @@ public class GameState extends Group {
 		return null;
 	}
 
-	//	==============================================================================================
-	//	  /$$$$$$  /$$$$$$$$ /$$$$$$  /$$$$$$$$ /$$$$$$$$       /$$$$$$$   /$$$$$$  /$$$$$$$$ /$$$$$$ 
-	//	  /$$__  $$|__  $$__//$$__  $$|__  $$__/| $$_____/      | $$__  $$ /$$__  $$|__  $$__//$$__  $$
-	//	 | $$  \__/   | $$  | $$  \ $$   | $$   | $$            | $$  \ $$| $$  \ $$   | $$  | $$  \ $$
-	//	 |  $$$$$$    | $$  | $$$$$$$$   | $$   | $$$$$         | $$  | $$| $$$$$$$$   | $$  | $$$$$$$$
-	//	  \____  $$   | $$  | $$__  $$   | $$   | $$__/         | $$  | $$| $$__  $$   | $$  | $$__  $$
-	//	  /$$  \ $$   | $$  | $$  | $$   | $$   | $$            | $$  | $$| $$  | $$   | $$  | $$  | $$
-	//	 |  $$$$$$/   | $$  | $$  | $$   | $$   | $$$$$$$$      | $$$$$$$/| $$  | $$   | $$  | $$  | $$
-	//	  \______/    |__/  |__/  |__/   |__/   |________/      |_______/ |__/  |__/   |__/  |__/  |__/
-	//	===============================================================================================                                                                                               
+	// ==============================================================================================
+	// /$$$$$$ /$$$$$$$$ /$$$$$$ /$$$$$$$$ /$$$$$$$$ /$$$$$$$ /$$$$$$ /$$$$$$$$
+	// /$$$$$$
+	// /$$__ $$|__ $$__//$$__ $$|__ $$__/| $$_____/ | $$__ $$ /$$__ $$|__ $$__//$$__
+	// $$
+	// | $$ \__/ | $$ | $$ \ $$ | $$ | $$ | $$ \ $$| $$ \ $$ | $$ | $$ \ $$
+	// | $$$$$$ | $$ | $$$$$$$$ | $$ | $$$$$ | $$ | $$| $$$$$$$$ | $$ | $$$$$$$$
+	// \____ $$ | $$ | $$__ $$ | $$ | $$__/ | $$ | $$| $$__ $$ | $$ | $$__ $$
+	// /$$ \ $$ | $$ | $$ | $$ | $$ | $$ | $$ | $$| $$ | $$ | $$ | $$ | $$
+	// | $$$$$$/ | $$ | $$ | $$ | $$ | $$$$$$$$ | $$$$$$$/| $$ | $$ | $$ | $$ | $$
+	// \______/ |__/ |__/ |__/ |__/ |________/ |_______/ |__/ |__/ |__/ |__/ |__/
+	// ===============================================================================================
 
 	/**
 	 * get the tmx map data used to create this game state
@@ -792,22 +785,21 @@ public class GameState extends Group {
 		KyperBoxGame.error(name, message);
 	}
 
-	//	 =====================================================
-	//	 /$$   /$$ /$$   /$$ /$$        /$$$$$$   /$$$$$$  /$$$$$$$ 
-	//	 | $$  | $$| $$$ | $$| $$       /$$__  $$ /$$__  $$| $$__  $$
-	//	 | $$  | $$| $$$$| $$| $$      | $$  \ $$| $$  \ $$| $$  \ $$
-	//	 | $$  | $$| $$ $$ $$| $$      | $$  | $$| $$$$$$$$| $$  | $$
-	//	 | $$  | $$| $$  $$$$| $$      | $$  | $$| $$__  $$| $$  | $$
-	//	 | $$  | $$| $$\  $$$| $$      | $$  | $$| $$  | $$| $$  | $$
-	//	 |  $$$$$$/| $$ \  $$| $$$$$$$$|  $$$$$$/| $$  | $$| $$$$$$$/
-	//	  \______/ |__/  \__/|________/ \______/ |__/  |__/|_______/ 
-	//	  =======================================================
+	// =====================================================
+	// /$$ /$$ /$$ /$$ /$$ /$$$$$$ /$$$$$$ /$$$$$$$
+	// | $$ | $$| $$$ | $$| $$ /$$__ $$ /$$__ $$| $$__ $$
+	// | $$ | $$| $$$$| $$| $$ | $$ \ $$| $$ \ $$| $$ \ $$
+	// | $$ | $$| $$ $$ $$| $$ | $$ | $$| $$$$$$$$| $$ | $$
+	// | $$ | $$| $$ $$$$| $$ | $$ | $$| $$__ $$| $$ | $$
+	// | $$ | $$| $$\ $$$| $$ | $$ | $$| $$ | $$| $$ | $$
+	// | $$$$$$/| $$ \ $$| $$$$$$$$| $$$$$$/| $$ | $$| $$$$$$$/
+	// \______/ |__/ \__/|________/ \______/ |__/ |__/|_______/
+	// =======================================================
 
-	
 	public void clearStateData() {
 		state_data.clear();
 	}
-	
+
 	public void unloadFonts() {
 		Array<BitmapFont> fvalues = fonts.values().toArray();
 		AssetManager am = game.getAssetManager();
@@ -880,29 +872,29 @@ public class GameState extends Group {
 	public void disableLayers(boolean disable) {
 		if (disable) {
 			this.setTouchable(Touchable.disabled);
-			//			uiground.setTouchable(Touchable.disabled);
-			//			foreground.setTouchable(Touchable.disabled);
-			//			playground.setTouchable(Touchable.disabled);
-			//			background.setTouchable(Touchable.disabled);
+			// uiground.setTouchable(Touchable.disabled);
+			// foreground.setTouchable(Touchable.disabled);
+			// playground.setTouchable(Touchable.disabled);
+			// background.setTouchable(Touchable.disabled);
 		} else {
 			this.setTouchable(Touchable.enabled);
-			//			uiground.setTouchable(Touchable.enabled);
-			//			foreground.setTouchable(Touchable.enabled);
-			//			playground.setTouchable(Touchable.enabled);
-			//			background.setTouchable(Touchable.enabled);
+			// uiground.setTouchable(Touchable.enabled);
+			// foreground.setTouchable(Touchable.enabled);
+			// playground.setTouchable(Touchable.enabled);
+			// background.setTouchable(Touchable.enabled);
 		}
 	}
 
-	//	============================================================================
-	//	 /$$$$$$$  /$$$$$$$  /$$$$$$$$      /$$        /$$$$$$   /$$$$$$  /$$$$$$$ 
-	//	 | $$__  $$| $$__  $$| $$_____/     | $$       /$$__  $$ /$$__  $$| $$__  $$
-	//	 | $$  \ $$| $$  \ $$| $$           | $$      | $$  \ $$| $$  \ $$| $$  \ $$
-	//	 | $$$$$$$/| $$$$$$$/| $$$$$ /$$$$$$| $$      | $$  | $$| $$$$$$$$| $$  | $$
-	//	 | $$____/ | $$__  $$| $$__/|______/| $$      | $$  | $$| $$__  $$| $$  | $$
-	//	 | $$      | $$  \ $$| $$           | $$      | $$  | $$| $$  | $$| $$  | $$
-	//	 | $$      | $$  | $$| $$$$$$$$     | $$$$$$$$|  $$$$$$/| $$  | $$| $$$$$$$/
-	//	 |__/      |__/  |__/|________/     |________/ \______/ |__/  |__/|_______/
-	//	 ===========================================================================
+	// ============================================================================
+	// /$$$$$$$ /$$$$$$$ /$$$$$$$$ /$$ /$$$$$$ /$$$$$$ /$$$$$$$
+	// | $$__ $$| $$__ $$| $$_____/ | $$ /$$__ $$ /$$__ $$| $$__ $$
+	// | $$ \ $$| $$ \ $$| $$ | $$ | $$ \ $$| $$ \ $$| $$ \ $$
+	// | $$$$$$$/| $$$$$$$/| $$$$$ /$$$$$$| $$ | $$ | $$| $$$$$$$$| $$ | $$
+	// | $$____/ | $$__ $$| $$__/|______/| $$ | $$ | $$| $$__ $$| $$ | $$
+	// | $$ | $$ \ $$| $$ | $$ | $$ | $$| $$ | $$| $$ | $$
+	// | $$ | $$ | $$| $$$$$$$$ | $$$$$$$$| $$$$$$/| $$ | $$| $$$$$$$/
+	// |__/ |__/ |__/|________/ |________/ \______/ |__/ |__/|_______/
+	// ===========================================================================
 
 	private void loadFonts(TiledMap data, String atlasname) {
 		fonts.clear();
@@ -916,7 +908,7 @@ public class GameState extends Group {
 			String fontfile = properties.get("font_file", String.class);
 			if (fontfile != null && type != null && type.equals(ffcheck)) {
 				boolean markup = properties.get("markup", false, boolean.class);
-				String atlas = properties.get("atlas",KyperBoxGame.NULL_STRING ,String.class);
+				String atlas = properties.get("atlas", KyperBoxGame.NULL_STRING, String.class);
 				if (atlas.equals(KyperBoxGame.NULL_STRING)) {
 					game.loadFont(fontfile, atlasname);
 				} else {
@@ -1028,14 +1020,14 @@ public class GameState extends Group {
 		game.getAssetManager().finishLoading();
 	}
 
-	//	 /$$   /$$ /$$$$$$       /$$        /$$$$$$   /$$$$$$  /$$$$$$$ 
-	//	 | $$  | $$|_  $$_/      | $$       /$$__  $$ /$$__  $$| $$__  $$
-	//	 | $$  | $$  | $$        | $$      | $$  \ $$| $$  \ $$| $$  \ $$
-	//	 | $$  | $$  | $$ /$$$$$$| $$      | $$  | $$| $$$$$$$$| $$  | $$
-	//	 | $$  | $$  | $$|______/| $$      | $$  | $$| $$__  $$| $$  | $$
-	//	 | $$  | $$  | $$        | $$      | $$  | $$| $$  | $$| $$  | $$
-	//	 |  $$$$$$/ /$$$$$$      | $$$$$$$$|  $$$$$$/| $$  | $$| $$$$$$$/
-	//	  \______/ |______/      |________/ \______/ |__/  |__/|_______/ 
+	// /$$ /$$ /$$$$$$ /$$ /$$$$$$ /$$$$$$ /$$$$$$$
+	// | $$ | $$|_ $$_/ | $$ /$$__ $$ /$$__ $$| $$__ $$
+	// | $$ | $$ | $$ | $$ | $$ \ $$| $$ \ $$| $$ \ $$
+	// | $$ | $$ | $$ /$$$$$$| $$ | $$ | $$| $$$$$$$$| $$ | $$
+	// | $$ | $$ | $$|______/| $$ | $$ | $$| $$__ $$| $$ | $$
+	// | $$ | $$ | $$ | $$ | $$ | $$| $$ | $$| $$ | $$
+	// | $$$$$$/ /$$$$$$ | $$$$$$$$| $$$$$$/| $$ | $$| $$$$$$$/
+	// \______/ |______/ |________/ \______/ |__/ |__/|_______/
 
 	private Actor getUiActor(Array<String> added, MapObject object, MapProperties properties, MapObjects objects,
 			TextureAtlas atlas) {
@@ -1052,7 +1044,7 @@ public class GameState extends Group {
 		if (type == null || added.contains(name, false))
 			return null;
 
-		if (type.equals("ImageButton")) { //TODO: implement hover image
+		if (type.equals("ImageButton")) { // TODO: implement hover image
 			ImageButtonStyle style = new ImageButtonStyle();
 			String up = properties.get("upImage", "", String.class);
 			String down = properties.get("downImage", "", String.class);
@@ -1088,7 +1080,7 @@ public class GameState extends Group {
 						if ((child_actor = uiground.getActor(children[i])) != null) {
 							child_actor.remove();
 							child_actor.setPosition(child_actor.getX() - x, child_actor.getY() - y);
-							//child_actor.setRotation(0);
+							// child_actor.setRotation(0);
 							if (KyperBoxGame.DEBUG_LOGGING)
 								log("child actor[" + child_actor.getName() + "] added to [" + name + "]");
 							t.addActor(child_actor);
@@ -1097,7 +1089,7 @@ public class GameState extends Group {
 							child_actor = getUiActor(added, child_object, child_properties, objects, atlas);
 							if (child_actor != null) {
 								child_actor.setPosition(child_actor.getX() - x, child_actor.getY() - y);
-								//child_actor.setRotation(0);
+								// child_actor.setRotation(0);
 								t.addActor(child_actor);
 							}
 						}
@@ -1116,8 +1108,8 @@ public class GameState extends Group {
 					t.setBackground(new TextureRegionDrawable(bg_texture));
 				}
 			}
-			//t.setTransform(true);
-			//t.setOrigin(Align.center);
+			// t.setTransform(true);
+			// t.setOrigin(Align.center);
 			t.setRotation(-r);
 
 		} else if (type.equals("Image")) {
@@ -1142,7 +1134,7 @@ public class GameState extends Group {
 				a = new Label(text, ls);
 				Label l = (Label) a;
 				l.setAlignment(Align.topLeft);
-				//l.setLayoutEnabled(false);
+				// l.setLayoutEnabled(false);
 				l.setOrigin(Align.center);
 				l.setWrap(wrap);
 
@@ -1176,7 +1168,7 @@ public class GameState extends Group {
 					style.pressedOffsetX = xOff;
 					style.pressedOffsetY = yOff;
 					boolean ninepatch = properties.get("ninepatch", Boolean.class);
-					//UP_BG
+					// UP_BG
 					if (atlas.findRegion(button_up_name) != null) {
 						TextureRegion up_texture = atlas.findRegion(button_up_name);
 						if (ninepatch) {
@@ -1186,7 +1178,7 @@ public class GameState extends Group {
 							style.up = new TextureRegionDrawable(up_texture);
 						}
 					}
-					//DOWN BG
+					// DOWN BG
 					if (atlas.findRegion(button_down_name) != null) {
 						TextureRegion down_texture = atlas.findRegion(button_down_name);
 						if (ninepatch) {
@@ -1196,7 +1188,7 @@ public class GameState extends Group {
 							style.down = new TextureRegionDrawable(down_texture);
 						}
 					}
-					//HOVER
+					// HOVER
 					if (atlas.findRegion(button_hover_name) != null) {
 						TextureRegion hover_texture = atlas.findRegion(button_hover_name);
 						if (ninepatch) {
@@ -1245,34 +1237,34 @@ public class GameState extends Group {
 			int size2 = 1;
 
 			if (bg_texture != null) {
-				//size = (int) (bg_texture.getRegionWidth() * .33f);
-				//size2 = (int) (bg_texture.getRegionHeight() * .33f);
+				// size = (int) (bg_texture.getRegionWidth() * .33f);
+				// size2 = (int) (bg_texture.getRegionHeight() * .33f);
 				style.background = new NinePatchDrawable(new NinePatch(bg_texture, size, size, size2, size2));
 
 				style.background.setMinHeight(h);
 				style.background.setMinWidth(w);
 			}
 			if (knob_texture != null) {
-				//size = (int) (knob_texture.getRegionWidth() * .33f);
-				//size2 = (int) (knob_texture.getRegionHeight() * .33f);
+				// size = (int) (knob_texture.getRegionWidth() * .33f);
+				// size2 = (int) (knob_texture.getRegionHeight() * .33f);
 				style.knob = new NinePatchDrawable(new NinePatch(knob_texture, size, size, size2, size2));
 			}
 			if (knob_after_texture != null) {
-				//size = (int) (knob_after_texture.getRegionWidth() * .33f);
-				//size2 = (int) (knob_after_texture.getRegionHeight() * .33f);
+				// size = (int) (knob_after_texture.getRegionWidth() * .33f);
+				// size2 = (int) (knob_after_texture.getRegionHeight() * .33f);
 				style.knobAfter = new NinePatchDrawable(new NinePatch(knob_after_texture, size, size, size2, size2));
 				style.knobAfter.setMinHeight(h);
 				style.knobAfter.setMinWidth(w);
 			}
 			if (knob_before_texture != null) {
-				//size = (int) (knob_before_texture.getRegionWidth() * .33f);
-				//size2 = (int) (knob_before_texture.getRegionHeight() * .33f);
+				// size = (int) (knob_before_texture.getRegionWidth() * .33f);
+				// size2 = (int) (knob_before_texture.getRegionHeight() * .33f);
 				style.knobBefore = new NinePatchDrawable(new NinePatch(knob_before_texture, size, size, size2, size2));
 				style.knobBefore.setMinHeight(h);
 				style.knobBefore.setMinWidth(w);
 			}
 			if (knob_texture != null) {
-				//				 size = (int) (knob_texture.getRegionWidth()*.33f);
+				// size = (int) (knob_texture.getRegionWidth()*.33f);
 				style.knob = new TextureRegionDrawable(knob_texture);
 			} else {
 				style.knob = new TextureRegionDrawable(knob);
@@ -1309,17 +1301,22 @@ public class GameState extends Group {
 		}
 	}
 
-	//	 /$$$$$$  /$$                                 /$$           /$$        /$$$$$$   /$$$$$$  /$$$$$$$ 
-	//	 /$$__  $$| $$                                | $$          | $$       /$$__  $$ /$$__  $$| $$__  $$
-	//	| $$  \ $$| $$$$$$$  /$$  /$$$$$$   /$$$$$$$ /$$$$$$        | $$      | $$  \ $$| $$  \ $$| $$  \ $$
-	//	| $$  | $$| $$__  $$|__/ /$$__  $$ /$$_____/|_  $$_/        | $$      | $$  | $$| $$$$$$$$| $$  | $$
-	//	| $$  | $$| $$  \ $$ /$$| $$$$$$$$| $$        | $$          | $$      | $$  | $$| $$__  $$| $$  | $$
-	//	| $$  | $$| $$  | $$| $$| $$_____/| $$        | $$ /$$      | $$      | $$  | $$| $$  | $$| $$  | $$
-	//	|  $$$$$$/| $$$$$$$/| $$|  $$$$$$$|  $$$$$$$  |  $$$$/      | $$$$$$$$|  $$$$$$/| $$  | $$| $$$$$$$/
-	//	 \______/ |_______/ | $$ \_______/ \_______/   \___/        |________/ \______/ |__/  |__/|_______/ 
-	//	               /$$  | $$                                                                            
-	//	              |  $$$$$$/                                                                            
-	//	               \______/      
+	// /$$$$$$ /$$ /$$ /$$ /$$$$$$ /$$$$$$ /$$$$$$$
+	// /$$__ $$| $$ | $$ | $$ /$$__ $$ /$$__ $$| $$__ $$
+	// | $$ \ $$| $$$$$$$ /$$ /$$$$$$ /$$$$$$$ /$$$$$$ | $$ | $$ \ $$| $$ \ $$| $$ \
+	// $$
+	// | $$ | $$| $$__ $$|__/ /$$__ $$ /$$_____/|_ $$_/ | $$ | $$ | $$| $$$$$$$$| $$
+	// | $$
+	// | $$ | $$| $$ \ $$ /$$| $$$$$$$$| $$ | $$ | $$ | $$ | $$| $$__ $$| $$ | $$
+	// | $$ | $$| $$ | $$| $$| $$_____/| $$ | $$ /$$ | $$ | $$ | $$| $$ | $$| $$ |
+	// $$
+	// | $$$$$$/| $$$$$$$/| $$| $$$$$$$| $$$$$$$ | $$$$/ | $$$$$$$$| $$$$$$/| $$ |
+	// $$| $$$$$$$/
+	// \______/ |_______/ | $$ \_______/ \_______/ \___/ |________/ \______/ |__/
+	// |__/|_______/
+	// /$$ | $$
+	// | $$$$$$/
+	// \______/
 
 	private void loadLayer(GameLayer game_layer, MapLayer map_layer) {
 		MapObjects objects = map_layer.getObjects();
@@ -1339,29 +1336,30 @@ public class GameState extends Group {
 			IGameObjectFactory factory = game.getObjectFactory();
 			game_object = factory.getGameObject(type);
 
-			//			for (String package_name : game.getObjectPackages()) {
-			//				boolean failed = false;
-			//				;
-			//				try {
-			//					game_object = (GameObject) Class.forName(package_name + "." + type).newInstance();
-			//				} catch (InstantiationException e) {
-			//					failed = true;
-			//				} catch (IllegalAccessException e) {
-			//					failed = true;
-			//				} catch (ClassNotFoundException e) {
-			//					failed = true;
-			//				}
+			// for (String package_name : game.getObjectPackages()) {
+			// boolean failed = false;
+			// ;
+			// try {
+			// game_object = (GameObject) Class.forName(package_name + "." +
+			// type).newInstance();
+			// } catch (InstantiationException e) {
+			// failed = true;
+			// } catch (IllegalAccessException e) {
+			// failed = true;
+			// } catch (ClassNotFoundException e) {
+			// failed = true;
+			// }
 			//
-			//				if (failed) {
-			//					if (KyperBoxGame.DEBUG_LOGGING)
-			//						error(package_name + " did not contain [" + type + ".class].");
-			//				}
+			// if (failed) {
+			// if (KyperBoxGame.DEBUG_LOGGING)
+			// error(package_name + " did not contain [" + type + ".class].");
+			// }
 			//
-			//				if (game_object != null) {
-			//					break;
-			//				}
+			// if (game_object != null) {
+			// break;
+			// }
 			//
-			//			}
+			// }
 			if (game_object != null) {
 				game_object.setName(name);
 				game_object.setPosition(x, y);

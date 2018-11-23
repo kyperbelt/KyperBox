@@ -4,6 +4,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
+import com.kyperbox.KyperBoxGame;
 import com.kyperbox.umisc.UserData;
 
 /**
@@ -13,7 +14,7 @@ import com.kyperbox.umisc.UserData;
  *
  */
 public class BehaviorTree {
-	
+
 	private static NodeFactory node_factory = new NodeFactory();
 
 	private BehaviorNode root; // base node in the btree
@@ -102,7 +103,7 @@ public class BehaviorTree {
 			if (root == null)
 				throw new NullPointerException(
 						"the root node of this behavior tree is null, Try and using its start method to set it.");
-			NodeState result = root.update(delta);
+			NodeState result = root.internalUpdate(delta);
 			if (result != NodeState.Running) {
 				finished = true;
 				last_result = result;
@@ -152,7 +153,7 @@ public class BehaviorTree {
 
 	public static BehaviorNode generateRoot(String json_data) {
 		JsonValue json = new JsonReader().parse(json_data);
-		int last = json.size -1;
+		int last = json.size - 1;
 		JsonValue root = json.get(last);
 		return getNode(root.name, root);
 	}
@@ -162,9 +163,5 @@ public class BehaviorTree {
 	}
 
 	// static end --
-
-
-
-
 
 }

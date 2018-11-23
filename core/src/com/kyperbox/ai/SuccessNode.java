@@ -18,10 +18,10 @@ public class SuccessNode extends SupplementNode {
 	@Override
 	public NodeState update(float delta) {
 		super.update(delta);
-		NodeState result = getChild().update(delta);
+		NodeState result = getChild().internalUpdate(delta);
 		if (result != NodeState.Running)
-			return setState(NodeState.Success);
-		return setState(result);
+			return NodeState.Success;
+		return result;
 	}
 
 }

@@ -53,6 +53,7 @@ public abstract class GameObject extends Group {
 	private KyperSprite render;
 	private boolean pre_draw_children = false;
 
+
 	public GameObject() {
 		setTransform(false);
 		controllers = new Array<GameObjectController>();
@@ -71,10 +72,6 @@ public abstract class GameObject extends Group {
 		thickness = 1;
 		position = new Vector2();
 		collision_center = new Vector2();
-	}
-
-	public void setPreDrawChildren(boolean pre_draw_children) {
-		this.pre_draw_children = pre_draw_children;
 	}
 
 	public float getDepthVelocity() {
@@ -269,6 +266,14 @@ public abstract class GameObject extends Group {
 			}
 		}
 		return getRotation();
+	}
+	
+	public String getSprite() {
+		return sprite;
+	}
+	
+	public KyperSprite getRenderSprite() {
+		return render;
 	}
 
 	public void setFlip(boolean flip_x, boolean flip_y) {
@@ -514,8 +519,9 @@ public abstract class GameObject extends Group {
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
 
-		if (pre_draw_children)
+		if (pre_draw_children) {
 			super.draw(batch, parentAlpha);
+		}
 
 		if (change_sprite && !sprite.equals(NO_SPRITE) && layer != null) {
 			String atlas = null;
@@ -554,6 +560,14 @@ public abstract class GameObject extends Group {
 
 		if (!pre_draw_children)
 			super.draw(batch, parentAlpha);
+	}
+	
+	public boolean isPreDrawChildren() {
+		return pre_draw_children;
+	}
+	
+	public void setPreDrawChildren(boolean pre_draw_children) {
+		this.pre_draw_children = pre_draw_children;
 	}
 
 	@Override
