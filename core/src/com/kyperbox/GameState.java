@@ -86,6 +86,8 @@ public class GameState extends Group {
 	/* delete ref */ private Array<String> svalues;
 	private ObjectMap<String, String> musics;
 	private ObjectMap<String, String> sounds;
+	
+	private String atlas;
 
 	public GameState(String tmx) {
 		this(tmx, new StateManager() {
@@ -154,6 +156,10 @@ public class GameState extends Group {
 	protected boolean haltsUpdate() {
 		return halt_update;
 	}
+	
+	public String getStateAtlas() {
+		return atlas;
+	}
 
 	/**
 	 * get the global user data for the entire game.
@@ -208,13 +214,14 @@ public class GameState extends Group {
 			background.setLayerProperties(map_data.getLayers().get("background").getProperties());
 
 			// do preload
-
+			this.atlas = map_data.getProperties().get("atlas", String.class);
 			loadAtlas(map_data);
-			loadFonts(map_data, map_data.getProperties().get("atlas", String.class));
-			loadParticleEffects(map_data, map_data.getProperties().get("atlas", String.class));
+			loadFonts(map_data, atlas);
+			loadParticleEffects(map_data, atlas);
 			loadShaders(map_data);
 			loadMusic(map_data);
 			loadSound(map_data);
+			this.atlas = atlas_name;
 
 			// init manager
 			if (manager != null) {
@@ -460,11 +467,12 @@ public class GameState extends Group {
 	 * @return
 	 */
 	public Sprite getGameSprite(String name) {
-		return getGameSprite(name, KyperBoxGame.GAME_ATLAS);
+		return getGameSprite(name, atlas);
 	}
 
 	public Sprite getGameSprite(String name, String atlas) {
 		if (!sprites.containsKey(name)) {
+			
 			AtlasRegion region = game.getAtlas(atlas).findRegion(name);
 			KyperSprite sprite = null;
 			if (region != null) {
