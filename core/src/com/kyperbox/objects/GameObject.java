@@ -491,7 +491,7 @@ public abstract class GameObject extends Group {
 	public void addController(GameObjectController controller) {
 		if (getController(controller.getClass()) != null) {
 			if (KyperBoxGame.DEBUG_LOGGING)
-				layer.getState().error("->" + getName() + " :Cannot add type [" + controller.getClass().getName()
+				KyperBoxGame.error("ObjectController Added::","->" + getName()==null?KyperBoxGame.NULL_STRING:getName() + " :Cannot add type [" + controller.getClass().getName()
 						+ "] more than once.");
 			return;
 		}

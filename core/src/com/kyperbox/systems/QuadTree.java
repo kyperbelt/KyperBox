@@ -16,7 +16,8 @@ import com.kyperbox.umisc.StringUtils;
 
 public class QuadTree extends CollisionSystem {
 
-	//this padding is added for absolutely no reason TODO: remove? it doesnt bother me right now so im going to leave it.
+	// this padding is added for absolutely no reason TODO: remove? it doesnt bother
+	// me right now so im going to leave it.
 	private static final int PAD = 0;
 	// TODO: add bounds follow
 	// TODO: test with object controller
@@ -94,7 +95,9 @@ public class QuadTree extends CollisionSystem {
 	@Override
 	public void gameObjectAdded(GameObject object, GameObject parent) {
 		if (KyperBoxGame.DEBUG_LOGGING)
-			getLayer().getState().log(StringUtils.format("QuadTree: added object[%s] with parent[%s]",object.getName()==null?KyperBoxGame.NULL_STRING:object.getName(),parent == null ?KyperBoxGame.NULL_STRING:parent.getName()));
+			getLayer().getState().log(StringUtils.format("QuadTree: added object[%s] with parent[%s]",
+					object.getName() == null ? KyperBoxGame.NULL_STRING : object.getName(),
+					(parent == null || parent.getName() == null) ? KyperBoxGame.NULL_STRING : parent.getName()));
 		objects.add(object);
 
 	}
@@ -114,7 +117,7 @@ public class QuadTree extends CollisionSystem {
 
 	@Override
 	public void gameObjectRemoved(GameObject object, GameObject parent) {
-		//object.getState().log("removed:"+object.getName()+" from quadtree");
+		// object.getState().log("removed:"+object.getName()+" from quadtree");
 		objects.removeValue(object, true);
 	}
 
@@ -122,12 +125,12 @@ public class QuadTree extends CollisionSystem {
 	public void update(float delta) {
 		root.clear();
 		remove_objects.clear();
-		
+
 		Rectangle view_bounds = getLayer().getCamera().getViewBounds();
-		
+
 		if (follow_view) {
-			
-			root.setPosition( bounds.getX() + view_bounds.getX(), bounds.getY() + view_bounds.getY());
+
+			root.setPosition(bounds.getX() + view_bounds.getX(), bounds.getY() + view_bounds.getY());
 
 		}
 		for (int i = 0; i < objects.size; i++) {
@@ -138,15 +141,12 @@ public class QuadTree extends CollisionSystem {
 				root.place(objects.get(i));
 
 		}
-		
 
 		for (int i = 0; i < remove_objects.size; i++) {
 			if (remove_objects.get(i) < objects.size)
 				objects.removeIndex(remove_objects.get(i));
 		}
-		
 
-		
 	}
 
 	@Override
@@ -308,8 +308,7 @@ public class QuadTree extends CollisionSystem {
 
 		public void debugRender(ShapeRenderer shapes) {
 			Rectangle view = manager.getLayer().getCamera().getViewBounds();
-			shapes.rect(this.bounds.x-view.x ,
-					this.bounds.y-view.y, this.bounds.width, this.bounds.height);
+			shapes.rect(this.bounds.x - view.x, this.bounds.y - view.y, this.bounds.width, this.bounds.height);
 			if (quads[0] != null) {
 				for (int i = 0; i < quads.length; i++) {
 					quads[i].debugRender(shapes);
@@ -339,8 +338,8 @@ public class QuadTree extends CollisionSystem {
 					quads[i].translate(x, y);
 				}
 		}
-		
-		public void setPosition(float x,float y) {
+
+		public void setPosition(float x, float y) {
 			bounds.setPosition(x, y);
 		}
 

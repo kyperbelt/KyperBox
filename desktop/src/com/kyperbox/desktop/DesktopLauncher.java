@@ -19,7 +19,7 @@ public class DesktopLauncher {
 			AutoPacking.pack("game", "image", "game");
 		}
 		//game
-		KyperBoxGame game = new TileCollisionTest();
+		KyperBoxGame game = new ControllerTest();
 		
 		game.setDevConsole(new DevConsole("console.fnt", "shade1.png",Keys.GRAVE));
 		

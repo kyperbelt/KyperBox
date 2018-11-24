@@ -46,18 +46,18 @@ public class ControllerMapping extends InputMapping{
 			break;
 		case ControllerMaps.LAXIS_LEFT:
 			if(controller.getLeftX() < 0)
-				return Math.abs(controller.getLeftX());
+				return Math.abs(Math.abs(controller.getLeftX()));
 			break;
 		case ControllerMaps.LAXIS_RIGHT:
 			if(controller.getLeftX() > 0)
-				return controller.getLeftX();
+				return Math.abs(controller.getLeftX());
 			break;
 		case ControllerMaps.LAXIS_UP:
-			if(controller.getLeftY() > 0)
-				return controller.getLeftY();
+			if(controller.getLeftY() < 0)
+				return Math.abs(controller.getLeftY());
 			break;
 		case ControllerMaps.LAXIS_DOWN:
-			if(controller.getLeftY() < 0) 
+			if(controller.getLeftY() > 0) 
 				return Math.abs(controller.getLeftY());
 			break;
 		case ControllerMaps.RAXIS_LEFT:
@@ -66,11 +66,11 @@ public class ControllerMapping extends InputMapping{
 			break;
 		case ControllerMaps.RAXIS_RIGHT:
 			if(controller.getRightX() > 0)
-				return controller.getRightX();
+				return Math.abs(controller.getRightX());
 			break;
 		case ControllerMaps.RAXIS_UP:
 			if(controller.getRightY() > 0)
-				return controller.getRightY();
+				return Math.abs(controller.getRightY());
 			break;
 		case ControllerMaps.RAXIS_DOWN:
 			if(controller.getRightY() < 0)
