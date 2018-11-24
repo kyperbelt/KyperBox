@@ -697,6 +697,7 @@ public class GameState extends Group {
 
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
+		Color c = batch.getColor();
 		ShaderProgram ps = batch.getShader();
 
 		if (ps != shader) {
@@ -711,6 +712,7 @@ public class GameState extends Group {
 		} else {
 			super.draw(batch, parentAlpha);
 		}
+		batch.setColor(c);
 
 	}
 
