@@ -1,5 +1,6 @@
 package com.kyperbox.objects;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
@@ -26,7 +27,7 @@ public class TilemapLayerObject extends GameObject {
 	private TiledMapTileLayer tiles;
 	private TileLayerRenderer render;
 	private Array<Array<MapTile>> cell_arrays;
-
+	
 	@Override
 	public void init(MapProperties properties) {
 		super.init(properties);
@@ -46,8 +47,11 @@ public class TilemapLayerObject extends GameObject {
 
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
+		Color c = batch.getColor();
+		batch.setColor(getColor().r, getColor().g, getColor().b, getColor().a * parentAlpha);
 		render.renderTileLayer(tiles, batch);
 		super.draw(batch, parentAlpha);
+		batch.setColor(c);
 	}
 
 	@Override

@@ -1,6 +1,7 @@
 package com.kyperbox.ai;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.kyperbox.umisc.UserData;
 
 /**
@@ -58,12 +59,12 @@ public abstract class BehaviorNode {
 		setState(NodeState.Running);
 		getTree().setCurrent(this);
 		total_runtime = 0;
-		start_time = System.nanoTime();
+		start_time = TimeUtils.nanoTime();
 	}
 	
 	public NodeState internalUpdate(float delta) {
 		NodeState state = this.update(delta);
-		total_runtime = (float) ((System.nanoTime() - start_time) / 1000000000.0);
+		total_runtime = (float) ((TimeUtils.nanoTime() - start_time) / 1000000000.0);
 		setState(state);
 		return state;
 	}
