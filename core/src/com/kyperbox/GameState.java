@@ -26,6 +26,7 @@ import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
@@ -214,13 +215,22 @@ public class GameState extends Group {
 			background.setLayerProperties(map_data.getLayers().get("background").getProperties());
 
 			// do preload
+			TiledMap md = this.map_data;
+			String pe = md.getProperties().get("preload",null,String.class);
+			
+			if(pe!=null) {
+				game.loadTiledMap(pe);
+				game.getAssetManager().finishLoading();
+				md = game.getTiledMap(pe);
+			}
+			
 			this.atlas = map_data.getProperties().get("atlas", String.class);
-			loadAtlas(map_data);
-			loadFonts(map_data, atlas);
-			loadParticleEffects(map_data, atlas);
-			loadShaders(map_data);
-			loadMusic(map_data);
-			loadSound(map_data);
+			loadAtlas(md);
+			loadFonts(md, atlas);
+			loadParticleEffects(md, atlas);
+			loadShaders(md);
+			loadMusic(md);
+			loadSound(md);
 			this.atlas = atlas_name;
 
 			// init manager
