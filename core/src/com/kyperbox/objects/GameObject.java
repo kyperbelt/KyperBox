@@ -11,10 +11,13 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Bits;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.kyperbox.GameState;
 import com.kyperbox.KyperBoxGame;
+import com.kyperbox.controllers.ControllerType;
 import com.kyperbox.input.GameInput;
+import com.kyperbox.umisc.Bag;
 import com.kyperbox.umisc.KyperSprite;
 import com.kyperbox.umisc.StringUtils;
 
@@ -35,7 +38,9 @@ public abstract class GameObject extends Group {
 	private Polygon col_poly;
 	private Polygon ret_poly;
 
+	private Bag<GameObjectController> controllerBag;
 	private Array<GameObjectController> controllers;
+	private Bits controllerBits;
 	private MapProperties properties;
 	private Vector2 velocity;
 	private Vector2 position;
@@ -53,10 +58,12 @@ public abstract class GameObject extends Group {
 	private KyperSprite render;
 	private boolean pre_draw_children = false;
 
-
 	public GameObject() {
 		setTransform(false);
+		controllerBag = new Bag<GameObjectController>();
 		controllers = new Array<GameObjectController>();
+		controllerBits = new Bits();
+
 		sprite = NO_SPRITE;
 		velocity = new Vector2();
 		setOrigin(Align.center);
@@ -267,11 +274,11 @@ public abstract class GameObject extends Group {
 		}
 		return getRotation();
 	}
-	
+
 	public String getSprite() {
 		return sprite;
 	}
-	
+
 	public KyperSprite getRenderSprite() {
 		return render;
 	}
@@ -378,18 +385,24 @@ public abstract class GameObject extends Group {
 		super.addActor(actor);
 	}
 
+	public <t extends GameObjectController> t getController(Class<t> type) {
+
+		return getController(ControllerType.getFor(type));
+	}
+
 	@SuppressWarnings("unchecked")
-	public <t> t getController(Class<t> type) {
-		for (GameObjectController manager : controllers)
-			if (manager.getClass().getName().equals(type.getName())
-					|| manager.getClass().getSuperclass().getName().equals(type.getName())) {
-				// System.out.println("sysclass_name="+system.getClass().getSuperclass().getName());
-				// System.out.println("type_passed_name="+type.getName());
-				return (t) manager;
-			}
-		// if (type.isInstance(manager))
-		// return type.cast(manager);
-		return null;
+	private <t extends GameObjectController> t getController(ControllerType controllerType) {
+		int controllerTypeIndex = controllerType.getIndex();
+
+		if (controllerTypeIndex < controllerBag.getCapacity()) {
+			return (t)controllerBag.get(controllerType.getIndex());
+		} else {
+			return null;
+		}
+	}
+	
+	public boolean hasComponent(ControllerType type) {
+		return controllerBits.get(type.getIndex());
 	}
 
 	public MapProperties getProperties() {
@@ -464,6 +477,12 @@ public abstract class GameObject extends Group {
 		update(delta);
 		super.act(delta);
 	}
+	
+	public void removeAllControllers() {
+		while(controllers.size > 0) {
+			removeController(controllers.get(0).getClass());
+		}
+	}
 
 	public void onRemove() {
 		// for (int i = 0; i < controllers.size; i++) {
@@ -489,31 +508,58 @@ public abstract class GameObject extends Group {
 	}
 
 	public void addController(GameObjectController controller) {
-		if (getController(controller.getClass()) != null) {
-			if (KyperBoxGame.DEBUG_LOGGING)
-				KyperBoxGame.error("ObjectController Added::","->" + getName()==null?KyperBoxGame.NULL_STRING:getName() + " :Cannot add type [" + controller.getClass().getName()
-						+ "] more than once.");
-			return;
-		}
-
-		controllers.add(controller);
-		controller.setRemoved(false);
-		controllers.sort(KyperBoxGame.getPriorityComperator());
-
-		if (layer != null) {
-			controller.init(this);
-			layer.gameObjectChanged(this, GameObjectChangeType.CONTROLLER, 1);
-		}
-	}
-
-	public void removeController(GameObjectController controller) {
-		if (controllers.removeValue(controller, true)) {
-			controller.remove(this);
-			controller.setRemoved(true);
+		if (addInternal(controller)) {
 			if (layer != null) {
-				layer.gameObjectChanged(this, GameObjectChangeType.CONTROLLER, -1);
+				controller.init(this);
+				layer.gameObjectChanged(this, GameObjectChangeType.CONTROLLER, 1);
 			}
 		}
+		// if (getController(controller.getClass()) != null) {
+		// if (KyperBoxGame.DEBUG_LOGGING)
+		// KyperBoxGame.error("ObjectController Added::","->" +
+		// getName()==null?KyperBoxGame.NULL_STRING:getName() + " :Cannot add type [" +
+		// controller.getClass().getName()
+		// + "] more than once.");
+		// return;
+		// }
+		//
+		// controllers.add(controller);
+
+	}
+	
+	public GameObjectController removeController(Class<? extends GameObjectController> controllerClass) {
+		ControllerType componentType = ControllerType.getFor(controllerClass);
+		int componentTypeIndex = componentType.getIndex();
+		
+		if(controllerBag.isIndexWithinBounds(componentTypeIndex)){
+			GameObjectController removeController = controllerBag.get(componentTypeIndex);
+	
+			if (removeController != null && removeInternal(controllerClass) != null) {
+				if (layer != null) {
+					layer.gameObjectChanged(this, GameObjectChangeType.CONTROLLER, -1);
+				}
+			}
+	
+			return removeController;
+		}
+		
+		return null;
+		
+	}
+
+	public GameObjectController removeController(GameObjectController controller) {
+		
+		
+		
+		return removeController(controller.getClass());
+		
+//		if (controllers.removeValue(controller, true)) {
+//			controller.remove(this);
+//			controller.setRemoved(true);
+//			if (layer != null) {
+//				layer.gameObjectChanged(this, GameObjectChangeType.CONTROLLER, -1);
+//			}
+//		}
 	}
 
 	@Override
@@ -561,11 +607,11 @@ public abstract class GameObject extends Group {
 		if (!pre_draw_children)
 			super.draw(batch, parentAlpha);
 	}
-	
+
 	public boolean isPreDrawChildren() {
 		return pre_draw_children;
 	}
-	
+
 	public void setPreDrawChildren(boolean pre_draw_children) {
 		this.pre_draw_children = pre_draw_children;
 	}
@@ -676,6 +722,54 @@ public abstract class GameObject extends Group {
 	public GameInput getGameInput() {
 		return getGame().getInput();
 	}
+
+	// --controller stuff
+
+	Bits getControllerBits() {
+		return controllerBits;
+	}
+
+	boolean addInternal(GameObjectController controller) {
+		Class<? extends GameObjectController> controllerClass = controller.getClass();
+		GameObjectController oldController = getController(controllerClass);
+
+		if (controller == oldController) {
+			return false;
+		}
+
+		if (oldController != null) {
+			removeInternal(controllerClass);
+		}
+
+		int controllerTypeIndex = ControllerType.getIndexFor(controllerClass);
+		controllerBag.set(controllerTypeIndex, controller);
+		controllers.add(controller);
+		controllerBits.set(controllerTypeIndex);
+
+		controller.setRemoved(false);
+		controllers.sort(KyperBoxGame.getPriorityComperator());
+
+		return true;
+	}
+
+	GameObjectController removeInternal(Class<? extends GameObjectController> controllerClass) {
+		ControllerType controllerType = ControllerType.getFor(controllerClass);
+		int controllerTypeIndex = controllerType.getIndex();
+		GameObjectController removeController = controllerBag.get(controllerTypeIndex);
+
+		if (removeController != null) {
+			controllerBag.set(controllerTypeIndex, null);
+			controllers.removeValue(removeController, true);
+			controllerBits.clear(controllerTypeIndex);
+			removeController.setRemoved(true);
+
+			return removeController;
+		}
+
+		return null;
+	}
+
+	// ---
 
 	/**
 	 * use this to pass messages to this object. Must be overridden

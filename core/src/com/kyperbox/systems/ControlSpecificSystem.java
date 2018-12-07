@@ -4,13 +4,14 @@ import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.utils.Array;
 import com.kyperbox.objects.GameObject;
 import com.kyperbox.objects.GameObject.GameObjectChangeType;
+import com.kyperbox.objects.GameObjectController;
 
 public abstract class ControlSpecificSystem extends LayerSystem {
 
 	Array<GameObject> objects;
-	Class<?> c;
+	Class<? extends GameObjectController> c;
 
-	public ControlSpecificSystem(Class<?> c) {
+	public ControlSpecificSystem(Class<? extends GameObjectController> c) {
 		this.c = c;
 		objects = new Array<GameObject>();
 	}

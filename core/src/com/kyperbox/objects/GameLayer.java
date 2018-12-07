@@ -22,7 +22,7 @@ import com.kyperbox.umisc.KyperSprite;
 
 public class GameLayer extends Group{
 	
-	private Array<LayerSystem> systems;
+	private Array<LayerSystem> systems =  new Array<LayerSystem>();
 	private GameState state;
 	private LayerCamera cam;
 	private MapProperties layer_properties;
@@ -30,7 +30,6 @@ public class GameLayer extends Group{
 	private ShaderProgram shader;
 	
 	public GameLayer(GameState state) {
-		systems = new Array<LayerSystem>();
 		this.state = state;
 		cam = new LayerCamera(this);
 		cam.setPosition(0, 0);
