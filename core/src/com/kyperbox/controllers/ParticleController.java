@@ -71,7 +71,7 @@ public class ParticleController extends GameObjectController {
 			ParticleSettings ps = particles.getValueAt(i);
 			PooledEffect pe = particles.getKeyAt(i);
 			pe.update(delta);
-			pe.setPosition(object.getX()+ps.xoff-campos.x-cam.getXOffset(), object.getY()+ps.yoff-campos.y-cam.getYOffset());
+			pe.setPosition(object.getX()+ps.xoff-campos.x+cam.getXOffset(), object.getY()+ps.yoff-campos.y+cam.getYOffset());
 			if(ps.post_draw) {
 				post_effects.add(pe);
 			}else {
