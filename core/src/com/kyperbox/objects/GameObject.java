@@ -528,11 +528,11 @@ public abstract class GameObject extends Group {
 	}
 	
 	public GameObjectController removeController(Class<? extends GameObjectController> controllerClass) {
-		ControllerType componentType = ControllerType.getFor(controllerClass);
-		int componentTypeIndex = componentType.getIndex();
+		ControllerType controllerType = ControllerType.getFor(controllerClass);
+		int controllerTypeIndex = controllerType.getIndex();
 		
-		if(controllerBag.isIndexWithinBounds(componentTypeIndex)){
-			GameObjectController removeController = controllerBag.get(componentTypeIndex);
+		if(controllerBag.isIndexWithinBounds(controllerTypeIndex)){
+			GameObjectController removeController = controllerBag.get(controllerTypeIndex);
 	
 			if (removeController != null && removeInternal(controllerClass) != null) {
 				if (layer != null) {

@@ -12,6 +12,7 @@ import com.badlogic.gdx.assets.loaders.ShaderProgramLoader;
 import com.badlogic.gdx.assets.loaders.ShaderProgramLoader.ShaderProgramParameter;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
@@ -88,6 +89,8 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	private Array<GameState> current_gamestates;
 	private IGameObjectFactory object_factory;
 	private Preferences game_prefs;
+	
+	private Color clearColor = Color.BLACK;
 
 	public static boolean DEBUG_LOGGING = true; // TURN OFF -- preface all logging with this
 
@@ -232,6 +235,14 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 		Gdx.input.setInputProcessor(input_multiplexer);
 
 		initiate();
+	}
+	
+	public void setClearColor(Color color) {
+		this.clearColor = color;
+	}
+	
+	public Color getClearColor() {
+		return clearColor;
 	}
 
 	/**
@@ -492,10 +503,10 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 	public AssetManager getAssetManager() {
 		return assets;
 	}
-
+	
 	@Override
 	public void render() {
-		clear();
+		clear(clearColor);
 		AnimatedTiledMapTile.updateAnimationBaseTime();
 
 		game_stage.getViewport().apply();
@@ -527,8 +538,8 @@ public abstract class KyperBoxGame extends ApplicationAdapter {
 
 	}
 
-	private static void clear() {
-		Gdx.gl.glClearColor(0, 0, 0, 1);
+	private static void clear(Color c) {
+		Gdx.gl.glClearColor(c.r, c.g, c.b, c.a);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 	}
 

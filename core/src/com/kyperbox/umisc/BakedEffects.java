@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.kyperbox.objects.GameLayer.LayerCamera;
 import com.kyperbox.objects.GameObject;
 
@@ -277,6 +278,14 @@ public class BakedEffects {
 		
 
 		return a;
+	}
+	
+	public static Action bob(float power,float duration,int repeats,boolean up) {
+		float tpower = up ? power : -power;
+		return Actions.sequence(Actions.moveBy(0, -tpower*.5f, duration*.25f),Actions.repeat(repeats, 
+				Actions.sequence(
+						Actions.moveBy(0, tpower,duration*.5f),Actions.moveBy(0, -tpower,duration*.5f)
+						)));
 	}
 
 //	/**
