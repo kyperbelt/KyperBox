@@ -30,12 +30,14 @@ public class GameLayer extends Group {
 	private MapProperties layer_properties;
 	private float time_scale;
 	private ShaderProgram shader;
+	private Matrix4 _camDebugTransform;
 
 	public GameLayer(GameState state) {
 		this.state = state;
 		cam = new LayerCamera(this);
 		cam.setPosition(0, 0);
 		time_scale = 1f;
+		_camDebugTransform = new Matrix4();
 	}
 
 	public void setLayerShader(ShaderProgram shader) {
@@ -138,11 +140,21 @@ public class GameLayer extends Group {
 		;
 
 	}
-	
+
 	@Override
 	protected Matrix4 computeTransform() {
 		Matrix4 view = cam.view();
 		return view;
+	}
+
+	@Override
+	protected void drawDebugChildren(ShapeRenderer shapes) {
+		_camDebugTransform.set(cam.projection());
+		Vector2 halfscreen = cam.getHalfScreen();
+		_camDebugTransform.translate(-halfscreen.x*cam.getZoom(), -halfscreen.y*cam.getZoom(), 0);
+		_camDebugTransform.scl(cam.getZoom());
+			shapes.setProjectionMatrix(_camDebugTransform);
+		super.drawDebugChildren(shapes);
 	}
 
 	@Override
@@ -172,7 +184,6 @@ public class GameLayer extends Group {
 			batch.setShader(current_shader);
 		}
 
-		
 	}
 
 	/**
@@ -213,7 +224,8 @@ public class GameLayer extends Group {
 	 * @param parent
 	 */
 	public void gameObjectAdded(GameObject object, GameObject parent) {
-		for (LayerSystem system : systems) {
+		for (int i = 0; i < systems.size; i++) {
+			LayerSystem system = systems.get(i);
 			if (system.isActive())
 				system.gameObjectAdded(object, parent);
 		}
@@ -231,7 +243,8 @@ public class GameLayer extends Group {
 	}
 
 	public void GameObjectRemoved(GameObject object, GameObject parent) {
-		for (LayerSystem system : systems) {
+		for (int i = 0; i < systems.size; i++) {
+			LayerSystem system = systems.get(i);
 			if (system.isActive())
 				system.gameObjectRemoved(object, parent);
 		}
@@ -316,32 +329,54 @@ public class GameLayer extends Group {
 		private Rectangle followBounds;
 		private Vector2 offset;
 		private Vector2 position;
+		private Matrix4 _viewScaled;
 		private Vector3 _util;
-
+		
+		private Vector2 halfscreen;
 		private LayerCamera(GameLayer layer) {
 			this.layer = layer;
 			view = layer.getState().getGame().getView();
 			cam = new OrthographicCamera(view.getWorldWidth(), view.getWorldHeight());
 			viewBounds = new Rectangle();
 			position = new Vector2();
-			followBounds = new Rectangle(5,5,5,5);
-			offset = new Vector2(0,0);
+			followBounds = new Rectangle(5, 5, 5, 5);
+			offset = new Vector2(0, 0);
 			_util = new Vector3();
+			_viewScaled = new Matrix4();
+			
+			halfscreen = new Vector2();
+			
+			//setCentered();
+		}
+		
+		public Vector2 getHalfScreen() {
+			halfscreen.x = cam.viewportWidth * .5f;
+			halfscreen.y = cam.viewportHeight * .5f;
+			return halfscreen;
 		}
 
 		public Rectangle getViewBounds() {
-			viewBounds.set(cam.position.x , cam.position.y,
-					cam.viewportWidth, cam.viewportHeight);
+			viewBounds.set((cam.position.x) / cam.zoom, (cam.position.y) / cam.zoom, cam.viewportWidth / cam.zoom,
+					cam.viewportHeight / cam.zoom);
+
 			return viewBounds;
 		}
+
+		public Matrix4 combined() {
+			return cam.combined;
+		}
 		
+		public Matrix4 projection() {
+			return cam.projection;
+		}
+
 		public Matrix4 view() {
-			return cam.view;
+			return _viewScaled.set(cam.view).scl(cam.zoom);
 		}
 
 		public void setCamFollowBounds(float x, float y, float width, float height) {
 
-			followBounds.set(x,y,width,height);
+			followBounds.set(x, y, width, height);
 		}
 
 		public Rectangle getCamFollowBounds() {
@@ -349,30 +384,30 @@ public class GameLayer extends Group {
 		}
 
 		public Vector2 project(Vector2 coords) {
-			_util.set(coords.x,coords.y,cam.position.z);
+			_util.set(coords.x, coords.y, cam.position.z);
 			cam.project(_util);
-			coords.set(_util.x+offset.x,_util.y+offset.y);
+			coords.set(_util.x + offset.x, _util.y + offset.y);
 			return coords;
 		}
 
 		public Vector2 unproject(Vector2 coords) {
-			_util.set(coords.x,coords.y,cam.position.z);
+			_util.set(coords.x, coords.y, cam.position.z);
 			cam.unproject(_util);
-			coords.set(_util.x+offset.x,_util.y+offset.y);
+			coords.set(_util.x + offset.x, _util.y + offset.y);
 			return coords;
 		}
 
 		public void setPosition(float x, float y) {
-			cam.position.set(x-offset.x, y-offset.y, cam.position.z);
+			cam.position.set(x* cam.zoom-offset.x  , y* cam.zoom -offset.y , cam.position.z);
 		}
 
 		public void setCentered() {
-			offset.x =  cam.viewportWidth * .5f;
-			offset.y =  cam.viewportHeight * .5f;
+			offset.x = cam.viewportWidth * .5f;
+			offset.y = cam.viewportHeight * .5f;
 		}
 
 		public Vector2 getPosition() {
-			position.set(cam.position.x+offset.x,cam.position.y+offset.y);
+			position.set(cam.position.x, cam.position.y );
 			return position;
 		}
 
@@ -385,7 +420,7 @@ public class GameLayer extends Group {
 		}
 
 		public void setOffset(float x_offset, float y_offset) {
-			offset.set(x_offset,y_offset);
+			offset.set(x_offset, y_offset);
 		}
 
 		public void setZoom(float zoom) {
@@ -397,7 +432,7 @@ public class GameLayer extends Group {
 		}
 
 		public void translate(float x, float y) {
-			setPosition(getPosition().x+x, getPosition().y+y);
+			setPosition(getPosition().x + x, getPosition().y + y);
 		}
 
 		public void update() {

@@ -172,6 +172,7 @@ public class GameState extends Group {
 	}
 
 	public void init() {
+		disableLayers(false);
 		// cleanup
 		if (background != null) {
 			background.remove();
@@ -183,6 +184,8 @@ public class GameState extends Group {
 			foreground = null;
 			uiground = null;
 		}
+		
+		
 
 		if (tmx != null) {
 			// load game state
