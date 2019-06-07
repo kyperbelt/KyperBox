@@ -1,5 +1,6 @@
 package com.kyperbox.systems;
 
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.utils.Array;
 import com.kyperbox.objects.GameObject;
@@ -61,6 +62,22 @@ public abstract class ControlSpecificSystem extends LayerSystem {
 		update(objects, delta);
 	}
 
+	
+	@Override
+	public void drawDebug(ShapeRenderer shapes) {
+		super.drawDebug(shapes);
+		
+		for (int i = 0; i < objects.size; i++) {
+			GameObject o = objects.get(i);
+			debugGameObject(o,shapes);
+		}
+		
+	}
+	
+	public void debugGameObject(GameObject object,ShapeRenderer shapes) {
+		
+	}
+	
 	public abstract void update(Array<GameObject> objects, float delta);
 
 	public abstract void added(GameObject object);

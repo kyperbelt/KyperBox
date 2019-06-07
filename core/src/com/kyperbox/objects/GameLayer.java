@@ -151,9 +151,9 @@ public class GameLayer extends Group {
 	protected void drawDebugChildren(ShapeRenderer shapes) {
 		_camDebugTransform.set(cam.projection());
 		Vector2 halfscreen = cam.getHalfScreen();
-		_camDebugTransform.translate(-halfscreen.x*cam.getZoom(), -halfscreen.y*cam.getZoom(), 0);
+		_camDebugTransform.translate(-halfscreen.x * cam.getZoom(), -halfscreen.y * cam.getZoom(), 0);
 		_camDebugTransform.scl(cam.getZoom());
-			shapes.setProjectionMatrix(_camDebugTransform);
+		shapes.setProjectionMatrix(_camDebugTransform);
 		super.drawDebugChildren(shapes);
 	}
 
@@ -257,6 +257,11 @@ public class GameLayer extends Group {
 			shapes.setColor(Color.RED);
 			Rectangle cfb = cam.getCamFollowBounds();
 			shapes.rect(cfb.x, cfb.y, cfb.width, cfb.height);
+
+			if (getDebug())
+			for (LayerSystem system : systems) {
+				system.drawDebug(shapes);
+			}
 		}
 
 		super.drawDebug(shapes);
@@ -331,8 +336,9 @@ public class GameLayer extends Group {
 		private Vector2 position;
 		private Matrix4 _viewScaled;
 		private Vector3 _util;
-		
+
 		private Vector2 halfscreen;
+
 		private LayerCamera(GameLayer layer) {
 			this.layer = layer;
 			view = layer.getState().getGame().getView();
@@ -343,12 +349,12 @@ public class GameLayer extends Group {
 			offset = new Vector2(0, 0);
 			_util = new Vector3();
 			_viewScaled = new Matrix4();
-			
+
 			halfscreen = new Vector2();
-			
-			//setCentered();
+
+			// setCentered();
 		}
-		
+
 		public Vector2 getHalfScreen() {
 			halfscreen.x = cam.viewportWidth * .5f;
 			halfscreen.y = cam.viewportHeight * .5f;
@@ -365,7 +371,7 @@ public class GameLayer extends Group {
 		public Matrix4 combined() {
 			return cam.combined;
 		}
-		
+
 		public Matrix4 projection() {
 			return cam.projection;
 		}
@@ -398,7 +404,7 @@ public class GameLayer extends Group {
 		}
 
 		public void setPosition(float x, float y) {
-			cam.position.set(x* cam.zoom-offset.x  , y* cam.zoom -offset.y , cam.position.z);
+			cam.position.set(x * cam.zoom - offset.x, y * cam.zoom - offset.y, cam.position.z);
 		}
 
 		public void setCentered() {
@@ -407,7 +413,7 @@ public class GameLayer extends Group {
 		}
 
 		public Vector2 getPosition() {
-			position.set(cam.position.x, cam.position.y );
+			position.set(cam.position.x + offset.x, cam.position.y + offset.y);
 			return position;
 		}
 
@@ -516,10 +522,6 @@ public class GameLayer extends Group {
 	@Override
 	protected void drawDebugBounds(ShapeRenderer shapes) {
 		super.drawDebugBounds(shapes);
-		if (getDebug())
-			for (LayerSystem system : systems) {
-				system.drawDebug(shapes);
-			}
 	}
 
 	// EXPERIMENTS;

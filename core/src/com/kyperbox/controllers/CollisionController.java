@@ -117,7 +117,7 @@ public class CollisionController extends GameObjectController {
 			}
 		} else {
 			if (tree == null) {
-				tree = object.getGameLayer().getSystem(CollisionSystem.class);
+				tree = this.object.getGameLayer().getSystem(CollisionSystem.class);
 			}
 			if (tree == null && KyperBoxGame.DEBUG_LOGGING)
 			object.getState().log("no collison sytem found : is null.");

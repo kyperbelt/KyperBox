@@ -401,7 +401,7 @@ public abstract class GameObject extends Group {
 		}
 	}
 	
-	public boolean hasComponent(ControllerType type) {
+	public boolean hasController(ControllerType type) {
 		return controllerBits.get(type.getIndex());
 	}
 
