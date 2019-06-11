@@ -5,7 +5,7 @@ import com.kyperbox.managers.Priority;
 
 public abstract class GameObjectController implements Poolable,Priority{
 	
-	private int priority = Priority.MEDIUM;
+	private int priority =0;
 	private boolean removed = false;
 	
 	/**

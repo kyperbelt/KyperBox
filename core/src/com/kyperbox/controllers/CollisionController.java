@@ -129,7 +129,7 @@ public class CollisionController extends GameObjectController {
 	public void init(GameObject object) {
 		if(object.getParent() == null)
 			return;
-		setPriority(Priority.HIGH);
+		setPriority(0);
 		collisions.clear();
 		this.object = object;
 

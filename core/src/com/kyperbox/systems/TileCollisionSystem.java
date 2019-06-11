@@ -9,6 +9,7 @@ import com.kyperbox.objects.GameObject;
 import com.kyperbox.objects.GameObject.GameObjectChangeType;
 import com.kyperbox.objects.TilemapLayerObject;
 import com.kyperbox.objects.TilemapLayerObject.MapTile;
+import com.kyperbox.umisc.StringUtils;
 
 /**
  * tile collision system to filter collisions
@@ -76,12 +77,14 @@ public class TileCollisionSystem extends LayerSystem{
 		if(object.getController(TileCollisionController.class) == null)
 			return;
 		tilemap_objects.add(object);
+		System.out.println("game object added");
 	}
 	
 	@Override
 	public void gameObjectChanged(GameObject object, int type, float value) {
 			if(type == GameObjectChangeType.CONTROLLER) {
 				if(value == -1) { //removed 
+					System.out.println(StringUtils.format("Object controller removed %s", object.getName()));
 					if(object.getController(TileCollisionController.class) == null)
 						tilemap_objects.removeValue(object, true);
 				}else if(value == 1) { //added
@@ -90,11 +93,13 @@ public class TileCollisionSystem extends LayerSystem{
 					}
 				}
 			}
-		
+			
+			
 	}
 	@Override
 	public void gameObjectRemoved(GameObject object, GameObject parent) {
 		tilemap_objects.removeValue(object, true);
+		System.out.println(StringUtils.format("Object removed %s", object.getName()));
 	}
 	@Override
 	public void update(float delta) {

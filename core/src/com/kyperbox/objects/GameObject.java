@@ -13,15 +13,17 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Bits;
 import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.badlogic.gdx.utils.Pool.Poolable;
 import com.kyperbox.GameState;
 import com.kyperbox.KyperBoxGame;
 import com.kyperbox.controllers.ControllerType;
 import com.kyperbox.input.GameInput;
 import com.kyperbox.umisc.Bag;
+import com.kyperbox.umisc.Event;
 import com.kyperbox.umisc.KyperSprite;
 import com.kyperbox.umisc.StringUtils;
 
-public abstract class GameObject extends Group {
+public abstract class GameObject extends Group implements Poolable{
 
 	public static final String NO_SPRITE = "NO_SPRITE_RENDERED";
 
@@ -41,6 +43,11 @@ public abstract class GameObject extends Group {
 	private Bag<GameObjectController> controllerBag;
 	private Array<GameObjectController> controllers;
 	private Bits controllerBits;
+	private Bits controllerGroupBits;
+
+	public final Event<GameObject> controllerAdded;
+	public final Event<GameObject> controllerRemoved;
+
 	private MapProperties properties;
 	private Vector2 velocity;
 	private Vector2 position;
@@ -57,12 +64,21 @@ public abstract class GameObject extends Group {
 	private boolean change_sprite;
 	private KyperSprite render;
 	private boolean pre_draw_children = false;
+	
+	public boolean removing;
+	public boolean shouldRemove;
+	
 
 	public GameObject() {
 		setTransform(false);
 		controllerBag = new Bag<GameObjectController>();
 		controllers = new Array<GameObjectController>();
 		controllerBits = new Bits();
+		controllerGroupBits = new Bits();
+
+		controllerAdded = new Event<GameObject>();
+		controllerRemoved = new Event<GameObject>();
+		
 
 		sprite = NO_SPRITE;
 		velocity = new Vector2();
@@ -97,6 +113,13 @@ public abstract class GameObject extends Group {
 	public Vector2 getTruePosition() {
 		position.set(getTrueX(), getTrueY());
 		return position;
+	}
+	
+	@Override
+	protected void setParent(Group parent) {
+//		if(parent!=null && parent instanceof GameLayer)
+//			objectAdded.fire(this);
+		super.setParent(parent);
 	}
 
 	/**
@@ -366,7 +389,7 @@ public abstract class GameObject extends Group {
 
 			if (layer != null) {
 				child.setGameLayer(layer);
-				layer.gameObjectAdded(child, this);
+				layer.gameObjectAdded(child);
 				child.init(properties);
 			}
 
@@ -395,12 +418,12 @@ public abstract class GameObject extends Group {
 		int controllerTypeIndex = controllerType.getIndex();
 
 		if (controllerTypeIndex < controllerBag.getCapacity()) {
-			return (t)controllerBag.get(controllerType.getIndex());
+			return (t) controllerBag.get(controllerType.getIndex());
 		} else {
 			return null;
 		}
 	}
-	
+
 	public boolean hasController(ControllerType type) {
 		return controllerBits.get(type.getIndex());
 	}
@@ -421,7 +444,7 @@ public abstract class GameObject extends Group {
 					continue;
 				GameObject child = (GameObject) getChildren().get(i);
 				child.setGameLayer(layer);
-				layer.gameObjectAdded(child, this);
+				layer.gameObjectAdded(child);
 				child.init(properties);
 			}
 		for (int i = 0; i < controllers.size; i++) {
@@ -477,9 +500,9 @@ public abstract class GameObject extends Group {
 		update(delta);
 		super.act(delta);
 	}
-	
+
 	public void removeAllControllers() {
-		while(controllers.size > 0) {
+		while (controllers.size > 0) {
 			removeController(controllers.get(0).getClass());
 		}
 	}
@@ -509,10 +532,16 @@ public abstract class GameObject extends Group {
 
 	public void addController(GameObjectController controller) {
 		if (addInternal(controller)) {
-			if (layer != null) {
+
 				controller.init(this);
-				layer.gameObjectChanged(this, GameObjectChangeType.CONTROLLER, 1);
-			}
+				if(layer!=null) {
+					layer.addController(this);
+				}else {
+
+					notifyControllerAdded();
+				}
+				System.out.println("controller added");
+				// layer.gameObjectChanged(this, GameObjectChangeType.CONTROLLER, 1);
 		}
 		// if (getController(controller.getClass()) != null) {
 		// if (KyperBoxGame.DEBUG_LOGGING)
@@ -526,40 +555,45 @@ public abstract class GameObject extends Group {
 		// controllers.add(controller);
 
 	}
-	
+
 	public GameObjectController removeController(Class<? extends GameObjectController> controllerClass) {
 		ControllerType controllerType = ControllerType.getFor(controllerClass);
 		int controllerTypeIndex = controllerType.getIndex();
-		
-		if(controllerBag.isIndexWithinBounds(controllerTypeIndex)){
+
+		if (controllerBag.isIndexWithinBounds(controllerTypeIndex)) {
 			GameObjectController removeController = controllerBag.get(controllerTypeIndex);
-	
+
 			if (removeController != null && removeInternal(controllerClass) != null) {
-				if (layer != null) {
-					layer.gameObjectChanged(this, GameObjectChangeType.CONTROLLER, -1);
+				//controllerRemoved.fire(this);
+				if(layer!=null) {
+					layer.removeController(this);;
+				}else {
+					notifyControllerRemoved();
 				}
+				// if (layer != null) {
+				// layer.gameObjectChanged(this, GameObjectChangeType.CONTROLLER, -1);
+				// }
 			}
-	
+
 			return removeController;
 		}
-		
+
 		return null;
-		
+
 	}
+	
 
 	public GameObjectController removeController(GameObjectController controller) {
-		
-		
-		
+
 		return removeController(controller.getClass());
-		
-//		if (controllers.removeValue(controller, true)) {
-//			controller.remove(this);
-//			controller.setRemoved(true);
-//			if (layer != null) {
-//				layer.gameObjectChanged(this, GameObjectChangeType.CONTROLLER, -1);
-//			}
-//		}
+
+		// if (controllers.removeValue(controller, true)) {
+		// controller.remove(this);
+		// controller.setRemoved(true);
+		// if (layer != null) {
+		// layer.gameObjectChanged(this, GameObjectChangeType.CONTROLLER, -1);
+		// }
+		// }
 	}
 
 	@Override
@@ -622,6 +656,14 @@ public abstract class GameObject extends Group {
 			layer.gameObjectChanged(this, GameObjectChangeType.LOCATION, 1);
 		super.setPosition(x, y);
 	}
+	
+	public void notifyControllerAdded() {
+		controllerAdded.fire(this);
+	}
+	
+	public void notifyControllerRemoved() {
+		controllerRemoved.fire(this);
+	}
 
 	/**
 	 * get the game layer this object belongs to
@@ -642,20 +684,22 @@ public abstract class GameObject extends Group {
 
 	@Override
 	public boolean remove() {
+
+		if(!shouldRemove)
+			layer.removeGameObject(this);
 		boolean l = false;
 		if (getParent() == null)
 			return l;
 		else if (getParent() == layer) {
-			layer.GameObjectRemoved(this, null);
 			onRemove();
 			l = layer.removeActor(this);
 			layer = null;
 		} else if (getParent() instanceof GameObject) {
-			layer.GameObjectRemoved(this, (GameObject) getParent());
 			onRemove();
 			layer = null;
 			l = true;
 		}
+		//if(l) objectRemoved.fire(this);
 		return l;
 	}
 
@@ -725,8 +769,12 @@ public abstract class GameObject extends Group {
 
 	// --controller stuff
 
-	Bits getControllerBits() {
+	public Bits getControllerBits() {
 		return controllerBits;
+	}
+
+	public Bits getControllerGroupBits() {
+		return controllerGroupBits;
 	}
 
 	boolean addInternal(GameObjectController controller) {
@@ -768,20 +816,28 @@ public abstract class GameObject extends Group {
 
 		return null;
 	}
+	
+	@Override
+	public void reset() {
+
+		shouldRemove = false;
+		removing = false;
+		
+	}
 
 	// ---
 
-	/**
-	 * use this to pass messages to this object. Must be overridden
-	 * 
-	 * @param type
-	 * @param args
-	 * @return
-	 */
-	public boolean passGameMessage(int type, Object... args) {
-		// TODO OVERRIDE ---
-		return false;
-	}
+//	/**
+//	 * use this to pass messages to this object. Must be overridden
+//	 * 
+//	 * @param type
+//	 * @param args
+//	 * @return
+//	 */
+//	public boolean passGameMessage(int type, Object... args) {
+//		// TODO OVERRIDE ---
+//		return false;
+//	}
 
 	public static class GameObjectChangeType {
 		public static final int CONTROLLER = 0; // value -1 means removed 1 = added

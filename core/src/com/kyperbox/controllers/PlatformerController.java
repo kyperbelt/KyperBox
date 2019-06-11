@@ -35,7 +35,7 @@ public class PlatformerController extends GameObjectController{
 		walking = false;
 		on_ground = false;
 		state = PlatformState.STAND;
-		setPriority(Priority.HIGH);
+		setPriority(0);
 		setJumpSpeed(object.getProperties().get("min_jump_speed", 200f,Float.class),object.getProperties().get("max_jump_speed", 600f,Float.class));
 		setGravity(object.getProperties().get("gravity", -12f,Float.class));
 		setWalkSpeed(object.getProperties().get("walk_speed",300f,Float.class));

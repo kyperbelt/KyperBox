@@ -98,7 +98,7 @@ public class ParticleTests extends KyperBoxGame{
 			
 			@Override
 			public void addLayerSystems(GameState state) {
-				state.getPlaygroundLayer().addLayerSystem(new ParticleSystem());
+				state.getPlaygroundLayer().addSystem(new ParticleSystem());
 			}
 		});
 		

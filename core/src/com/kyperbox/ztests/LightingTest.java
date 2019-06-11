@@ -77,10 +77,9 @@ public class LightingTest extends KyperBoxGame {
 				state.getPlaygroundLayer().getCamera().setCentered();
 				gcs = new GameCameraSystem(10);
 				gcs.setFeathering(true);
-				state.getPlaygroundLayer().addLayerSystem(gcs);
+				state.getPlaygroundLayer().addSystem(gcs);
 				b2dphys = new Box2dPhysicsSystem(100, 0, 0, true);
-				b2dphys.setPriority(LayerSystem.HIGH);
-				state.getPlaygroundLayer().addLayerSystem(b2dphys);
+				state.getPlaygroundLayer().addSystem(b2dphys);
 			}
 		});
 

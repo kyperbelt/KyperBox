@@ -71,7 +71,7 @@ public class ObjectParentTest extends KyperBoxGame{
 			public void addLayerSystems(GameState state) {
 				quadtree = new QuadTree(getView().getWorldWidth(), getView().getWorldHeight());
 				
-				state.getPlaygroundLayer().addLayerSystem(quadtree);
+				state.getPlaygroundLayer().addSystem(quadtree);
 				getInput().addInputMapping(move_left, new KeyboardMapping(Keys.LEFT));
 				getInput().addInputMapping(move_right, new KeyboardMapping(Keys.RIGHT));
 				getInput().addInputMapping(move_down, new KeyboardMapping(Keys.DOWN));

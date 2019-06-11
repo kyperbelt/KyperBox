@@ -5,6 +5,7 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.kyperbox.KyperBoxGame;
 import com.kyperbox.console.DevConsole;
+import com.kyperbox.ztests.CollisionTest;
 import com.kyperbox.ztests.ControllerTest;
 import com.kyperbox.ztests.LightingTest;
 import com.kyperbox.ztests.ParticleTests;
@@ -19,7 +20,7 @@ public class DesktopLauncher {
 			AutoPacking.pack("game", "image", "game");
 		}
 		//game
-		KyperBoxGame game = new TileCollisionTest();
+		KyperBoxGame game = new ParticleTests();
 		
 		game.setDevConsole(new DevConsole("console.fnt", "shade1.png",Keys.GRAVE));
 		

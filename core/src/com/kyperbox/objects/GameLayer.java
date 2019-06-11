@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.MapProperties;
-import com.badlogic.gdx.math.Affine2;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -16,15 +15,60 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Bits;
+import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.Pool;
+import com.badlogic.gdx.utils.SnapshotArray;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.kyperbox.GameState;
 import com.kyperbox.KyperBoxGame;
-import com.kyperbox.systems.LayerSystem;
+import com.kyperbox.controllers.ControllerGroup;
+import com.kyperbox.objects.GameObject.GameObjectChangeType;
+import com.kyperbox.systems.AbstractSystem;
+import com.kyperbox.systems.GameObjectListener;
+import com.kyperbox.umisc.Event;
+import com.kyperbox.umisc.EventListener;
 import com.kyperbox.umisc.KyperSprite;
 
 public class GameLayer extends Group {
+	
+	//TODO: create adding objects operation pool
+	//TODO: implement controller added and removed operations
+	//TODO: make a test to check controller adding works, entity adding listeners work
+	
+	public static final ControllerGroup ALL = ControllerGroup.all().get();
 
-	private Array<LayerSystem> systems = new Array<LayerSystem>();
+	private EventListener<GameObject> controllerAddedListener;
+	private EventListener<GameObject> controllerRemovedListener;
+
+	public final Event<AbstractSystem> AbstractSystemAdded;
+	public final Event<AbstractSystem> AbstractSystemRemoved;
+
+	// for backwards compatibility
+	public final Event<GameObject> gameObjectControllerChanged;
+	public final Event<GameObject> gameObjectAdded;
+	public final Event<GameObject> gameObjectRemoved;
+
+	private Array<GameObject> objects;
+	private Array<GameObject> removingObjects;
+	private ObjectMap<ControllerGroup, Array<GameObject>> objectsByGroup;
+
+	private SnapshotArray<ObjectListenerData> objectListeners = new SnapshotArray<ObjectListenerData>(true, 16);
+	private ObjectMap<ControllerGroup, Bits> objectListenerMasks = new ObjectMap<ControllerGroup, Bits>();
+	private BitsPool bitsPool = new BitsPool();
+
+	private boolean updating = false;
+	private boolean notifying = false;
+
+	private ObjectOperationPool objectOperationPool = new ObjectOperationPool();
+	private Array<GameObjectOperation> objectOperations = new Array<GameObjectOperation>();
+	
+	private ControllerOperationPool controllerOperationPool = new ControllerOperationPool();
+	private Array<ControllerOperation> controllerOperations = new Array<GameLayer.ControllerOperation>();
+
+	private Array<AbstractSystem> systems;
+	private ObjectMap<Class<? extends AbstractSystem>, AbstractSystem> systemsByClass;
+
 	private GameState state;
 	private LayerCamera cam;
 	private MapProperties layer_properties;
@@ -38,6 +82,94 @@ public class GameLayer extends Group {
 		cam.setPosition(0, 0);
 		time_scale = 1f;
 		_camDebugTransform = new Matrix4();
+
+		objects = new Array<GameObject>();
+		removingObjects = new Array<GameObject>();
+		objectsByGroup = new ObjectMap<ControllerGroup, Array<GameObject>>();
+
+		systems = new Array<AbstractSystem>();
+		systemsByClass = new ObjectMap<Class<? extends AbstractSystem>, AbstractSystem>();
+
+		// deprecated events
+		gameObjectAdded = new Event<GameObject>();
+		gameObjectRemoved = new Event<GameObject>();
+		gameObjectControllerChanged = new Event<GameObject>();
+		// ----
+
+		controllerAddedListener = new ControllerListener();
+		controllerRemovedListener = new ControllerListener();
+
+		AbstractSystemAdded = new Event<AbstractSystem>();
+		AbstractSystemRemoved = new Event<AbstractSystem>();
+	}
+
+	public void addGameObjectListener(ControllerGroup group, int priority, GameObjectListener listener) {
+		getControllerGroupObjects(group);
+
+		int insertionIndex = 0;
+		while (insertionIndex < objectListeners.size) {
+			if (objectListeners.get(insertionIndex).priority <= priority) {
+				insertionIndex++;
+			} else {
+				break;
+			}
+		}
+
+		// Shift up bitmasks by one step
+		for (Bits mask : objectListenerMasks.values()) {
+			for (int k = mask.length(); k > insertionIndex; k--) {
+				if (mask.get(k - 1)) {
+					mask.set(k);
+				} else {
+					mask.clear(k);
+				}
+			}
+			mask.clear(insertionIndex);
+		}
+
+		objectListenerMasks.get(group).set(insertionIndex);
+
+		ObjectListenerData objectListenerData = new ObjectListenerData();
+		objectListenerData.listener = listener;
+		objectListenerData.priority = priority;
+		objectListeners.insert(insertionIndex, objectListenerData);
+
+	}
+
+	public void removeGameObjectListener(GameObjectListener listener) {
+		for (int i = 0; i < objectListeners.size; i++) {
+			ObjectListenerData objectListenerData = objectListeners.get(i);
+			if (objectListenerData.listener == listener) {
+				// Shift down bitmasks by one step
+				for (Bits mask : objectListenerMasks.values()) {
+					for (int k = i, n = mask.length(); k < n; k++) {
+						if (mask.get(k + 1)) {
+							mask.set(k);
+						} else {
+							mask.clear(k);
+						}
+					}
+				}
+
+				objectListeners.removeIndex(i--);
+			}
+		}
+	}
+
+	protected void addController(GameObject object) {
+		ControllerOperation co = controllerOperationPool.obtain();
+		co.type = ControllerOperation.ADD;
+		co.object = object;
+
+		controllerOperations.add(co);
+	}
+
+	protected void removeController(GameObject object) {
+		ControllerOperation co = controllerOperationPool.obtain();
+		co.type = ControllerOperation.REMOVE;
+		co.object = object;
+
+		controllerOperations.add(co);
 	}
 
 	public void setLayerShader(ShaderProgram shader) {
@@ -93,6 +225,12 @@ public class GameLayer extends Group {
 		return state.getAnimation(animation_name);
 	}
 
+	/**
+	 * do not use this on loop as it may cause slow down
+	 * 
+	 * @param name
+	 * @return
+	 */
 	public Actor getActor(String name) {
 		for (Actor c : getChildren()) {
 			if (c.getName() != null && c.getName().equals(name))
@@ -111,7 +249,7 @@ public class GameLayer extends Group {
 	}
 
 	/**
-	 * get a game object by name
+	 * get a game object by name do not use this on loop as it may cause slowdown
 	 * 
 	 * @param name
 	 * @return
@@ -130,14 +268,54 @@ public class GameLayer extends Group {
 
 	@Override
 	public void act(float delta) {
-		systems.sort(KyperBoxGame.getPriorityComperator());
-		for (int i = 0; i < systems.size; i++) {
-			LayerSystem system = systems.get(i);
-			if (system.isActive())
-				system.update(delta * time_scale);
+
+		updating = true;
+
+		try {
+
+			for (int i = 0; i < systems.size; i++) {
+				AbstractSystem system = systems.get(i);
+				if (system.isActive())
+					system.update(delta * time_scale);
+
+				// object removal happens here
+				while (removingObjects.size > 0 || objectOperations.size > 0 || controllerOperations.size > 0) {
+					for (int j = 0; j < removingObjects.size; j++) {
+						internalRemoveGameObject(removingObjects.get(j));
+					}
+					objects.removeAll(removingObjects, true);
+					removingObjects.clear();
+
+					// object addition happens here
+					for (int j = 0; j < objectOperations.size; j++) {
+						//TODO: transiton this to an operation that stores the map properties as well.
+						GameObjectOperation op = objectOperations.get(j);
+						addInternal(op.object, op.properties, false);
+					}
+					objectOperationPool.freeAll(objectOperations);
+					objectOperations.clear();
+
+					// controller operation notifications happen here
+					for (int j = 0; j < controllerOperations.size; j++) {
+						ControllerOperation cop = controllerOperations.get(j);
+						if(cop.type == ControllerOperation.ADD) {
+							cop.object.notifyControllerAdded();
+						}else 
+						if(cop.type == ControllerOperation.REMOVE) {
+							cop.object.notifyControllerRemoved();
+						}
+					}
+					controllerOperationPool.freeAll(controllerOperations);
+					controllerOperations.clear();
+					
+				}
+			}
+
+		} finally {
+			updating = false;
 		}
+
 		super.act(delta * time_scale);
-		;
 
 	}
 
@@ -168,14 +346,14 @@ public class GameLayer extends Group {
 		}
 
 		for (int i = 0; i < systems.size; i++) {
-			LayerSystem system = systems.get(i);
+			AbstractSystem system = systems.get(i);
 			if (system.isActive())
 				system.preDraw(batch, getColor().a * parentAlpha);
 		}
 		super.draw(batch, parentAlpha);
 
 		for (int i = 0; i < systems.size; i++) {
-			LayerSystem system = systems.get(i);
+			AbstractSystem system = systems.get(i);
 			if (system.isActive())
 				system.postDraw(batch, getColor().a * parentAlpha);
 		}
@@ -196,10 +374,8 @@ public class GameLayer extends Group {
 	 * @param value
 	 *            -the value of the change
 	 */
-	public void gameObjectChanged(GameObject object, int type, float value) {
-		for (LayerSystem system : systems) {
-			system.gameObjectChanged(object, type, value);
-		}
+	protected void gameObjectChanged(GameObject object, int type, float value) {
+		gameObjectControllerChanged.fire(object);
 	}
 
 	/**
@@ -209,11 +385,24 @@ public class GameLayer extends Group {
 	 * @param properties
 	 */
 	public void addGameObject(GameObject object, MapProperties properties) {
-		object.setGameLayer(this);
-		addActor(object);
-		gameObjectAdded(object, null);
-		object.init(properties);
+		addInternal(object, properties, (updating || notifying));
+	}
 
+	private void addInternal(GameObject object, MapProperties properties, boolean delayed) {
+
+		if (delayed) {
+			GameObjectOperation op = objectOperationPool.obtain();
+			op.object = object;
+			op.properties = properties;
+			op.type = GameObjectOperation.ADD;
+			objectOperations.add(op);
+		} else {
+			objects.add(object);
+			object.setGameLayer(this);
+			addActor(object);
+			gameObjectAdded(object);
+			object.init(properties);
+		}
 	}
 
 	/**
@@ -223,12 +412,11 @@ public class GameLayer extends Group {
 	 * @param object
 	 * @param parent
 	 */
-	public void gameObjectAdded(GameObject object, GameObject parent) {
-		for (int i = 0; i < systems.size; i++) {
-			LayerSystem system = systems.get(i);
-			if (system.isActive())
-				system.gameObjectAdded(object, parent);
-		}
+	protected void gameObjectAdded(GameObject object) {
+		object.controllerAdded.add(controllerAddedListener);
+		object.controllerRemoved.add(controllerRemovedListener);
+		refreshControllerGroup(object);
+		gameObjectAdded.fire(object);
 	}
 
 	@Override
@@ -242,11 +430,13 @@ public class GameLayer extends Group {
 		return r;
 	}
 
-	public void GameObjectRemoved(GameObject object, GameObject parent) {
-		for (int i = 0; i < systems.size; i++) {
-			LayerSystem system = systems.get(i);
-			if (system.isActive())
-				system.gameObjectRemoved(object, parent);
+	public void removeGameObject(GameObject object) {
+		object.shouldRemove = true;
+		if(updating || notifying) {
+
+			removingObjects.add(object);
+		}else {
+			internalRemoveGameObject(object);
 		}
 	}
 
@@ -259,9 +449,9 @@ public class GameLayer extends Group {
 			shapes.rect(cfb.x, cfb.y, cfb.width, cfb.height);
 
 			if (getDebug())
-			for (LayerSystem system : systems) {
-				system.drawDebug(shapes);
-			}
+				for (AbstractSystem system : systems) {
+					system.drawDebug(shapes);
+				}
 		}
 
 		super.drawDebug(shapes);
@@ -272,22 +462,30 @@ public class GameLayer extends Group {
 	 * 
 	 * @return
 	 */
-	public Array<LayerSystem> getSystems() {
+	public Array<AbstractSystem> getSystems() {
 		return systems;
+	}
+
+	public void addSystem(AbstractSystem system) {
+		addSystem(system, 0);
 	}
 
 	/**
 	 * add a layer manager
 	 */
-	public void addLayerSystem(LayerSystem system) {
-		for (LayerSystem m : systems)
-			if (m.getClass().getName().equals(system.getClass().getName())) {
-				getState().error("manager [" + m.getClass().getName() + "] already exists in layer " + getName() + ".");
-			}
-		system.setLayer(this);
+	public void addSystem(AbstractSystem system, int priority) {
+		AbstractSystem oldSystem = systemsByClass.get(system.getClass());
+		if (oldSystem != null) {
+			getState()
+					.error("manager [" + system.getClass().getName() + "] already exists in layer " + getName() + ".");
+			return;
+		}
+
 		systems.add(system);
 		systems.sort(KyperBoxGame.getPriorityComperator());
-		system.init(getLayerProperties());
+		systemsByClass.put(system.getClass(), system);
+		AbstractSystemAdded.fire(system);
+		system.internalAddToLayer(this);
 	}
 
 	public MapProperties getLayerProperties() {
@@ -297,7 +495,9 @@ public class GameLayer extends Group {
 	@Override
 	public boolean remove() {
 		while (systems.size > 0) {
-			systems.pop().onRemove();
+			AbstractSystem system = systems.pop();
+			AbstractSystemRemoved.fire(system);
+			systemsByClass.remove(system.getClass());
 		}
 		return super.remove();
 	}
@@ -306,18 +506,106 @@ public class GameLayer extends Group {
 		return cam;
 	}
 
-	@SuppressWarnings("unchecked")
-	public <t extends LayerSystem> t getSystem(Class<t> type) {
+	private void internalRemoveGameObject(GameObject object) {
+		if (!object.isRemoved())
+			object.remove();
+		object.shouldRemove = false;
+		object.removing = true;
+		refreshControllerGroup(object);
+		gameObjectRemoved.fire(object);
 
-		for (LayerSystem system : systems) {
-			if (system.getClass().getName().equals(type.getName())
-					|| system.getClass().getSuperclass().getName().equals(type.getName())) {
-				// System.out.println("sysclass_name="+system.getClass().getSuperclass().getName());
-				// System.out.println("type_passed_name="+type.getName());
-				return (t) system;
+		object.controllerAdded.remove(controllerAddedListener);
+		object.controllerRemoved.remove(controllerRemovedListener);
+		object.removing = false;
+
+	}
+
+	private void refreshControllerGroup(GameObject object) {
+
+		Bits addListenerBits = bitsPool.obtain();
+		Bits removeListenerBits = bitsPool.obtain();
+
+		for (ControllerGroup controllerGroup : objectsByGroup.keys()) {
+			final int traitGroupIndex = controllerGroup.getIndex();
+			final Bits objectGroupBits = object.getControllerGroupBits();
+
+			boolean belongsToGroup = objectGroupBits.get(traitGroupIndex);
+			boolean matches = controllerGroup.matches(object) && !object.removing;
+
+			if (belongsToGroup != matches) {
+				final Bits listenersMask = objectListenerMasks.get(controllerGroup);
+				final Array<GameObject> groupObjects = objectsByGroup.get(controllerGroup);
+				if (matches) {
+					System.out.println("object added");
+					addListenerBits.or(listenersMask);
+					groupObjects.add(object);
+					objectGroupBits.set(traitGroupIndex);
+				} else {
+					System.out.println("object removed");
+					removeListenerBits.or(listenersMask);
+					groupObjects.removeValue(object, true);
+					objectGroupBits.clear(traitGroupIndex);
+				}
 			}
 		}
-		return null;
+
+		notifying = true;
+		Object[] items = objectListeners.begin();
+
+		try {
+			for (int i = removeListenerBits.nextSetBit(0); i >= 0; i = removeListenerBits.nextSetBit(i + 1)) {
+				((ObjectListenerData) items[i]).listener.objectRemoved(object);
+			}
+
+			for (int i = addListenerBits.nextSetBit(0); i >= 0; i = addListenerBits.nextSetBit(i + 1)) {
+				((ObjectListenerData) items[i]).listener.objectAdded(object);
+			}
+		} finally {
+			addListenerBits.clear();
+			removeListenerBits.clear();
+			bitsPool.free(addListenerBits);
+			bitsPool.free(removeListenerBits);
+			objectListeners.end();
+			notifying = false;
+		}
+
+	}
+
+	public boolean isNotifying() {
+		return notifying;
+	}
+
+	public Array<GameObject> getControllerGroupObjects(ControllerGroup group) {
+		Array<GameObject> objectsInGroup = objectsByGroup.get(group);
+		if (objectsInGroup == null) {
+			objectsInGroup = new Array<GameObject>();
+			objectsByGroup.put(group, objectsInGroup);
+
+			for (GameObject object : objects) {
+				refreshControllerGroup(object);
+			}
+		}
+		return objectsInGroup;
+	}
+
+	@Override
+	protected void drawDebugBounds(ShapeRenderer shapes) {
+		super.drawDebugBounds(shapes);
+	}
+
+	@SuppressWarnings("unchecked")
+	public <t extends AbstractSystem> t getSystem(Class<t> type) {
+		return (t) systemsByClass.get(type);
+		// for (AbstractSystem system : systems) {
+		// if (system.getClass().getName().equals(type.getName())
+		// || system.getClass().getSuperclass().getName().equals(type.getName())) {
+		// //
+		// System.out.println("sysclass_name="+system.getClass().getSuperclass().getName());
+		// // System.out.println("type_passed_name="+type.getName());
+		// return (t) system;
+		// }
+		// }
+		// return null;
 	}
 
 	public static class LayerCamera {
@@ -519,9 +807,64 @@ public class GameLayer extends Group {
 
 	}
 
-	@Override
-	protected void drawDebugBounds(ShapeRenderer shapes) {
-		super.drawDebugBounds(shapes);
+	private class ControllerListener implements EventListener<GameObject> {
+
+		@Override
+		public void process(Event<GameObject> event, GameObject object) {
+			refreshControllerGroup(object);
+			gameObjectChanged(object, GameObjectChangeType.CONTROLLER, 1);
+
+		}
+
+	}
+
+	private static class BitsPool extends Pool<Bits> {
+		@Override
+		protected Bits newObject() {
+			return new Bits();
+		}
+	}
+
+	private static class ObjectListenerData {
+		public GameObjectListener listener;
+		public int priority;
+	}
+
+	private static class ControllerOperationPool extends Pool<ControllerOperation> {
+
+		@Override
+		protected ControllerOperation newObject() {
+			return new ControllerOperation();
+		}
+
+	}
+	
+	private static class ObjectOperationPool extends Pool<GameObjectOperation> {
+
+		@Override
+		protected GameObjectOperation newObject() {
+			return new GameObjectOperation();
+		}
+		
+	}
+	
+	private static class GameObjectOperation {
+		public static final int ADD = 1;
+		public static final int REMOVE = -1;
+		
+		public int type; 
+		public GameObject object;
+		public MapProperties properties;
+	}
+
+	private static class ControllerOperation {
+		public static final int ADD = 1;
+		public static final int REMOVE = -1;
+
+		public int type;
+		public GameObject object;
+		public GameObjectController controller;
+
 	}
 
 	// EXPERIMENTS;
