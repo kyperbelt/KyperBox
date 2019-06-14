@@ -2,14 +2,18 @@ package com.kyperbox.systems;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Pool.Poolable;
 import com.kyperbox.KyperBoxGame;
+import com.kyperbox.controllers.CollisionController;
+import com.kyperbox.controllers.ControllerGroup;
+import com.kyperbox.controllers.ControllerType;
+import com.kyperbox.controllers.IgnoreCollision;
 import com.kyperbox.objects.BasicGameObject;
+import com.kyperbox.objects.GameLayer;
 import com.kyperbox.objects.GameObject;
 import com.kyperbox.objects.GameObject.GameObjectChangeType;
 import com.kyperbox.umisc.StringUtils;
@@ -32,8 +36,28 @@ public class QuadTree extends CollisionSystem {
 	private Quad root; // the head honcho of this quad tree
 	private Array<GameObject> ret_list; // an array used to return results to gameobjects for collision checks
 	private GameObject check_object;
-	private IntArray remove_objects;
 	private boolean culling;
+	
+	private ControllerGroup collisionGroup = ControllerGroup.all().exclude(IgnoreCollision.class).get();
+	
+	private GameObjectListener listener = new GameObjectListener() {
+		@Override
+		public void objectRemoved(GameObject object) {
+			CollisionController cc = object.getController(CollisionController.class);
+			if(cc!=null) {
+				cc.setCollisionSystem(null);
+			}
+		}
+		
+		@Override
+		public void objectAdded(GameObject object) {
+			CollisionController cc = object.getController(CollisionController.class);
+			if(cc!=null) {
+				cc.setCollisionSystem(QuadTree.this);
+			}
+				
+		}
+	};
 
 	/**
 	 * create a quadtree collision manager with a default max_depth of 4 and a
@@ -47,10 +71,8 @@ public class QuadTree extends CollisionSystem {
 	public QuadTree(float x, float y, float width, float height) {
 		check_object = new BasicGameObject();
 		check_object.init(null);
-		remove_objects = new IntArray();
 		culling = true;
 		bounds = new Rectangle(x - PAD, y - PAD, width + PAD * 2, height + PAD * 2);
-		objects = new Array<GameObject>();
 		follow_view = false;
 		final QuadTree m = this;
 		quad_pool = new Pool<QuadTree.Quad>() {
@@ -81,50 +103,20 @@ public class QuadTree extends CollisionSystem {
 	public QuadTree(float width, float height) {
 		this(0, 0, width, height);
 	}
+	
 
 	@Override
-	public void init(MapProperties properties) {
-		// TODO: set boundaries here maybe????? using some underlying layer properties.
-		// I dont know how to implement this
-		// since layers at this moment dont have types so just adding properties seems
-		// dirty.
+	public void addedToLayer(GameLayer layer) {
 		if (KyperBoxGame.DEBUG_LOGGING)
 			getLayer().getState().log("QuadTree: init");
-	}
-
-	@Override
-	public void gameObjectAdded(GameObject object, GameObject parent) {
-		if (KyperBoxGame.DEBUG_LOGGING)
-			getLayer().getState().log(StringUtils.format("QuadTree: added object[%s] with parent[%s]",
-					object.getName() == null ? KyperBoxGame.NULL_STRING : object.getName(),
-					(parent == null || parent.getName() == null) ? KyperBoxGame.NULL_STRING : parent.getName()));
-		objects.add(object);
-
-	}
-
-	@Override
-	public void gameObjectChanged(GameObject object, int type, float value) {
-		if (type != GameObjectChangeType.LOCATION)
-			return;
-
-		if (!objects.contains(object, true)) {
-			Rectangle o = object.getCollisionBounds();
-			if (root.bounds.overlaps(o)) {
-				objects.add(object);
-			}
-		}
-	}
-
-	@Override
-	public void gameObjectRemoved(GameObject object, GameObject parent) {
-		// object.getState().log("removed:"+object.getName()+" from quadtree");
-		objects.removeValue(object, true);
+		objects = layer.getControllerGroupObjects(collisionGroup);
+		layer.addGameObjectListener(collisionGroup, 0, listener);
+		
 	}
 
 	@Override
 	public void update(float delta) {
 		root.clear();
-		remove_objects.clear();
 
 		Rectangle view_bounds = getLayer().getCamera().getViewBounds();
 
@@ -136,15 +128,10 @@ public class QuadTree extends CollisionSystem {
 		for (int i = 0; i < objects.size; i++) {
 			Rectangle rect = objects.get(i).getCollisionBounds();
 			if (culling && !root.bounds.overlaps(rect)) {
-				remove_objects.add(i);
+				//DO NOTHING
 			} else
 				root.place(objects.get(i));
 
-		}
-
-		for (int i = 0; i < remove_objects.size; i++) {
-			if (remove_objects.get(i) < objects.size)
-				objects.removeIndex(remove_objects.get(i));
 		}
 
 	}
@@ -157,13 +144,13 @@ public class QuadTree extends CollisionSystem {
 	}
 
 	@Override
-	public void onRemove() {
+	public void removedFromLayer(GameLayer layer) {
 		if (KyperBoxGame.DEBUG_LOGGING)
 			getLayer().getState().log("QuadTree: removed");
 		root.clear();
 		ret_list.clear();
-		objects.clear();
-		remove_objects.clear();
+		objects = null;
+		layer.removeGameObjectListener(listener);
 	}
 
 	public Pool<Quad> getPool() {

@@ -32,10 +32,9 @@ import com.kyperbox.umisc.KyperSprite;
 
 public class GameLayer extends Group {
 	
-	//TODO: create adding objects operation pool
-	//TODO: implement controller added and removed operations
 	//TODO: make a test to check controller adding works, entity adding listeners work
 	
+	@SuppressWarnings("unchecked")
 	public static final ControllerGroup ALL = ControllerGroup.all().get();
 
 	private EventListener<GameObject> controllerAddedListener;
@@ -50,7 +49,6 @@ public class GameLayer extends Group {
 	public final Event<GameObject> gameObjectRemoved;
 
 	private Array<GameObject> objects;
-	private Array<GameObject> removingObjects;
 	private ObjectMap<ControllerGroup, Array<GameObject>> objectsByGroup;
 
 	private SnapshotArray<ObjectListenerData> objectListeners = new SnapshotArray<ObjectListenerData>(true, 16);
@@ -84,7 +82,6 @@ public class GameLayer extends Group {
 		_camDebugTransform = new Matrix4();
 
 		objects = new Array<GameObject>();
-		removingObjects = new Array<GameObject>();
 		objectsByGroup = new ObjectMap<ControllerGroup, Array<GameObject>>();
 
 		systems = new Array<AbstractSystem>();
@@ -279,18 +276,23 @@ public class GameLayer extends Group {
 					system.update(delta * time_scale);
 
 				// object removal happens here
-				while (removingObjects.size > 0 || objectOperations.size > 0 || controllerOperations.size > 0) {
-					for (int j = 0; j < removingObjects.size; j++) {
-						internalRemoveGameObject(removingObjects.get(j));
-					}
-					objects.removeAll(removingObjects, true);
-					removingObjects.clear();
+				while (objectOperations.size > 0 || controllerOperations.size > 0) {
+//					for (int j = 0; j < removingObjects.size; j++) {
+//						internalRemoveGameObject(removingObjects.get(j));
+//					}
+//					objects.removeAll(removingObjects, true);
+//					removingObjects.clear();
 
-					// object addition happens here
+					// object addition/remove happens here
 					for (int j = 0; j < objectOperations.size; j++) {
-						//TODO: transiton this to an operation that stores the map properties as well.
 						GameObjectOperation op = objectOperations.get(j);
-						addInternal(op.object, op.properties, false);
+						if(op.type == GameObjectOperation.ADD) {
+							addInternal(op.object, op.properties, false);
+						}else if(op.type == GameObjectOperation.REMOVE){
+							internalRemoveGameObject(op.object);
+							objects.removeValue(op.object, true);
+						}
+						
 					}
 					objectOperationPool.freeAll(objectOperations);
 					objectOperations.clear();
@@ -433,8 +435,10 @@ public class GameLayer extends Group {
 	public void removeGameObject(GameObject object) {
 		object.shouldRemove = true;
 		if(updating || notifying) {
-
-			removingObjects.add(object);
+			GameObjectOperation op = objectOperationPool.obtain();
+			op.type = GameObjectOperation.REMOVE;
+			op.object = object;
+			objectOperations.add(op);
 		}else {
 			internalRemoveGameObject(object);
 		}
@@ -486,6 +490,7 @@ public class GameLayer extends Group {
 		systemsByClass.put(system.getClass(), system);
 		AbstractSystemAdded.fire(system);
 		system.internalAddToLayer(this);
+		
 	}
 
 	public MapProperties getLayerProperties() {
@@ -511,6 +516,7 @@ public class GameLayer extends Group {
 			object.remove();
 		object.shouldRemove = false;
 		object.removing = true;
+		object.setGameLayer(null);
 		refreshControllerGroup(object);
 		gameObjectRemoved.fire(object);
 
@@ -525,11 +531,11 @@ public class GameLayer extends Group {
 		Bits addListenerBits = bitsPool.obtain();
 		Bits removeListenerBits = bitsPool.obtain();
 
-		for (ControllerGroup controllerGroup : objectsByGroup.keys()) {
-			final int traitGroupIndex = controllerGroup.getIndex();
+		for (ControllerGroup controllerGroup :objectListenerMasks.keys()) {
+			final int groupIndex = controllerGroup.getIndex();
 			final Bits objectGroupBits = object.getControllerGroupBits();
 
-			boolean belongsToGroup = objectGroupBits.get(traitGroupIndex);
+			boolean belongsToGroup = objectGroupBits.get(groupIndex);
 			boolean matches = controllerGroup.matches(object) && !object.removing;
 
 			if (belongsToGroup != matches) {
@@ -539,12 +545,12 @@ public class GameLayer extends Group {
 					System.out.println("object added");
 					addListenerBits.or(listenersMask);
 					groupObjects.add(object);
-					objectGroupBits.set(traitGroupIndex);
+					objectGroupBits.set(groupIndex);
 				} else {
 					System.out.println("object removed");
 					removeListenerBits.or(listenersMask);
 					groupObjects.removeValue(object, true);
-					objectGroupBits.clear(traitGroupIndex);
+					objectGroupBits.clear(groupIndex);
 				}
 			}
 		}
@@ -580,6 +586,7 @@ public class GameLayer extends Group {
 		if (objectsInGroup == null) {
 			objectsInGroup = new Array<GameObject>();
 			objectsByGroup.put(group, objectsInGroup);
+			objectListenerMasks.put(group, new Bits());
 
 			for (GameObject object : objects) {
 				refreshControllerGroup(object);
@@ -593,9 +600,8 @@ public class GameLayer extends Group {
 		super.drawDebugBounds(shapes);
 	}
 
-	@SuppressWarnings("unchecked")
 	public <t extends AbstractSystem> t getSystem(Class<t> type) {
-		return (t) systemsByClass.get(type);
+		return getSystem(type,false);
 		// for (AbstractSystem system : systems) {
 		// if (system.getClass().getName().equals(type.getName())
 		// || system.getClass().getSuperclass().getName().equals(type.getName())) {
@@ -606,6 +612,26 @@ public class GameLayer extends Group {
 		// }
 		// }
 		// return null;
+	}
+	
+	/**
+	 * get the system and add if this is a superclass type that may return a subclass
+	 * @param type
+	 * @param superclass - whether or not a subclass is a valid return
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public <t extends AbstractSystem> t getSystem(Class<t> type,boolean superclass) {
+		t system = (t) systemsByClass.get(type);
+		if(superclass && system == null) {
+			for (AbstractSystem s : systems) {
+				if (s.getClass().getSuperclass().getName().equals(type.getName())) {
+					system = (t) s;
+					break;
+				}
+			}
+		}
+		return system;
 	}
 
 	public static class LayerCamera {
@@ -641,6 +667,10 @@ public class GameLayer extends Group {
 			halfscreen = new Vector2();
 
 			// setCentered();
+		}
+		
+		public GameLayer getLayer() {
+			return layer;
 		}
 
 		public Vector2 getHalfScreen() {
@@ -863,7 +893,7 @@ public class GameLayer extends Group {
 
 		public int type;
 		public GameObject object;
-		public GameObjectController controller;
+		//public GameObjectController controller;
 
 	}
 

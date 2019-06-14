@@ -1,60 +1,47 @@
 package com.kyperbox.systems;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.utils.Array;
+import com.kyperbox.controllers.ControllerGroup;
+import com.kyperbox.objects.GameLayer;
 import com.kyperbox.objects.GameObject;
-import com.kyperbox.objects.GameObject.GameObjectChangeType;
 import com.kyperbox.objects.GameObjectController;
 
-public abstract class ControlSpecificSystem extends LayerSystem {
+public abstract class ControlSpecificSystem extends AbstractSystem {
 
 	Array<GameObject> objects;
 	Class<? extends GameObjectController> c;
+	ControllerGroup group;
+	
+	GameObjectListener listener = new GameObjectListener() {
+		@Override
+		public void objectRemoved(GameObject object) {
+			removed(object);
+		}
+		
+		@Override
+		public void objectAdded(GameObject object) {
+			added(object);
+		}
+	};
 
 	public ControlSpecificSystem(Class<? extends GameObjectController> c) {
 		this.c = c;
-		objects = new Array<GameObject>();
+		group = ControllerGroup.all(c).get();
 	}
-
+	
 	@Override
-	public void gameObjectAdded(GameObject object, GameObject parent) {
-		Object component = object.getController(c);
-		if (component != null) {
-			objects.add(object);
-			added(object);
-		}
+	public void internalAddToLayer(GameLayer layer) {
+		objects = layer.getControllerGroupObjects(group);
+		layer.addGameObjectListener(group, 0, listener);
+		super.internalAddToLayer(layer);
 	}
-
+	
 	@Override
-	public void gameObjectChanged(GameObject object, int type, float value) {
-		if (type == GameObjectChangeType.CONTROLLER) {
-			Object component = object.getController(c);
-			if (component == null) {
-				if (objects.removeValue(object, true))
-					removed(object);
-			} else if (!objects.contains(object, true)) {
-				objects.add(object);
-				added(object);
-			}
-		}
-	}
-
-	@Override
-	public void gameObjectRemoved(GameObject object, GameObject parent) {
-
-		if (objects.removeValue(object, true))
-			removed(object);
-	}
-
-	@Override
-	public void init(MapProperties properties) {
-		objects.clear();
-	}
-
-	@Override
-	public void onRemove() {
-		objects.clear();
+	public void internalRemoveFromLayer(GameLayer layer) {
+		objects = null;
+		layer.removeGameObjectListener(listener);
+		super.internalRemoveFromLayer(layer);
 	}
 
 	@Override
@@ -83,5 +70,7 @@ public abstract class ControlSpecificSystem extends LayerSystem {
 	public abstract void added(GameObject object);
 
 	public abstract void removed(GameObject object);
+	
+	
 
 }

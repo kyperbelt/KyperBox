@@ -47,6 +47,7 @@ public abstract class GameObject extends Group implements Poolable{
 
 	public final Event<GameObject> controllerAdded;
 	public final Event<GameObject> controllerRemoved;
+	public final Event<GameObject> locationChanged;
 
 	private MapProperties properties;
 	private Vector2 velocity;
@@ -70,6 +71,7 @@ public abstract class GameObject extends Group implements Poolable{
 	
 
 	public GameObject() {
+		removing = false;
 		setTransform(false);
 		controllerBag = new Bag<GameObjectController>();
 		controllers = new Array<GameObjectController>();
@@ -78,6 +80,7 @@ public abstract class GameObject extends Group implements Poolable{
 
 		controllerAdded = new Event<GameObject>();
 		controllerRemoved = new Event<GameObject>();
+		locationChanged = new Event<GameObject>();
 		
 
 		sprite = NO_SPRITE;
@@ -652,9 +655,13 @@ public abstract class GameObject extends Group implements Poolable{
 
 	@Override
 	public void setPosition(float x, float y) {
-		if (layer != null && (x != getX() || y != getY()))
-			layer.gameObjectChanged(this, GameObjectChangeType.LOCATION, 1);
 		super.setPosition(x, y);
+	}
+	
+	@Override
+	protected void positionChanged() {
+		locationChanged.fire(this);
+		super.positionChanged();
 	}
 	
 	public void notifyControllerAdded() {
@@ -685,20 +692,9 @@ public abstract class GameObject extends Group implements Poolable{
 	@Override
 	public boolean remove() {
 
-		if(!shouldRemove)
+		if(!shouldRemove && !removing)
 			layer.removeGameObject(this);
-		boolean l = false;
-		if (getParent() == null)
-			return l;
-		else if (getParent() == layer) {
-			onRemove();
-			l = layer.removeActor(this);
-			layer = null;
-		} else if (getParent() instanceof GameObject) {
-			onRemove();
-			layer = null;
-			l = true;
-		}
+		boolean l = super.remove();
 		//if(l) objectRemoved.fire(this);
 		return l;
 	}
