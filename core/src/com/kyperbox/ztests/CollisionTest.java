@@ -162,7 +162,7 @@ public class CollisionTest extends KyperBoxGame{
 				pooperties.put("sprite", "windowbackground");
 				quadtree = new QuadTree(0, 0, getView().getWorldWidth(), getView().getWorldHeight());
 				quadtree.setFollowView(true);
-				state.getPlaygroundLayer().addLayerSystem(quadtree);
+				state.getPlaygroundLayer().addSystem(quadtree);
 			}
 			
 			@Override

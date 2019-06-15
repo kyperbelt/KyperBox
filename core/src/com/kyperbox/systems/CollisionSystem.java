@@ -3,9 +3,10 @@ package com.kyperbox.systems;
 import com.badlogic.gdx.utils.Array;
 import com.kyperbox.objects.GameObject;
 
-public abstract class CollisionSystem extends LayerSystem {
+public abstract class CollisionSystem extends AbstractSystem {
 
 	private boolean parent_collisions;
+	
 	
 	public void setParentCollisions(boolean parent_collisions) {
 		this.parent_collisions = parent_collisions;

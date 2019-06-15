@@ -119,10 +119,10 @@ public class TileCollisionTest extends KyperBoxGame {
 				parallax.addMapping("mountains", .6f, 0f, true);
 				parallax.addMapping("mountain_far", .2f, 0f, true);
 				parallax.addMapping("parallax_back", 0, 0f, true);
-				state.getBackgroundLayer().addLayerSystem(parallax);
-				state.getPlaygroundLayer().addLayerSystem(new TileCollisionSystem("platformer_tiles"));
+				state.getBackgroundLayer().addSystem(parallax);
+				state.getPlaygroundLayer().addSystem(new TileCollisionSystem("platformer_tiles"));
 				game_cam = new GameCameraSystem(3);
-				state.getPlaygroundLayer().addLayerSystem(game_cam);
+				state.getPlaygroundLayer().addSystem(game_cam);
 				debugEnabled(true);
 			}
 

@@ -48,7 +48,7 @@ public class ParallaxMappingTest extends KyperBoxGame{
 				parallax.addMapping("mountains", .6f,0f, true);
 				parallax.addMapping("mountain_far", .2f,0f, true);
 				parallax.addMapping("parallax_back", 0,0f, true);
-				state.getBackgroundLayer().addLayerSystem(parallax);
+				state.getBackgroundLayer().addSystem(parallax);
 				
 			}
 			
