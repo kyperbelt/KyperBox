@@ -28,6 +28,7 @@ import com.kyperbox.systems.AbstractSystem;
 import com.kyperbox.systems.GameObjectListener;
 import com.kyperbox.umisc.Event;
 import com.kyperbox.umisc.EventListener;
+import com.kyperbox.umisc.ImmutableArray;
 import com.kyperbox.umisc.KyperSprite;
 
 public class GameLayer extends Group {
@@ -50,6 +51,7 @@ public class GameLayer extends Group {
 
 	private Array<GameObject> objects;
 	private ObjectMap<ControllerGroup, Array<GameObject>> objectsByGroup;
+	private ObjectMap<ControllerGroup, ImmutableArray<GameObject>> immutableObjectsByGroup;
 
 	private SnapshotArray<ObjectListenerData> objectListeners = new SnapshotArray<ObjectListenerData>(true, 16);
 	private ObjectMap<ControllerGroup, Bits> objectListenerMasks = new ObjectMap<ControllerGroup, Bits>();
@@ -83,6 +85,7 @@ public class GameLayer extends Group {
 
 		objects = new Array<GameObject>();
 		objectsByGroup = new ObjectMap<ControllerGroup, Array<GameObject>>();
+		immutableObjectsByGroup = new ObjectMap<ControllerGroup, ImmutableArray<GameObject>>();
 
 		systems = new Array<AbstractSystem>();
 		systemsByClass = new ObjectMap<Class<? extends AbstractSystem>, AbstractSystem>();
@@ -581,11 +584,14 @@ public class GameLayer extends Group {
 		return notifying;
 	}
 
-	public Array<GameObject> getControllerGroupObjects(ControllerGroup group) {
-		Array<GameObject> objectsInGroup = objectsByGroup.get(group);
+	public ImmutableArray<GameObject> getControllerGroupObjects(ControllerGroup group) {
+		ImmutableArray<GameObject> objectsInGroup = immutableObjectsByGroup.get(group);
+		
 		if (objectsInGroup == null) {
-			objectsInGroup = new Array<GameObject>();
-			objectsByGroup.put(group, objectsInGroup);
+			Array<GameObject> newObjects = new Array<GameObject>();
+			objectsInGroup = new ImmutableArray<GameObject>(newObjects);
+			objectsByGroup.put(group, newObjects);
+			immutableObjectsByGroup.put(group, objectsInGroup);
 			objectListenerMasks.put(group, new Bits());
 
 			for (GameObject object : objects) {

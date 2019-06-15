@@ -4,19 +4,16 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Pool.Poolable;
 import com.kyperbox.KyperBoxGame;
 import com.kyperbox.controllers.CollisionController;
 import com.kyperbox.controllers.ControllerGroup;
-import com.kyperbox.controllers.ControllerType;
 import com.kyperbox.controllers.IgnoreCollision;
 import com.kyperbox.objects.BasicGameObject;
 import com.kyperbox.objects.GameLayer;
 import com.kyperbox.objects.GameObject;
-import com.kyperbox.objects.GameObject.GameObjectChangeType;
-import com.kyperbox.umisc.StringUtils;
+import com.kyperbox.umisc.ImmutableArray;
 
 public class QuadTree extends CollisionSystem {
 
@@ -31,13 +28,14 @@ public class QuadTree extends CollisionSystem {
 	private int max_depth; // how deep is the quad tree
 	private int max_objects; // how many objects before the quad breaks
 	private boolean follow_view; // does this manager follow the layer camera view
-	private Array<GameObject> objects;
+	private ImmutableArray<GameObject> objects;
 	private Pool<Quad> quad_pool;
 	private Quad root; // the head honcho of this quad tree
 	private Array<GameObject> ret_list; // an array used to return results to gameobjects for collision checks
 	private GameObject check_object;
 	private boolean culling;
 	
+	@SuppressWarnings("unchecked")
 	private ControllerGroup collisionGroup = ControllerGroup.all().exclude(IgnoreCollision.class).get();
 	
 	private GameObjectListener listener = new GameObjectListener() {
@@ -125,7 +123,7 @@ public class QuadTree extends CollisionSystem {
 			root.setPosition(bounds.getX() + view_bounds.getX(), bounds.getY() + view_bounds.getY());
 
 		}
-		for (int i = 0; i < objects.size; i++) {
+		for (int i = 0; i < objects.size(); i++) {
 			Rectangle rect = objects.get(i).getCollisionBounds();
 			if (culling && !root.bounds.overlaps(rect)) {
 				//DO NOTHING

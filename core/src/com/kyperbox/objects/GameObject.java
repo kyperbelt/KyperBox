@@ -123,6 +123,8 @@ public abstract class GameObject extends Group implements Poolable{
 //		if(parent!=null && parent instanceof GameLayer)
 //			objectAdded.fire(this);
 		super.setParent(parent);
+		if(parent instanceof GameLayer)
+			this.layer = (GameLayer) parent;
 	}
 
 	/**
@@ -692,7 +694,7 @@ public abstract class GameObject extends Group implements Poolable{
 	@Override
 	public boolean remove() {
 
-		if(!shouldRemove && !removing)
+		if(!shouldRemove && !removing && layer!=null)
 			layer.removeGameObject(this);
 		boolean l = super.remove();
 		//if(l) objectRemoved.fire(this);

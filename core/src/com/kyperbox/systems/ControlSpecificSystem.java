@@ -1,15 +1,15 @@
 package com.kyperbox.systems;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.utils.Array;
 import com.kyperbox.controllers.ControllerGroup;
 import com.kyperbox.objects.GameLayer;
 import com.kyperbox.objects.GameObject;
 import com.kyperbox.objects.GameObjectController;
+import com.kyperbox.umisc.ImmutableArray;
 
 public abstract class ControlSpecificSystem extends AbstractSystem {
 
-	Array<GameObject> objects;
+	ImmutableArray<GameObject> objects;
 	Class<? extends GameObjectController> c;
 	ControllerGroup group;
 	
@@ -25,6 +25,7 @@ public abstract class ControlSpecificSystem extends AbstractSystem {
 		}
 	};
 
+	@SuppressWarnings("unchecked")
 	public ControlSpecificSystem(Class<? extends GameObjectController> c) {
 		this.c = c;
 		group = ControllerGroup.all(c).get();
@@ -54,7 +55,7 @@ public abstract class ControlSpecificSystem extends AbstractSystem {
 	public void drawDebug(ShapeRenderer shapes) {
 		super.drawDebug(shapes);
 		
-		for (int i = 0; i < objects.size; i++) {
+		for (int i = 0; i < objects.size(); i++) {
 			GameObject o = objects.get(i);
 			debugGameObject(o,shapes);
 		}
@@ -65,7 +66,7 @@ public abstract class ControlSpecificSystem extends AbstractSystem {
 		
 	}
 	
-	public abstract void update(Array<GameObject> objects, float delta);
+	public abstract void update(ImmutableArray<GameObject> objects, float delta);
 
 	public abstract void added(GameObject object);
 
